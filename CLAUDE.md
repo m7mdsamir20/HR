@@ -296,7 +296,7 @@ supabase/
 - ✅ CSP بـ nonce لكل طلب + HSTS وباقي الهيدرز (اتأكد منها على `pnpm build && pnpm start`: الـ nonce على كل السكربتات ومفيش أخطاء console).
 - ✅ Vitest + اختبارات رقم الهوية، `supabase/config.toml` (التسجيل العام مقفول، رقم سري 8+، رفع 10MiB)، GitHub Actions CI.
 - ✅ Supabase محلي شغال (Docker)، و`@users.invalid` مقبول في `admin.createUser` (اتأكد منه).
-- ✅ حدود Supabase Auth: `sign_in_sign_ups` بيتحسب على IP السيرفر، فاترفع، والحماية الحقيقية حدنا في `login_begin`. **وقبل الإطلاق لازم CAPTCHA** (شوف تحت).
+- ✅ حدود Supabase Auth: `sign_in_sign_ups` بيتحسب على IP السيرفر، فاترفع، والحماية الحقيقية حدنا في `login_begin`. **مفيش CAPTCHA** (قرار المستخدم، شوف تحت).
 - ⏳ **مؤجل لآخر المشروع (النشر):** مشروع Supabase سحابي، وربط Vercel، وتجربة `@sparticuz/chromium` للـ PDF.
 
 **قرارات تقنية من المرحلة 0**
@@ -311,11 +311,12 @@ supabase/
 - ✅ جداول `companies` و`platform_admins` و`employees` و`audit_logs` و`private.login_attempts` + RLS + 43 اختبار pgTAP (في CI).
 - ✅ صفحة الدخول (مقسومة زي نظام الخدمات)، الخروج، الـ rate limit الذرّي، الرسالة العامة، صفحة "الاشتراك منتهي".
 - ✅ لوحة مدير النظام: إنشاء شركة + حساب مديرها، تعديل حد الموظفين وتاريخ الانتهاء، إيقاف/تفعيل، البحث برقم الهوية.
-- ✅ فحص `security-audit` ← `SECURITY.md` (الحكم: NEEDS SECURITY FIXES BEFORE LAUNCH بسبب CAPTCHA بس).
+- ✅ فحص `security-audit` ← `SECURITY.md` (الحكم: CONDITIONALLY READY، مع خطر مقبول بقرار المستخدم: مفيش CAPTCHA).
 
 **قرارات تقنية من المرحلة 1أ**
 - **الكتابة:** بيانات الشركات بتتكتب بهوية المستخدم نفسه (RLS + triggers سجل العمليات شغالين). الـ service role لعمليات Auth الإدارية وRPCs حد المحاولات بس.
-- **حد المحاولات:** `login_begin()` بتفحص وتسجل في خطوة واحدة تحت advisory lock، و`login_succeeded()` بتقلبها نجاح. قبل الإطلاق: **Turnstile CAPTCHA على Supabase Auth** (`[auth.captcha]`)، لأن أي حد يقدر يكلم Supabase Auth مباشرة بالمفتاح العام ويتخطى حدنا. خطاف التحقق من الرقم السري متاح على خطة Teams وما فوق بس.
+- **حد المحاولات:** `login_begin()` بتفحص وتسجل في خطوة واحدة تحت advisory lock، و`login_succeeded()` بتقلبها نجاح.
+- **مفيش CAPTCHA (قرار المستخدم، 2 نوفمبر 2026):** متضيفش CAPTCHA أو Turnstile إلا لو المستخدم طلبها. الخطر المقبول: أي حد يقدر يكلم Supabase Auth مباشرة بالمفتاح العام ويتخطى حدنا، والحماية ساعتها حد Supabase لكل IP بس. لو اتطلبت بعدين: `[auth.captcha]` (Turnstile) + تمرير الـ token في `signInWithPassword`.
 - **الكوكي:** جلسة Supabase `httpOnly` (`src/lib/supabase/cookie-options.ts`). المتصفح مبيكلمش Supabase خالص، ومفيش عميل متصفح.
 - **shadcn/ui:** Radix + RTL، ومتغيراته مربوطة بالـ tokens بتاعتنا. `card` و`secondary` **مش** ألوان في Tailwind، لأنهم أسماء في مقاسات الخطوط (`text-card` و`text-secondary`). الأزرار ارتفاعها 44px. `cn` مبني على `clsx` + `tailwind-merge` ومتعلّم مقاسات الخطوط بتاعتنا.
 - **النصوص العربي في الواجهة بالفصحى** (المستخدمين في السعودية). التواصل مع المستخدم بس هو اللي بالمصري.
