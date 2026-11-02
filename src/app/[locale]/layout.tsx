@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans_Arabic, Inter } from "next/font/google";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { localeDir, routing } from "@/i18n/routing";
@@ -20,10 +21,6 @@ const inter = Inter({
   variable: "--font-inter",
   display: "swap",
 });
-
-export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }));
-}
 
 export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
@@ -45,6 +42,8 @@ export const viewport: Viewport = {
 };
 
 export default async function LocaleLayout({ children, params }: LayoutProps<"/[locale]">) {
+  // Every page renders per request: the CSP nonce changes on each response (src/proxy.ts).
+  await connection();
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
 
