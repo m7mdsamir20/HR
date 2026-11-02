@@ -36,7 +36,17 @@
       "invalid": "Incorrect ID number or password",
       "locked": "Too many sign-in attempts. Wait 15 minutes and try again.",
       "unavailable": "Sign-in is unavailable right now. Try again shortly."
-    }
+    },
+    "tagline": "Task and HR management for companies",
+    "panelTitle": "Every task documented, from assignment to approval",
+    "cycle": {
+      "assign": "Task assigned to an employee",
+      "execute": "Done on site or in the office",
+      "report": "Completion report with photo proof",
+      "review": "Supervisor review",
+      "approve": "Approved with a stamp and rating"
+    },
+    "noSignup": "Accounts are created by your company manager. There is no self sign-up."
   },
   "app": {
     "greeting": "Hello, {name}",

@@ -94,6 +94,11 @@
   --color-line: var(--line);
   --color-on-accent: var(--on-accent);
 
+  /* Fixed dark surface (sign-in panel): stays navy in both themes, so not theme tokens. */
+  --color-night: #18233d;
+  --color-night-deep: #0f1724;
+  --color-night-stamp: #4cb487;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card-foreground: var(--card-foreground);

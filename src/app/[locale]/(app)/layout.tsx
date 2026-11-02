@@ -12,7 +12,7 @@ export default async function AppLayout({ children, params }: LayoutProps<"/[loc
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="border-b border-line bg-surface">
-        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-3 px-4">
+        <div className="flex h-14 items-center justify-between gap-3 px-4 md:px-8">
           <p className="truncate text-card">{companyName}</p>
           <div className="flex shrink-0 items-center gap-1">
             <LocaleSwitcher />
@@ -20,7 +20,7 @@ export default async function AppLayout({ children, params }: LayoutProps<"/[loc
           </div>
         </div>
       </header>
-      <div className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">{children}</div>
+      <div className="w-full flex-1 px-4 py-6 md:px-8">{children}</div>
     </div>
   );
 }

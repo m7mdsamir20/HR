@@ -4,7 +4,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(39);
+select plan(43);
 
 -- ---------------------------------------------------------------------------
 -- Fixtures (as postgres, bypassing RLS)
@@ -149,7 +149,7 @@ select throws_ok(
   $$select public.admin_create_company('x', null, null, 5, current_date + 1,
     '00000000-0000-0000-0000-0000000000ee', '1000000501', 'مالك', null, null)$$,
   '42501', null, 'only a system admin can create companies');
-select throws_ok($$select public.login_allowed('a', 'b')$$, '42501', null,
+select throws_ok($$select public.login_begin('a', 'b')$$, '42501', null,
   'login rate-limit functions are not callable by users');
 select throws_ok('select count(*) from private.login_attempts', '42501', null,
   'login attempts are not readable by users');
@@ -199,6 +199,23 @@ select isnt(
     '00000000-0000-0000-0000-0000000000ee', '1000000501', 'مالك جديد', null, null),
   null, 'the system admin can create a company with its owner');
 reset role;
+
+-- ---------------------------------------------------------------------------
+-- Login rate limit (runs as the service role does; users can't call it, tested above)
+-- ---------------------------------------------------------------------------
+select is(
+  (select count(*) from (select public.login_begin('id-x', 'ip-x') as a from generate_series(1, 5)) s where a is not null),
+  5::bigint, 'five attempts per national ID are allowed');
+select is(public.login_begin('id-x', 'ip-other'), null, 'the sixth attempt for that ID is refused, from any IP');
+
+select public.login_succeeded(public.login_begin('id-z', 'ip-z'));
+select is(
+  (select count(*) from (select public.login_begin('id-z', 'ip-z') as a from generate_series(1, 5)) s where a is not null),
+  5::bigint, 'a successful login resets the per-ID count');
+
+select is(
+  (select count(*) from (select public.login_begin('id-' || g, 'ip-shared') as a from generate_series(1, 51) g) s where a is null),
+  1::bigint, 'an IP is refused after 50 failures across different IDs');
 
 select * from finish();
 rollback;

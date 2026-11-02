@@ -196,41 +196,61 @@ grant execute on function public.admin_create_company(text, text, text, integer,
 -- Login rate limit (§5.10). Service role only: the login Server Action calls these.
 -- 5 failures per national ID in 15 minutes (counted since the last success), and a wider
 -- 50 failures per IP, since whole offices share one IP.
+--
+-- login_begin() checks and records in one step under advisory locks, so parallel requests can't
+-- all pass the check before any failure is written. The attempt is stored as a failure up front
+-- and only flipped by login_succeeded() after the password and membership checks pass.
 -- ---------------------------------------------------------------------------
-create function public.login_allowed(p_id_hash text, p_ip_hash text) returns boolean
-language sql stable security definer set search_path = '' as $$
-  select
-    (select count(*)
-       from private.login_attempts a
-       where a.national_id_hash = p_id_hash
-         and not a.success
-         and a.created_at > greatest(
-           now() - interval '15 minutes',
-           coalesce((select max(s.created_at) from private.login_attempts s
-                      where s.national_id_hash = p_id_hash and s.success), '-infinity'::timestamptz)
-         )) < 5
-    and
-    (select count(*)
-       from private.login_attempts a
-       where a.ip_hash = p_ip_hash
-         and not a.success
-         and a.created_at > now() - interval '15 minutes') < 50;
-$$;
-
-create function public.login_record(p_id_hash text, p_ip_hash text, p_success boolean) returns void
+create function public.login_begin(p_id_hash text, p_ip_hash text) returns bigint
 language plpgsql security definer set search_path = '' as $$
+declare
+  v_id_failures integer;
+  v_ip_failures integer;
+  v_attempt bigint;
 begin
+  -- Always ID then IP, so two sessions can't deadlock on these locks.
+  perform pg_advisory_xact_lock(hashtextextended('login:id:' || p_id_hash, 0));
+  perform pg_advisory_xact_lock(hashtextextended('login:ip:' || p_ip_hash, 0));
+
+  select count(*) into v_id_failures
+    from private.login_attempts a
+    where a.national_id_hash = p_id_hash
+      and not a.success
+      and a.created_at > greatest(
+        now() - interval '15 minutes',
+        coalesce((select max(s.created_at) from private.login_attempts s
+                   where s.national_id_hash = p_id_hash and s.success), '-infinity'::timestamptz)
+      );
+
+  select count(*) into v_ip_failures
+    from private.login_attempts a
+    where a.ip_hash = p_ip_hash
+      and not a.success
+      and a.created_at > now() - interval '15 minutes';
+
+  if v_id_failures >= 5 or v_ip_failures >= 50 then
+    return null;
+  end if;
+
   insert into private.login_attempts (national_id_hash, ip_hash, success)
-  values (p_id_hash, p_ip_hash, p_success);
+  values (p_id_hash, p_ip_hash, false)
+  returning id into v_attempt;
 
   -- Occasional cleanup keeps the table small without a cron job.
   if random() < 0.01 then
     delete from private.login_attempts where created_at < now() - interval '1 day';
   end if;
+
+  return v_attempt;
 end;
 $$;
 
-revoke execute on function public.login_allowed(text, text) from public, anon, authenticated;
-revoke execute on function public.login_record(text, text, boolean) from public, anon, authenticated;
-grant execute on function public.login_allowed(text, text) to service_role;
-grant execute on function public.login_record(text, text, boolean) to service_role;
+create function public.login_succeeded(p_attempt bigint) returns void
+language sql security definer set search_path = '' as $$
+  update private.login_attempts set success = true where id = p_attempt;
+$$;
+
+revoke execute on function public.login_begin(text, text) from public, anon, authenticated;
+revoke execute on function public.login_succeeded(bigint) from public, anon, authenticated;
+grant execute on function public.login_begin(text, text) to service_role;
+grant execute on function public.login_succeeded(bigint) to service_role;

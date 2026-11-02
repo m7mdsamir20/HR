@@ -106,11 +106,11 @@ isOneToOne: false
             "admin_create_company":
 { Args: { "p_commercial_reg": string,"p_max_employees": number,"p_name_ar": string,"p_name_en": string,"p_owner_name_ar": string,"p_owner_name_en": string,"p_owner_national_id": string,"p_owner_phone": string,"p_owner_user_id": string,"p_subscription_ends_at": string }; Returns: string
                            },
-"login_allowed":
-{ Args: { "p_id_hash": string,"p_ip_hash": string }; Returns: boolean
+"login_begin":
+{ Args: { "p_id_hash": string,"p_ip_hash": string }; Returns: number
                            },
-"login_record":
-{ Args: { "p_id_hash": string,"p_ip_hash": string,"p_success": boolean }; Returns: undefined
+"login_succeeded":
+{ Args: { "p_attempt": number }; Returns: undefined
                            },
 "my_account":
 { Args: Record<PropertyKey, never>; Returns: Json

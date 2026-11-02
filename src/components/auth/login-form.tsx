@@ -57,7 +57,9 @@ export function LoginForm() {
 
       <div className="flex flex-col gap-2">
         <Label htmlFor="password">{t("password")}</Label>
-        <div className="relative">
+        {/* The value is LTR, so the wrapper is too: the eye and the reserved padding then sit on the
+            same side in both languages and typed characters never run under the icon. */}
+        <div className="relative" dir="ltr">
           <Input
             id="password"
             name="password"

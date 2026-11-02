@@ -33,26 +33,18 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
   const idKey = rateLimitKey("id", nationalId);
   const ipKey = rateLimitKey("ip", await clientIp());
   const service = createAdminClient();
-  const record = async (success: boolean) => {
-    await service.rpc("login_record", { p_id_hash: idKey, p_ip_hash: ipKey, p_success: success });
-  };
 
-  // Fail closed: if the limiter can't be checked, nobody signs in.
-  const { data: allowed, error: limitError } = await service.rpc("login_allowed", { p_id_hash: idKey, p_ip_hash: ipKey });
+  // Checks the limits and records this attempt as a failure in one atomic step (fails closed if
+  // the limiter is unreachable). It's flipped to success only after every check below passes.
+  const { data: attempt, error: limitError } = await service.rpc("login_begin", { p_id_hash: idKey, p_ip_hash: ipKey });
   if (limitError) return { error: "unavailable", nationalId: typed };
-  if (!allowed) return { error: "locked", nationalId: typed };
+  if (attempt === null) return { error: "locked", nationalId: typed };
 
-  if (!isValidNationalId(nationalId)) {
-    await record(false);
-    return { error: "invalid", nationalId: typed };
-  }
+  if (!isValidNationalId(nationalId)) return { error: "invalid", nationalId: typed };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email: authEmailFor(nationalId), password: parsed.data.password });
-  if (error) {
-    await record(false);
-    return { error: "invalid", nationalId: typed };
-  }
+  if (error) return { error: "invalid", nationalId: typed };
 
   // Correct password but no active membership (disabled, suspended, expired): same generic answer,
   // so the response never reveals that the account exists. CLAUDE.md §3.
@@ -65,11 +57,11 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
   }
   if (!canEnter(account)) {
     await supabase.auth.signOut({ scope: "local" });
-    await record(false);
     return { error: "invalid", nationalId: typed };
   }
 
-  await record(true);
+  const { error: recordError } = await service.rpc("login_succeeded", { p_attempt: attempt });
+  if (recordError) console.error("login_succeeded failed", recordError.code);
   redirect({ href: homePathFor(account), locale });
 }
 
