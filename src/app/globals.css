@@ -1,4 +1,18 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* Dark mode follows the OS unless the page pins data-theme (same rule as the tokens below). */
+@custom-variant dark {
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]) *) {
+      @slot;
+    }
+  }
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+}
 
 /* Design tokens — CLAUDE.md §6. Colors are information: each task status owns one color. */
 :root {
@@ -11,6 +25,7 @@
   --saffron: #c98a1b;
   --brick: #b23a2b;
   --line: #dde2ea;
+  --on-accent: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -24,6 +39,7 @@
     --saffron: #e3ae4f;
     --brick: #e57a6b;
     --line: #2a3647;
+    --on-accent: #0f1724;
   }
 }
 
@@ -37,6 +53,33 @@
   --saffron: #e3ae4f;
   --brick: #e57a6b;
   --line: #2a3647;
+  --on-accent: #0f1724;
+}
+
+/* shadcn/ui variables, mapped onto the tokens above so components never introduce new colors.
+   `card` and `secondary` are deliberately NOT exposed as Tailwind colors: those names belong to our
+   type scale (text-card = 18/600, text-secondary = 13/400) and a color of the same name would
+   repaint that text (white on white). Use bg-surface / bg-paper instead. */
+:root {
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --popover: var(--surface);
+  --popover-foreground: var(--ink);
+  --primary: var(--indigo);
+  --primary-foreground: var(--on-accent);
+  --secondary: var(--paper);
+  --secondary-foreground: var(--ink);
+  --muted: var(--paper);
+  --muted-foreground: var(--ink-soft);
+  --accent: var(--paper);
+  --accent-foreground: var(--ink);
+  --destructive: var(--brick);
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--indigo);
+  --radius: 0.75rem;
 }
 
 @theme inline {
@@ -49,8 +92,27 @@
   --color-saffron: var(--saffron);
   --color-brick: var(--brick);
   --color-line: var(--line);
+  --color-on-accent: var(--on-accent);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 
   --font-sans: var(--font-plex-arabic), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-sans);
 
   /* Type scale from field-service-saas design rules §1.1 */
   --text-page: 1.75rem;
@@ -78,33 +140,52 @@
   --radius-control: 8px;
   --radius-card: 12px;
   --radius-modal: 16px;
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-html {
-  font-size: 100%;
-  -webkit-text-size-adjust: 100%;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    font-size: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: var(--font-plex-arabic), ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.9375rem; /* Body 15 / 400 */
+    line-height: 1.6;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* English UI uses Inter; Arabic glyphs inside it fall back to Plex. */
+  html[lang="en"] body {
+    font-family: var(--font-inter), var(--font-plex-arabic), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  table,
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
 }
 
-body {
-  font-family: var(--font-plex-arabic), ui-sans-serif, system-ui, sans-serif;
-  font-size: 0.9375rem; /* Body 15 / 400 */
-  line-height: 1.6;
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-/* English UI uses Inter; Arabic glyphs inside it fall back to Plex. */
-html[lang="en"] body {
-  font-family: var(--font-inter), var(--font-plex-arabic), ui-sans-serif, system-ui, sans-serif;
-}
-
+/* Secondary text is always the soft ink color, wherever the 13px size is used. */
 .text-secondary {
   color: var(--ink-soft);
-}
-
-table,
-.tabular {
-  font-variant-numeric: tabular-nums;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -206,8 +206,10 @@ anonymous_users = 30
 # Number of sessions that can be refreshed in a 5 minute interval per IP address.
 token_refresh = 150
 # Number of sign up and sign-in requests that can be made in a 5 minute interval per IP address (excludes anonymous users).
-# Logins run from a Server Action, so Supabase sees the server's IP for everyone. Our own limiter
-# (login_attempts) is the real control; raise this on the hosted project too (Auth > Rate Limits).
+# Logins run from a Server Action, so Supabase sees the server's IP for everyone; our limiter
+# (login_attempts) enforces per-ID and per-IP limits there. Raising this also loosens direct calls to
+# Auth with the public key, which skip our limiter: production MUST enable [auth.captcha] (Turnstile)
+# before launch so direct password grants need a CAPTCHA too. CLAUDE.md §3 / SECURITY.md.
 sign_in_sign_ups = 1000
 # Number of OTP / Magic link verifications that can be made in a 5 minute interval per IP address.
 token_verifications = 30

@@ -1,13 +1,166 @@
 {
   "metadata": {
-    "title": "Tasks and HR management"
+    "title": "Tasks & HR"
   },
   "common": {
     "language": "Language",
-    "switchTo": "العربية"
+    "switchTo": "العربية",
+    "logout": "Sign out",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "back": "Back",
+    "optional": "Optional",
+    "unexpected": "Something went wrong. Try again, and contact support if it keeps happening."
   },
-  "home": {
-    "title": "The platform is being set up",
-    "description": "Signing in with your ID number arrives in the next phase."
+  "roles": {
+    "owner": "Company manager",
+    "hr": "HR officer",
+    "manager": "Supervisor",
+    "employee": "Employee"
+  },
+  "login": {
+    "title": "Sign in",
+    "intro": "Use your national ID or Iqama number and the password your company gave you.",
+    "nationalId": "National ID / Iqama",
+    "digits": "{count} of 10 digits",
+    "citizen": "National ID",
+    "resident": "Iqama",
+    "password": "Password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "forgot": "Forgot your password? Ask your company manager to set a new one.",
+    "errors": {
+      "invalid": "Incorrect ID number or password",
+      "locked": "Too many sign-in attempts. Wait 15 minutes and try again.",
+      "unavailable": "Sign-in is unavailable right now. Try again shortly."
+    }
+  },
+  "app": {
+    "greeting": "Hello, {name}",
+    "profileTitle": "My details",
+    "fullName": "Name",
+    "nationalId": "ID number",
+    "role": "Role",
+    "company": "Company",
+    "comingNext": "Your tasks and notifications will show here once your company starts using them."
+  },
+  "subscriptionEnded": {
+    "title": "Company subscription is inactive",
+    "suspended": "Your company account is suspended. Contact the platform team to reactivate it.",
+    "expired": "Your company subscription ended on {date}. Contact the platform team to renew it.",
+    "note": "Your company data is kept. Employees can't sign in until the subscription is renewed."
+  },
+  "admin": {
+    "panel": "System Admin",
+    "nav": {
+      "companies": "Companies",
+      "lookup": "ID lookup"
+    },
+    "status": {
+      "active": "Active",
+      "expiring": "Ending soon",
+      "expired": "Expired",
+      "suspended": "Suspended"
+    },
+    "companies": {
+      "title": "Companies",
+      "add": "Add company",
+      "search": "Search by company name",
+      "searchSubmit": "Search",
+      "empty": "No companies yet. Add the first company and its manager account.",
+      "noResults": "No company matches that name.",
+      "name": "Company",
+      "owner": "Manager",
+      "employees": "Employees",
+      "seats": "{used} of {max}",
+      "endsAt": "Subscription ends",
+      "status": "Status",
+      "open": "Open {name}"
+    },
+    "create": {
+      "title": "Add company",
+      "companySection": "Company details",
+      "nameAr": "Company name (Arabic)",
+      "nameEn": "Company name (English)",
+      "commercialReg": "Commercial registration",
+      "commercialRegHint": "10 digits",
+      "subscriptionSection": "Subscription",
+      "maxEmployees": "Maximum employees",
+      "endsAt": "Last day of subscription",
+      "ownerSection": "Company manager account",
+      "ownerHint": "The manager signs in with their ID number and this password. Share them yourself.",
+      "ownerNationalId": "Manager's ID number",
+      "ownerNameAr": "Manager's name (Arabic)",
+      "ownerNameEn": "Manager's name (English)",
+      "ownerPhone": "Manager's mobile",
+      "ownerPhoneHint": "Starts with 05",
+      "password": "Password",
+      "passwordHint": "At least 8 characters",
+      "generate": "Suggest a password",
+      "submit": "Create company",
+      "submitting": "Creating…",
+      "errors": {
+        "invalid": "Check the fields marked in red.",
+        "nationalIdTaken": "This ID number is already registered. Use ID lookup to see where.",
+        "unexpected": "The company couldn't be created. Try again."
+      },
+      "fields": {
+        "nameAr": "Enter the Arabic company name (at least 2 characters).",
+        "nameEn": "English name must be 2 to 120 characters.",
+        "commercialReg": "Commercial registration is 10 digits.",
+        "maxEmployees": "Enter a number from 1 to 100000.",
+        "endsAt": "Pick today or a later date.",
+        "ownerNationalId": "ID number is 10 digits starting with 1 or 2.",
+        "ownerNameAr": "Enter the manager's Arabic name.",
+        "ownerNameEn": "English name must be 2 to 120 characters.",
+        "ownerPhone": "Mobile is 10 digits starting with 05.",
+        "password": "Password must be 8 to 72 characters."
+      }
+    },
+    "company": {
+      "commercialReg": "Commercial registration",
+      "createdAt": "Added on",
+      "owners": "Company managers",
+      "activeEmployees": "Active employees",
+      "subscriptionTitle": "Subscription",
+      "subscriptionSaved": "Subscription saved",
+      "belowActive": "There are {count} active employees. The maximum can't be lower than that.",
+      "suspend": "Suspend company",
+      "activate": "Activate company",
+      "suspendTitle": "Suspend {name}?",
+      "suspendBody": "Every employee of this company loses access immediately. Data is kept, and you can reactivate at any time.",
+      "suspendConfirm": "Suspend company",
+      "activateTitle": "Activate {name}?",
+      "activateBody": "Employees can sign in again while the subscription is still valid.",
+      "activateConfirm": "Activate company",
+      "suspended": "Company suspended",
+      "activated": "Company activated",
+      "activity": "Recent activity",
+      "noActivity": "No recorded activity.",
+      "actions": {
+        "company_insert": "Company created",
+        "company_update": "Company details changed",
+        "employee_insert": "Employee added",
+        "employee_update": "Employee changed"
+      }
+    },
+    "lookup": {
+      "title": "ID lookup",
+      "intro": "See where an ID number is registered before resolving a conflict. Only system admins see this.",
+      "nationalId": "National ID / Iqama",
+      "submit": "Look up",
+      "invalid": "ID number is 10 digits starting with 1 or 2.",
+      "notFound": "This number isn't registered with any company, so it can be added.",
+      "platformAdmin": "This number belongs to a system admin account.",
+      "inCompany": "Registered with {company}",
+      "employeeStatus": {
+        "active": "Active account",
+        "disabled": "Disabled account",
+        "deleted": "Deleted account (number is free)"
+      }
+    }
   }
 }
