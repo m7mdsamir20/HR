@@ -2,7 +2,8 @@
 
 دليل العمل على المشروع. اقرأه كله قبل أي تعديل. المواصفات الكاملة للوحدات موجودة في [README.md](README.md)، والملف ده بيحدد **القرارات المحسومة، وترتيب التنفيذ، وقواعد الأمان والتصميم** اللي لازم تتطبق.
 
-> **الحالة:** مرحلة التخطيط. مفيش كود لسه. **متبدأش تنفيذ أي حاجة غير لما المستخدم يقول "ابدأ"**، ولا انتقال من مرحلة للي بعدها من غير موافقته.
+> **الحالة:** المرحلة 0 (التجهيز) — الكود الأساسي اتعمل ومرفوع على GitHub (`m7mdsamir20/HR`, فرع `main`). باقي فيها بنود محتاجة المستخدم (شوف "المرحلة 0 — المتبقي" في القسم 8). **ممنوع الانتقال لمرحلة جديدة من غير موافقة المستخدم.**
+> **GitHub:** كل خطوة مكتملة = commit منفصل + push على طول (طلب المستخدم).
 > **لغة التواصل مع المستخدم:** عربي (مصري). أسماء الملفات والكود والـ commits بالإنجليزي.
 
 ---
@@ -64,7 +65,7 @@ Supabase Auth بيحتاج إيميل أو موبايل، فهنستخدم **إ�
   - التحقق من الصيغة فقط: 10 أرقام تبدأ بـ `1` (مواطن) أو `2` (مقيم).
   - رسالة خطأ واحدة لكل الحالات (رقم غلط، رقم سري غلط، حساب معطّل، شركة موقوفة): **"رقم الهوية أو الرقم السري غير صحيح"** — منعاً لكشف وجود الحسابات.
 - الدخول بيتم من **Server Action** مع Rate limit خاص بينا (شوف القسم 5)، لأن Supabase لو اتنادى من السيرفر هيشوف IP بتاع Vercel لكل المستخدمين. **يتأكد منه في المرحلة 0:** حدود Supabase على IP السيرفر وإزاي نتعامل معاها.
-- الجلسات بـ `@supabase/ssr` (cookies httpOnly). تحديث الجلسة في `middleware.ts` (أو `proxy.ts` حسب إصدار Next).
+- الجلسات بـ `@supabase/ssr` (cookies httpOnly). تحديث الجلسة في `src/proxy.ts` (Next 16).
 - **تغيير الرقم السري من الموظف:** يتحقق من الحالي أولاً، ثم التحديث، ثم إلغاء باقي الجلسات (`signOut({ scope: 'others' })`).
 - **المدير يحط رقم سري جديد:** عبر admin API، وبعده إلغاء **كل** جلسات الموظف. المدير **عمره ما يشوف** الرقم الحالي (Supabase بيخزنه hash).
 - **التعطيل:** `ban_duration` في Supabase + `status = 'disabled'` في جدولنا + إلغاء الجلسات. والـ RLS بيتحقق من `status` في كل طلب، فالـ JWT الساري (لحد ساعة) مبيفتحش أي بيانات.
@@ -283,10 +284,26 @@ supabase/
 كل مرحلة تنتهي بـ: اختبارات ناجحة + فحص `security-audit` للجزء ده + مراجعة الواجهة على موبايل (375px) بالعربي والإنجليزي.
 
 **المرحلة 0 — التجهيز**
-- إنشاء المشروع، TypeScript strict، ESLint، Tailwind، shadcn، next-intl (ar/en + RTL)، tokens التصميم والخط.
-- Supabase محلي (CLI) + مشروع سحابي، قفل التسجيل العام، متغيرات البيئة و`.env.example`.
-- التأكد من: قبول Supabase للإيميل الداخلي `@users.invalid`، وسلوك rate limit مع Server Actions.
-- Headers الأمان، CI (lint + typecheck + unit + RLS tests).
+- ✅ Next.js 16.4 + React 19.3 + TypeScript strict (`noUncheckedIndexedAccess`) + ESLint + Tailwind 4.
+- ✅ next-intl 4 (عربي افتراضي على `/`، إنجليزي على `/en`، `localeDetection: false`) + RTL + خطوط Plex/Inter + tokens.
+- ✅ عملاء Supabase (server / client / admin بـ `server-only`) + تجديد الجلسة في `src/proxy.ts`.
+- ✅ CSP بـ nonce لكل طلب + HSTS وباقي الهيدرز (اتأكد منها على `pnpm build && pnpm start`: الـ nonce على كل السكربتات ومفيش أخطاء console).
+- ✅ Vitest + اختبارات رقم الهوية، `supabase/config.toml` (التسجيل العام مقفول، رقم سري 8+، رفع 10MiB)، GitHub Actions CI.
+- ⏳ **المتبقي (محتاج المستخدم):**
+  1. إنشاء مشروع Supabase سحابي (منطقة قريبة من السعودية) وإدخال المفاتيح في `.env.local` وفي Vercel. ومن لوحة Supabase: Authentication → قفل "Allow new users to sign up".
+  2. تشغيل Docker Desktop عشان `supabase start` المحلي واختبارات RLS.
+  3. التأكد إن Supabase بيقبل `@users.invalid` مع `admin.createUser` (محلي أو على المشروع السحابي).
+  4. حدود rate limit في Supabase Auth لما الدخول بيتم من Server Action (كله من IP بتاع Vercel).
+  5. ربط المستودع بمشروع Vercel، وتجربة `@sparticuz/chromium` للـ PDF.
+  6. shadcn/ui: يتضاف مع أول شاشة فيها مكونات (المرحلة 1أ) عشان منضيفش مكونات مش مستخدمة.
+
+**قرارات تقنية من المرحلة 0**
+- **Next 16:** الـ middleware اسمه `proxy.ts` (في `src/`). اقرأ `node_modules/next/dist/docs/` قبل أي API جديد (شوف `AGENTS.md`).
+- **Cache Components مقفول** (`cacheComponents` مش مفعّل): مفيش كاش على السيرفر لبيانات الشركات. الـ layout بينادي `connection()` فكل الصفحات dynamic، وده مطلوب كمان عشان الـ CSP nonce.
+- **اللغة:** `i18n/request.ts` بيقرا اللغة من `next/root-params`. الـ Server Actions والـ Route Handlers مبيقدروش يقروه، فبيمرروا `locale` صريح لـ `getTranslations({ locale })`.
+- **متغيرات البيئة:** `NEXT_PUBLIC_SUPABASE_URL` ، `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` ، `SUPABASE_SECRET_KEY` ، `RATE_LIMIT_PEPPER`. بتتفحص بـ zod أول ما تُستخدم (مش وقت الـ import) عشان الـ build في CI يشتغل من غير مفاتيح.
+- **CSP:** السكربتات بـ nonce + `strict-dynamic` بس. الـ styles مسموح فيها inline (React style attributes).
+- **pnpm 11:** سكربتات التثبيت مقفولة افتراضياً؛ المسموح متحدد في `pnpm-workspace.yaml` (`allowBuilds`).
 
 **المرحلة 1أ — الدخول ولوحة مدير النظام**
 - جداول `companies` و`platform_admins` و`employees` و`audit_logs` و`login_attempts` + RLS + اختبارات العزل.
@@ -374,13 +391,17 @@ supabase/
 
 ---
 
-## 10. أوامر (تتحدد بعد المرحلة 0)
+## 10. أوامر
 
 ```bash
-pnpm dev            # تطوير
-pnpm build && pnpm start   # فحص الإنتاج (Headers وCSP والكوكيز لازم تتختبر هنا مش في dev)
-pnpm lint && pnpm typecheck
-pnpm test           # Vitest
-pnpm test:e2e       # Playwright (موبايل 375px + ديسكتوب، عربي + إنجليزي)
-supabase test db    # اختبارات RLS والعزل
+pnpm dev                    # تطوير
+pnpm build && pnpm start    # فحص الإنتاج (الهيدرز والـ CSP والكوكيز تتختبر هنا مش في dev)
+pnpm lint                   # ESLint
+pnpm typecheck              # next typegen + tsc (الأنواع PageProps/LayoutProps بتتولد من Next)
+pnpm test                   # Vitest (src/**/*.test.ts)
+pnpm exec supabase start    # Supabase محلي (محتاج Docker Desktop شغال)
+pnpm exec supabase test db  # اختبارات RLS والعزل (pgTAP) — من المرحلة 1أ
 ```
+
+`.claude/launch.json` فيه `web-prod` (`pnpm start`) و`web-dev` (`pnpm dev`) على بورت 3000.
+Playwright (`pnpm test:e2e`) يتضاف مع أول شاشة تفاعلية في المرحلة 1أ.
