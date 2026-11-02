@@ -1,26 +1,118 @@
 @import "tailwindcss";
 
+/* Design tokens — CLAUDE.md §6. Colors are information: each task status owns one color. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --paper: #f6f7f9;
+  --surface: #ffffff;
+  --ink: #18233d;
+  --ink-soft: #4a5875;
+  --indigo: #2f4a9e;
+  --stamp: #1f7a55;
+  --saffron: #c98a1b;
+  --brick: #b23a2b;
+  --line: #dde2ea;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    --paper: #0f1724;
+    --surface: #172131;
+    --ink: #e6eaf2;
+    --ink-soft: #a3aec4;
+    --indigo: #8fa6e8;
+    --stamp: #4cb487;
+    --saffron: #e3ae4f;
+    --brick: #e57a6b;
+    --line: #2a3647;
   }
 }
 
+:root[data-theme="dark"] {
+  --paper: #0f1724;
+  --surface: #172131;
+  --ink: #e6eaf2;
+  --ink-soft: #a3aec4;
+  --indigo: #8fa6e8;
+  --stamp: #4cb487;
+  --saffron: #e3ae4f;
+  --brick: #e57a6b;
+  --line: #2a3647;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-indigo: var(--indigo);
+  --color-stamp: var(--stamp);
+  --color-saffron: var(--saffron);
+  --color-brick: var(--brick);
+  --color-line: var(--line);
+
+  --font-sans: var(--font-plex-arabic), ui-sans-serif, system-ui, sans-serif;
+
+  /* Type scale from field-service-saas design rules §1.1 */
+  --text-page: 1.75rem;
+  --text-page--line-height: 1.3;
+  --text-page--font-weight: 600;
+  --text-section: 1.25rem;
+  --text-section--line-height: 1.4;
+  --text-section--font-weight: 600;
+  --text-card: 1.125rem;
+  --text-card--line-height: 1.45;
+  --text-card--font-weight: 600;
+  --text-label: 0.875rem;
+  --text-label--line-height: 1.5;
+  --text-label--font-weight: 500;
+  --text-table: 0.875rem;
+  --text-table--line-height: 1.5;
+  --text-secondary: 0.8125rem;
+  --text-secondary--line-height: 1.55;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.5;
+  --text-stat: 1.875rem;
+  --text-stat--line-height: 1.2;
+  --text-stat--font-weight: 700;
+
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --radius-modal: 16px;
+}
+
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-plex-arabic), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.9375rem; /* Body 15 / 400 */
+  line-height: 1.6;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* English UI uses Inter; Arabic glyphs inside it fall back to Plex. */
+html[lang="en"] body {
+  font-family: var(--font-inter), var(--font-plex-arabic), ui-sans-serif, system-ui, sans-serif;
+}
+
+.text-secondary {
+  color: var(--ink-soft);
+}
+
+table,
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
