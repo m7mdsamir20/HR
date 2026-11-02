@@ -1,0 +1,156 @@
+"use client";
+
+import { Sparkles } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { useActionState, useState } from "react";
+import { createCompany, type CreateCompanyState } from "@/actions/admin";
+import { FormField } from "@/components/form-field";
+import { Button } from "@/components/ui/button";
+import type { CreateCompanyField } from "@/lib/validation/company";
+
+// No look-alike characters (0/O, 1/l/I) so the manager can read it out to the owner.
+const ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+
+function suggestPassword(length = 12): string {
+  const bytes = crypto.getRandomValues(new Uint32Array(length));
+  return Array.from(bytes, (b) => ALPHABET[b % ALPHABET.length]).join("");
+}
+
+export function CreateCompanyForm({ minDate }: { minDate: string }) {
+  const t = useTranslations("admin.create");
+  const tCommon = useTranslations("common");
+  const locale = useLocale();
+  const [state, action, pending] = useActionState<CreateCompanyState, FormData>(createCompany, undefined);
+  const [password, setPassword] = useState("");
+
+  const v = (f: CreateCompanyField) => state?.values[f] ?? "";
+  const err = (f: CreateCompanyField) => {
+    if (!state?.fields?.[f]) return undefined;
+    // A taken ID is well-formed: say that, not the format rule.
+    if (f === "ownerNationalId" && state.error === "nationalIdTaken") return t("fields.ownerNationalIdTaken");
+    return t(`fields.${f}`);
+  };
+
+  return (
+    <form action={action} className="flex flex-col gap-8" noValidate>
+      <input type="hidden" name="locale" value={locale} />
+
+      {state?.error && (
+        <p role="alert" className="max-w-3xl rounded-control border border-brick/30 bg-brick/5 px-3 py-2.5 text-label text-brick">
+          {t(`errors.${state.error}`)}
+        </p>
+      )}
+
+      <fieldset className="grid max-w-3xl gap-5 md:grid-cols-2">
+        <legend className="mb-4 text-section">{t("companySection")}</legend>
+        <FormField name="nameAr" label={t("nameAr")} defaultValue={v("nameAr")} error={err("nameAr")} required dir="rtl" />
+        <FormField
+          name="nameEn"
+          label={t("nameEn")}
+          defaultValue={v("nameEn")}
+          error={err("nameEn")}
+          optionalLabel={tCommon("optional")}
+          dir="ltr"
+        />
+        <FormField
+          name="commercialReg"
+          label={t("commercialReg")}
+          hint={t("commercialRegHint")}
+          defaultValue={v("commercialReg")}
+          error={err("commercialReg")}
+          optionalLabel={tCommon("optional")}
+          inputMode="numeric"
+          dir="ltr"
+          className="md:col-span-2 md:max-w-sm"
+        />
+      </fieldset>
+
+      <fieldset className="grid max-w-3xl gap-5 md:grid-cols-2">
+        <legend className="mb-4 text-section">{t("subscriptionSection")}</legend>
+        <FormField
+          name="maxEmployees"
+          label={t("maxEmployees")}
+          type="number"
+          min={1}
+          max={100000}
+          defaultValue={v("maxEmployees")}
+          error={err("maxEmployees")}
+          required
+          dir="ltr"
+        />
+        <FormField
+          name="endsAt"
+          label={t("endsAt")}
+          type="date"
+          min={minDate}
+          defaultValue={v("endsAt")}
+          error={err("endsAt")}
+          required
+          dir="ltr"
+        />
+      </fieldset>
+
+      <fieldset className="grid max-w-3xl gap-5 md:grid-cols-2">
+        <legend className="mb-1 text-section">{t("ownerSection")}</legend>
+        <p className="text-secondary md:col-span-2">{t("ownerHint")}</p>
+        <FormField
+          name="ownerNationalId"
+          label={t("ownerNationalId")}
+          defaultValue={v("ownerNationalId")}
+          error={err("ownerNationalId")}
+          required
+          inputMode="numeric"
+          maxLength={14}
+          dir="ltr"
+          className="tabular-nums"
+        />
+        <FormField
+          name="ownerPhone"
+          label={t("ownerPhone")}
+          hint={t("ownerPhoneHint")}
+          type="tel"
+          defaultValue={v("ownerPhone")}
+          error={err("ownerPhone")}
+          optionalLabel={tCommon("optional")}
+          inputMode="tel"
+          dir="ltr"
+        />
+        <FormField name="ownerNameAr" label={t("ownerNameAr")} defaultValue={v("ownerNameAr")} error={err("ownerNameAr")} required dir="rtl" />
+        <FormField
+          name="ownerNameEn"
+          label={t("ownerNameEn")}
+          defaultValue={v("ownerNameEn")}
+          error={err("ownerNameEn")}
+          optionalLabel={tCommon("optional")}
+          dir="ltr"
+        />
+        {/* Shown in clear text on purpose: the admin reads it to the owner. Never sent back on errors. */}
+        <FormField
+          name="password"
+          label={t("password")}
+          hint={t("passwordHint")}
+          error={err("password")}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          autoComplete="off"
+          spellCheck={false}
+          maxLength={72}
+          dir="ltr"
+          className="md:col-span-2 md:max-w-lg"
+        >
+          <Button type="button" variant="outline" onClick={() => setPassword(suggestPassword())} className="shrink-0">
+            <Sparkles aria-hidden />
+            {t("generate")}
+          </Button>
+        </FormField>
+      </fieldset>
+
+      <div>
+        <Button type="submit" size="lg" disabled={pending}>
+          {pending ? t("submitting") : t("submit")}
+        </Button>
+      </div>
+    </form>
+  );
+}

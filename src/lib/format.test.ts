@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { daysBetween, formatDate, todayInRiyadh } from "./format";
+import { daysBetween, formatDate, formatDateTime, todayInRiyadh } from "./format";
 
 describe("formatDate", () => {
   it("uses Latin digits and the Gregorian calendar in Arabic", () => {
@@ -22,5 +22,11 @@ describe("daysBetween", () => {
   it("counts whole days", () => {
     expect(daysBetween("2026-11-02", "2026-12-02")).toBe(30);
     expect(daysBetween("2026-11-02", "2026-11-01")).toBe(-1);
+  });
+});
+
+describe("formatDateTime", () => {
+  it("shows the month name and Riyadh time", () => {
+    expect(formatDateTime("en", "2026-11-02T12:44:00Z")).toBe("2 November 2026 at 15:44");
   });
 });

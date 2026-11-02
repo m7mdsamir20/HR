@@ -127,7 +127,8 @@
         "ownerNameAr": "Enter the manager's Arabic name.",
         "ownerNameEn": "English name must be 2 to 120 characters.",
         "ownerPhone": "Mobile is 10 digits starting with 05.",
-        "password": "Password must be 8 to 72 characters."
+        "password": "Password must be 8 to 72 characters.",
+        "ownerNationalIdTaken": "This number is already registered."
       }
     },
     "company": {

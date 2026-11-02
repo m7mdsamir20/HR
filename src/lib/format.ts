@@ -12,7 +12,7 @@ export function formatDate(locale: Locale, isoDate: string): string {
 /** Date and time in Riyadh for a timestamp. */
 export function formatDateTime(locale: Locale, isoTimestamp: string): string {
   return new Intl.DateTimeFormat(intlLocale(locale), {
-    dateStyle: "medium",
+    dateStyle: "long",
     timeStyle: "short",
     timeZone: "Asia/Riyadh",
   }).format(new Date(isoTimestamp));
