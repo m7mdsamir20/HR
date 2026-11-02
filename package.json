@@ -9,7 +9,11 @@
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "db:reset": "supabase db reset",
+    "db:seed": "node --env-file=.env.local scripts/seed-dev.mjs",
+    "db:test": "supabase test db",
+    "admin:create": "node --env-file=.env.local scripts/create-platform-admin.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",

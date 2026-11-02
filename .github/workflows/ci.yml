@@ -39,3 +39,19 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+  database:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.122.0
+
+      # Postgres only: enough to apply migrations and run the pgTAP isolation tests.
+      - run: supabase db start
+
+      - name: RLS and isolation tests
+        run: supabase test db
