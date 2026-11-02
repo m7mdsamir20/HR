@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import type { NextRequest, NextResponse } from "next/server";
+import { sessionCookieOptions } from "./cookie-options";
 
 // Refreshes the Supabase session cookie on the response the i18n proxy already built.
 // Authorization is NOT decided here: pages and Server Actions check the session themselves.
@@ -10,6 +11,7 @@ export async function refreshSession(request: NextRequest, response: NextRespons
   if (!request.cookies.getAll().some((c) => c.name.startsWith("sb-"))) return;
 
   const supabase = createServerClient(url, key, {
+    cookieOptions: sessionCookieOptions,
     cookies: {
       getAll() {
         return request.cookies.getAll();

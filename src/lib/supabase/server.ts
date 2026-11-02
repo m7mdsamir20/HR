@@ -2,6 +2,7 @@ import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { publicEnv } from "@/lib/env";
+import { sessionCookieOptions } from "./cookie-options";
 import type { Database } from "./database.types";
 
 // Request-scoped client acting as the signed-in user: every query goes through RLS.
@@ -10,6 +11,7 @@ export async function createClient() {
   const cookieStore = await cookies();
 
   return createServerClient<Database>(NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
+    cookieOptions: sessionCookieOptions,
     cookies: {
       getAll() {
         return cookieStore.getAll();

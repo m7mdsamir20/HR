@@ -2,7 +2,8 @@
 
 دليل العمل على المشروع. اقرأه كله قبل أي تعديل. المواصفات الكاملة للوحدات موجودة في [README.md](README.md)، والملف ده بيحدد **القرارات المحسومة، وترتيب التنفيذ، وقواعد الأمان والتصميم** اللي لازم تتطبق.
 
-> **الحالة:** المرحلة 0 (التجهيز) — الكود الأساسي اتعمل ومرفوع على GitHub (`m7mdsamir20/HR`, فرع `main`). باقي فيها بنود محتاجة المستخدم (شوف "المرحلة 0 — المتبقي" في القسم 8). **ممنوع الانتقال لمرحلة جديدة من غير موافقة المستخدم.**
+> **الحالة:** المرحلة 1أ (الدخول ولوحة مدير النظام) خلصت ومرفوعة على GitHub (`m7mdsamir20/HR`, فرع `main`)، وفحصها في [SECURITY.md](SECURITY.md). الجاي: المرحلة 1ب. **ممنوع الانتقال لمرحلة جديدة من غير موافقة المستخدم.**
+> **النشر:** Supabase السحابي وVercel في **آخر المشروع** بس (قرار المستخدم). لحد كده الشغل والاختبار على Supabase محلي (Docker) و`pnpm build`.
 > **GitHub:** كل خطوة مكتملة = commit منفصل + push على طول (طلب المستخدم).
 > **لغة التواصل مع المستخدم:** عربي (مصري). أسماء الملفات والكود والـ commits بالإنجليزي.
 
@@ -294,13 +295,9 @@ supabase/
 - ✅ عملاء Supabase (server / client / admin بـ `server-only`) + تجديد الجلسة في `src/proxy.ts`.
 - ✅ CSP بـ nonce لكل طلب + HSTS وباقي الهيدرز (اتأكد منها على `pnpm build && pnpm start`: الـ nonce على كل السكربتات ومفيش أخطاء console).
 - ✅ Vitest + اختبارات رقم الهوية، `supabase/config.toml` (التسجيل العام مقفول، رقم سري 8+، رفع 10MiB)، GitHub Actions CI.
-- ⏳ **المتبقي (محتاج المستخدم):**
-  1. إنشاء مشروع Supabase سحابي (منطقة قريبة من السعودية) وإدخال المفاتيح في `.env.local` وفي Vercel. ومن لوحة Supabase: Authentication → قفل "Allow new users to sign up".
-  2. تشغيل Docker Desktop عشان `supabase start` المحلي واختبارات RLS.
-  3. التأكد إن Supabase بيقبل `@users.invalid` مع `admin.createUser` (محلي أو على المشروع السحابي).
-  4. حدود rate limit في Supabase Auth لما الدخول بيتم من Server Action (كله من IP بتاع Vercel).
-  5. ربط المستودع بمشروع Vercel، وتجربة `@sparticuz/chromium` للـ PDF.
-  6. shadcn/ui: يتضاف مع أول شاشة فيها مكونات (المرحلة 1أ) عشان منضيفش مكونات مش مستخدمة.
+- ✅ Supabase محلي شغال (Docker)، و`@users.invalid` مقبول في `admin.createUser` (اتأكد منه).
+- ✅ حدود Supabase Auth: `sign_in_sign_ups` بيتحسب على IP السيرفر، فاترفع، والحماية الحقيقية حدنا في `login_begin`. **وقبل الإطلاق لازم CAPTCHA** (شوف تحت).
+- ⏳ **مؤجل لآخر المشروع (النشر):** مشروع Supabase سحابي، وربط Vercel، وتجربة `@sparticuz/chromium` للـ PDF.
 
 **قرارات تقنية من المرحلة 0**
 - **Next 16:** الـ middleware اسمه `proxy.ts` (في `src/`). اقرأ `node_modules/next/dist/docs/` قبل أي API جديد (شوف `AGENTS.md`).
@@ -310,10 +307,19 @@ supabase/
 - **CSP:** السكربتات بـ nonce + `strict-dynamic` بس. الـ styles مسموح فيها inline (React style attributes).
 - **pnpm 11:** سكربتات التثبيت مقفولة افتراضياً؛ المسموح متحدد في `pnpm-workspace.yaml` (`allowBuilds`).
 
-**المرحلة 1أ — الدخول ولوحة مدير النظام**
-- جداول `companies` و`platform_admins` و`employees` و`audit_logs` و`login_attempts` + RLS + اختبارات العزل.
-- صفحة الدخول، الخروج، الـ rate limit، الرسالة العامة.
-- لوحة مدير النظام: إنشاء شركة + حساب مديرها، تعديل حد الموظفين وتاريخ الانتهاء، إيقاف/تفعيل، كشف تعارض أرقام الهوية.
+**المرحلة 1أ — الدخول ولوحة مدير النظام** ✅
+- ✅ جداول `companies` و`platform_admins` و`employees` و`audit_logs` و`private.login_attempts` + RLS + 43 اختبار pgTAP (في CI).
+- ✅ صفحة الدخول (مقسومة زي نظام الخدمات)، الخروج، الـ rate limit الذرّي، الرسالة العامة، صفحة "الاشتراك منتهي".
+- ✅ لوحة مدير النظام: إنشاء شركة + حساب مديرها، تعديل حد الموظفين وتاريخ الانتهاء، إيقاف/تفعيل، البحث برقم الهوية.
+- ✅ فحص `security-audit` ← `SECURITY.md` (الحكم: NEEDS SECURITY FIXES BEFORE LAUNCH بسبب CAPTCHA بس).
+
+**قرارات تقنية من المرحلة 1أ**
+- **الكتابة:** بيانات الشركات بتتكتب بهوية المستخدم نفسه (RLS + triggers سجل العمليات شغالين). الـ service role لعمليات Auth الإدارية وRPCs حد المحاولات بس.
+- **حد المحاولات:** `login_begin()` بتفحص وتسجل في خطوة واحدة تحت advisory lock، و`login_succeeded()` بتقلبها نجاح. قبل الإطلاق: **Turnstile CAPTCHA على Supabase Auth** (`[auth.captcha]`)، لأن أي حد يقدر يكلم Supabase Auth مباشرة بالمفتاح العام ويتخطى حدنا. خطاف التحقق من الرقم السري متاح على خطة Teams وما فوق بس.
+- **الكوكي:** جلسة Supabase `httpOnly` (`src/lib/supabase/cookie-options.ts`). المتصفح مبيكلمش Supabase خالص، ومفيش عميل متصفح.
+- **shadcn/ui:** Radix + RTL، ومتغيراته مربوطة بالـ tokens بتاعتنا. `card` و`secondary` **مش** ألوان في Tailwind، لأنهم أسماء في مقاسات الخطوط (`text-card` و`text-secondary`). الأزرار ارتفاعها 44px. `cn` مبني على `clsx` + `tailwind-merge` ومتعلّم مقاسات الخطوط بتاعتنا.
+- **النصوص العربي في الواجهة بالفصحى** (المستخدمين في السعودية). التواصل مع المستخدم بس هو اللي بالمصري.
+- **أنواع قاعدة البيانات:** `pnpm db:types` بعد أي migration. الحسابات التجريبية: `pnpm db:reset && pnpm db:seed` (الرقم السري في `scripts/seed-dev.mjs`).
 
 **المرحلة 1ب — اليوزرات وملف الموظف**
 - مدير الشركة/HR: إنشاء موظف (رقم هوية + رقم سري + دور + قسم + مشرف)، تعديل، تعطيل، حذف، رقم سري جديد.
@@ -405,7 +411,10 @@ pnpm lint                   # ESLint
 pnpm typecheck              # next typegen + tsc (الأنواع PageProps/LayoutProps بتتولد من Next)
 pnpm test                   # Vitest (src/**/*.test.ts)
 pnpm exec supabase start    # Supabase محلي (محتاج Docker Desktop شغال)
-pnpm exec supabase test db  # اختبارات RLS والعزل (pgTAP) — من المرحلة 1أ
+pnpm db:test                # اختبارات RLS والعزل (pgTAP)
+pnpm db:reset && pnpm db:seed   # قاعدة محلية نضيفة + حسابات تجريبية
+pnpm db:types               # تحديث أنواع TypeScript من قاعدة البيانات
+pnpm admin:create <id> "<name>"   # إنشاء مدير نظام (الطريقة الوحيدة)
 ```
 
 `.claude/launch.json` فيه `web-prod` (`pnpm start`) و`web-dev` (`pnpm dev`) على بورت 3000.

@@ -41,9 +41,6 @@ importers:
       server-only:
         specifier: 0.0.1
         version: 0.0.1
-      shadcn:
-        specifier: 4.23.0
-        version: 4.23.0
       tailwind-merge:
         specifier: 3.7.0
         version: 3.7.0
@@ -72,6 +69,9 @@ importers:
       eslint-config-next:
         specifier: 16.4.3
         version: 16.4.3(@typescript-eslint/parser@8.72.1(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
+      shadcn:
+        specifier: 4.23.0
+        version: 4.23.0
       supabase:
         specifier: ^2.122.0
         version: 2.122.0
