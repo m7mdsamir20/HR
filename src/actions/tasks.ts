@@ -32,6 +32,8 @@ function taskError(error: { code?: string; message?: string } | null, context: s
       return "notSubmitted";
     case "too_many_files":
       return "tooManyFiles";
+    case "invalid_attachment":
+      return "fileType";
     case "rating_required":
     case "note_required":
       return "invalid";
@@ -142,8 +144,14 @@ export async function submitReport(taskId: string, _prev: ReportState, formData:
   // Only paths this flow produced for this task; checked before anything touches storage.
   const expected = new RegExp(`^${member.company.id}/reports/${id.data}/[0-9a-f-]{36}\\.(jpg|png|webp|heic|pdf|docx|xlsx)$`);
   if (paths.some((p) => !expected.test(p))) return { ok: false, error: "forbidden" };
+  // Removes files that were just uploaded for a report that won't be recorded; never one that an
+  // existing report already cites (that is evidence).
   const discard = async () => {
-    if (paths.length) await supabase.storage.from(BUCKET).remove(paths);
+    if (paths.length === 0) return;
+    const { data: used } = await supabase.from("report_attachments").select("file_path").in("file_path", paths);
+    const cited = new Set((used ?? []).map((r) => r.file_path));
+    const orphans = paths.filter((p) => !cited.has(p));
+    if (orphans.length) await supabase.storage.from(BUCKET).remove(orphans);
   };
 
   const parsed = reportSchema.safeParse({

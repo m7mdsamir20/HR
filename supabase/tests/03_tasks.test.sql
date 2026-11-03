@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(42);
+select plan(48);
 
 create function pg_temp.mk_user(p_id uuid, p_nid text) returns void language sql as $$
   insert into auth.users (id, email, aud, role, instance_id, created_at)
@@ -108,8 +108,25 @@ select throws_ok(format($f$select public.task_submit_report(%L, jsonb_build_obje
   (select id from ids where name = 't1')), '23514', null, 'delivery links must be https');
 select throws_ok(format($f$select public.task_submit_report(%L, jsonb_build_object('summary', 'تم'),
     jsonb_build_array(jsonb_build_object('path', '0000000a-0000-0000-0000-000000000000/reports/%s/11111111-1111-1111-1111-111111111111.jpg', 'name', 'x.jpg', 'mime', 'image/jpeg', 'size', 10)))$f$,
-  (select id from ids where name = 't1'), (select id from ids where name = 't2')), '23514', null,
+  (select id from ids where name = 't1'), (select id from ids where name = 't2')), 'P0001', 'invalid_attachment',
   'an attachment from another task''s folder is refused');
+reset role;
+insert into storage.objects (bucket_id, name, metadata)
+values ('company-files', '0000000a-0000-0000-0000-000000000000/reports/' || (select id from ids where name = 't1') || '/11111111-1111-1111-1111-111111111111.jpg',
+  '{"size": 1024, "mimetype": "image/jpeg"}');
+select pg_temp.act_as('00000000-0000-0000-0000-0000000000a4');
+select throws_ok(format($f$select public.task_submit_report(%L, jsonb_build_object('summary', 'تم'),
+    jsonb_build_array(jsonb_build_object('path', '0000000a-0000-0000-0000-000000000000/reports/%s/22222222-2222-2222-2222-222222222222.jpg', 'name', 'x.jpg', 'mime', 'image/jpeg', 'size', 10)))$f$,
+  (select id from ids where name = 't1'), (select id from ids where name = 't1')), 'P0001', 'invalid_attachment',
+  'an attachment that was never uploaded is refused');
+select throws_ok(format($f$select public.task_submit_report(%L, jsonb_build_object('summary', 'تم'),
+    jsonb_build_array(jsonb_build_object('path', '0000000a-0000-0000-0000-000000000000/reports/%s/11111111-1111-1111-1111-111111111111.jpg', 'name', 'x.jpg', 'mime', 'text/html', 'size', 1024)))$f$,
+  (select id from ids where name = 't1'), (select id from ids where name = 't1')), 'P0001', 'invalid_attachment',
+  'a declared type that doesn''t match the extension is refused');
+select throws_ok(format($f$select public.task_submit_report(%L, jsonb_build_object('summary', 'تم'),
+    jsonb_build_array(jsonb_build_object('path', '0000000a-0000-0000-0000-000000000000/reports/%s/11111111-1111-1111-1111-111111111111.jpg', 'name', 'x.jpg', 'mime', 'image/jpeg', 'size', 999)))$f$,
+  (select id from ids where name = 't1'), (select id from ids where name = 't1')), 'P0001', 'invalid_attachment',
+  'a size that doesn''t match storage is refused');
 select isnt(public.task_submit_report((select id from ids where name = 't1'),
     jsonb_build_object('summary', 'تم تركيب 6 كاميرات وتجربة التسجيل', 'hours_spent', '5', 'obstacles', 'تأخر وصول الكابلات',
       'links', jsonb_build_array('https://example.com/handover')),
@@ -161,6 +178,25 @@ reset role;
 select pg_temp.act_as('00000000-0000-0000-0000-0000000000a5');
 select is((select count(*) from notifications where recipient_id = '000000a4-0000-0000-0000-000000000000'), 0::bigint,
   'nobody reads someone else''s notifications');
+reset role;
+
+-- A file a report points at can't be deleted through the storage API, not even by its uploader
+select pg_temp.act_as('00000000-0000-0000-0000-0000000000a4');
+-- (Storage forbids raw SQL deletes, so check the predicate the delete policy uses.)
+select is(private.storage_file_in_use('0000000a-0000-0000-0000-000000000000/reports/' || (select id from ids where name = 't1') || '/11111111-1111-1111-1111-111111111111.jpg'), true,
+  'proof files that a report cites are marked in use, so the storage delete policy refuses them');
+select is(private.storage_file_in_use('0000000a-0000-0000-0000-000000000000/reports/' || (select id from ids where name = 't1') || '/33333333-3333-3333-3333-333333333333.jpg'), false,
+  'a file nothing points at can still be cleaned up');
+reset role;
+
+-- A manager whose role was removed loses the team's tasks even while manager_id still points at them
+insert into employees (id, company_id, user_id, national_id, id_type, full_name_ar, role, manager_id)
+select '000000a6-0000-0000-0000-000000000000', '0000000a-0000-0000-0000-000000000000', null, '2000000906', 'resident', 'فني 3', 'employee', '000000a2-0000-0000-0000-000000000000';
+insert into tasks (id, company_id, created_by, assignee_id, title, due_date)
+values ('00000ea5-0000-0000-0000-000000000000', '0000000a-0000-0000-0000-000000000000', '000000a1-0000-0000-0000-000000000000', '000000a6-0000-0000-0000-000000000000', 'مهمة فريق HR', current_date);
+select pg_temp.act_as('00000000-0000-0000-0000-0000000000a2');
+select is((select count(*) from tasks where id = '00000ea5-0000-0000-0000-000000000000'), 0::bigint,
+  'someone who is not currently a manager does not see a "team" task through manager_id alone');
 reset role;
 
 -- Review rights follow the current role: a demoted manager loses them on tasks they created

@@ -202,3 +202,23 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Approval stamp: pressed down once. The global reduced-motion rule above shortens it to nothing. */
+@keyframes stamp-press {
+  0% {
+    opacity: 0;
+    transform: rotate(-6deg) scale(1.6);
+  }
+  70% {
+    opacity: 1;
+    transform: rotate(-6deg) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(-6deg) scale(1);
+  }
+}
+
+.stamp-press {
+  animation: stamp-press 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
