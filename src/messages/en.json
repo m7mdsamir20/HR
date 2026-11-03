@@ -284,5 +284,51 @@
       "deleteConfirm": "Delete account permanently",
       "noActions": "You can't manage this account."
     }
+  },
+  "settings": {
+    "title": "Settings",
+    "saved": "Changes saved",
+    "company": {
+      "title": "Company details",
+      "nameAr": "Company name (Arabic)",
+      "nameEn": "Company name (English)",
+      "commercialReg": "Commercial registration"
+    },
+    "logo": {
+      "title": "Company logo",
+      "intro": "Your employees see the logo at the top of every page and on printed documents.",
+      "current": "Current logo",
+      "choose": "Choose a logo image",
+      "hint": "PNG, JPG or WebP, up to 512 KB.",
+      "upload": "Upload logo",
+      "uploading": "Uploading…",
+      "remove": "Remove logo",
+      "saved": "Logo updated"
+    },
+    "departments": {
+      "title": "Departments",
+      "intro": "Use departments to organise employees. Deleting a department doesn't delete its people.",
+      "empty": "No departments yet. Add the first one below.",
+      "add": "Add a department",
+      "addSubmit": "Add",
+      "nameAr": "Department name (Arabic)",
+      "nameEn": "Department name (English)",
+      "rename": "Edit",
+      "delete": "Delete",
+      "deleteConfirm": "Delete the {name} department?",
+      "deleteNote": "{count} employees will be left without a department.",
+      "employees": "{count} employees"
+    },
+    "fields": {
+      "nameAr": "Enter the Arabic name (at least 2 characters).",
+      "nameEn": "English name must be 2 to 120 characters.",
+      "commercialReg": "Commercial registration is 10 digits.",
+      "logo": "Choose a logo image."
+    },
+    "errors": {
+      "fileType": "That file type isn't supported. Use a PNG, JPG or WebP image.",
+      "fileSize": "The image is larger than 512 KB. Make it smaller and try again.",
+      "duplicate": "A department with this name already exists."
+    }
   }
 }

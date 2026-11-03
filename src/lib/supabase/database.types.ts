@@ -170,6 +170,9 @@ isOneToOne: false
 "employee_create":
 { Args: { "p_department_id": string,"p_full_name_ar": string,"p_full_name_en": string,"p_job_title": string,"p_locale": string,"p_manager_id": string,"p_national_id": string,"p_phone": string,"p_role": Database["public"]['Enums']["employee_role"],"p_user_id": string }; Returns: string
                            },
+"employee_create_begin":
+{ Args: { "p_role": Database["public"]['Enums']["employee_role"] }; Returns: undefined
+                           },
 "employee_delete_begin":
 { Args: { "p_employee_id": string }; Returns: string
                            },

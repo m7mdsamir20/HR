@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(52);
+select plan(55);
 
 create function pg_temp.mk_user(p_id uuid, p_nid text) returns void language sql as $$
   insert into auth.users (id, email, aud, role, instance_id, created_at)
@@ -66,6 +66,12 @@ select isnt(
 select throws_ok(
   $$select public.employee_create('00000000-0000-0000-0000-0000000000e2', '1000000902', 'مالك مزيف', null, null, null, 'owner', null, null, 'ar')$$,
   '42501', null, 'HR cannot create an owner');
+select throws_ok($$select public.employee_create_begin('owner')$$, '42501', null,
+  'HR is refused before any Auth account is created');
+select lives_ok($$select public.employee_create_begin('employee') from generate_series(1, 30)$$,
+  'thirty employee creations in ten minutes are allowed');
+select throws_ok($$select public.employee_create_begin('employee')$$, 'P0001', 'rate_limited',
+  'the 31st creation attempt in ten minutes is refused before touching Auth');
 select throws_ok(
   $$select public.employee_create('00000000-0000-0000-0000-0000000000e2', '1000000902', 'موارد', null, null, null, 'hr', null, null, 'ar')$$,
   '42501', null, 'HR cannot create another HR');

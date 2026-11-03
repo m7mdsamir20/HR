@@ -53,6 +53,11 @@ export async function createEmployee(_prev: EmployeeFormState, formData: FormDat
   if (!parsed.success) return { error: "invalid", fields: invalidFields(parsed.error), values };
   const d = parsed.data;
 
+  // Authorize and spend the creation allowance before calling Auth (no unlimited ID probing).
+  const supabase = await createClient();
+  const { error: beginError } = await supabase.rpc("employee_create_begin", { p_role: d.role });
+  if (beginError) return { error: toActionError(beginError, "createEmployee"), values };
+
   const service = createAdminClient();
   const { data: created, error: createError } = await service.auth.admin.createUser({
     email: authEmailFor(d.nationalId),
@@ -67,7 +72,6 @@ export async function createEmployee(_prev: EmployeeFormState, formData: FormDat
     return { error: "unexpected", values };
   }
 
-  const supabase = await createClient();
   const { data: employeeId, error } = await supabase.rpc("employee_create", {
     p_user_id: created.user.id,
     p_national_id: d.nationalId,

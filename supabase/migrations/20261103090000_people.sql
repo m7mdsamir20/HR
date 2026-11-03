@@ -193,6 +193,20 @@ create trigger departments_audit after insert or update or delete on public.depa
 -- Employee management RPCs. Auth users are created/banned/deleted by the Server Action with the
 -- service role; these do the authorization and the tenant writes as the signed-in user.
 -- ---------------------------------------------------------------------------
+-- Runs before the Server Action touches Supabase Auth: authorizes and spends the company's
+-- creation allowance, so the Auth API can't be used to probe national IDs without a limit.
+create function public.employee_create_begin(p_role public.employee_role) returns void
+language plpgsql security definer set search_path = '' as $$
+declare
+  v_company uuid := private.auth_company_id();
+begin
+  if v_company is null or not private.can_manage_role(p_role) then
+    raise exception 'forbidden' using errcode = '42501';
+  end if;
+  perform private.take_rate_limit('employee_create', v_company::text, 30, interval '10 minutes');
+end;
+$$;
+
 create function public.employee_create(
   p_user_id uuid,
   p_national_id text,
@@ -213,7 +227,6 @@ begin
   if v_company is null or not private.can_manage_role(p_role) then
     raise exception 'forbidden' using errcode = '42501';
   end if;
-  perform private.take_rate_limit('employee_create', v_company::text, 30, interval '10 minutes');
 
   -- Only a fresh Auth user made for this national ID: an old or leftover account (with a password
   -- someone else knows) can never be attached to a new employee row.
@@ -486,6 +499,7 @@ create policy documents_delete on public.employee_documents for delete to authen
 -- ---------------------------------------------------------------------------
 revoke execute on function
   public.consume_rate_limit(text),
+  public.employee_create_begin(public.employee_role),
   public.employee_create(uuid, text, text, text, text, text, public.employee_role, uuid, uuid, text),
   public.employee_update(uuid, text, text, text, text, public.employee_role, uuid, uuid),
   public.employee_set_status(uuid, public.employee_status),
@@ -499,6 +513,7 @@ revoke execute on function
 from public, anon;
 grant execute on function
   public.consume_rate_limit(text),
+  public.employee_create_begin(public.employee_role),
   public.employee_create(uuid, text, text, text, text, text, public.employee_role, uuid, uuid, text),
   public.employee_update(uuid, text, text, text, text, public.employee_role, uuid, uuid),
   public.employee_set_status(uuid, public.employee_status),
