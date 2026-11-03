@@ -12,7 +12,7 @@ export default async function NewEmployeePage({ params }: PageProps<"/[locale]/e
   const locale = (await params).locale as Locale;
   const member = await requireMember(locale, ["owner", "hr"]);
   const t = await getTranslations({ locale, namespace: "employees" });
-  const { departments, managers } = await employeeFormOptions(locale);
+  const { departments, managers, nationalities } = await employeeFormOptions(locale);
 
   return (
     <main className="flex flex-col gap-6">
@@ -29,6 +29,7 @@ export default async function NewEmployeePage({ params }: PageProps<"/[locale]/e
         roles={assignableRoles(member.role)}
         departments={departments}
         managers={managers}
+        nationalities={nationalities}
         defaults={{ locale }}
       />
     </main>

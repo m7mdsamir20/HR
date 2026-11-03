@@ -1,5 +1,6 @@
 import "server-only";
 import type { Locale } from "@/i18n/routing";
+import { nationalityOptions } from "@/lib/countries";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -29,6 +30,9 @@ export async function employeeFormOptions(locale: Locale, excludeEmployeeId?: st
   ]);
 
   return {
+    // Built here, not in the browser: Intl region names differ between Node and browsers, which
+    // would make the server and client render different option lists.
+    nationalities: nationalityOptions(locale),
     departments: (departments ?? []).map((d) => ({ value: d.id, label: localName(locale, d.name_ar, d.name_en) })),
     managers: (managers ?? [])
       .filter((m) => m.id !== excludeEmployeeId)

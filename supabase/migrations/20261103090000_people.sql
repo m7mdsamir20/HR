@@ -381,6 +381,26 @@ begin
 end;
 $$;
 
+-- The caller's own profile. Includes only the *name* of their manager: RLS doesn't let a plain
+-- employee read the manager's row (national ID, phone), but they should know who it is.
+create function public.my_profile() returns jsonb
+language sql stable security definer set search_path = '' as $$
+  select jsonb_build_object(
+    'national_id', e.national_id,
+    'phone', e.phone,
+    'job_title', e.job_title,
+    'locale', e.locale,
+    'department_ar', d.name_ar,
+    'department_en', d.name_en,
+    'manager_ar', m.full_name_ar,
+    'manager_en', m.full_name_en
+  )
+  from public.employees e
+  left join public.departments d on d.id = e.department_id
+  left join public.employees m on m.id = e.manager_id and m.status = 'active'
+  where e.id = private.auth_employee_id();
+$$;
+
 create function public.profile_password_changed() returns void
 language plpgsql security definer set search_path = '' as $$
 declare
@@ -508,6 +528,7 @@ revoke execute on function
   public.employee_password_reset_begin(uuid),
   public.profile_set_locale(text),
   public.profile_password_changed(),
+  public.my_profile(),
   public.company_update_profile(text, text, text),
   public.company_set_logo(text)
 from public, anon;
@@ -522,6 +543,7 @@ grant execute on function
   public.employee_password_reset_begin(uuid),
   public.profile_set_locale(text),
   public.profile_password_changed(),
+  public.my_profile(),
   public.company_update_profile(text, text, text),
   public.company_set_logo(text)
 to authenticated;

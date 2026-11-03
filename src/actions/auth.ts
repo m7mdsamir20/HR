@@ -62,7 +62,8 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
 
   const { error: recordError } = await service.rpc("login_succeeded", { p_attempt: attempt });
   if (recordError) console.error("login_succeeded failed", recordError.code);
-  redirect({ href: homePathFor(account), locale });
+  // Employees land in the language saved in their profile.
+  redirect({ href: homePathFor(account), locale: account.kind === "employee" ? account.locale : locale });
 }
 
 export async function logout(formData: FormData): Promise<void> {

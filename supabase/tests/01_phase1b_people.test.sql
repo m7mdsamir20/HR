@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(55);
+select plan(57);
 
 create function pg_temp.mk_user(p_id uuid, p_nid text) returns void language sql as $$
   insert into auth.users (id, email, aud, role, instance_id, created_at)
@@ -60,11 +60,13 @@ select throws_ok($$update employees set department_id = '00000d0b-0000-0000-0000
 -- ---------------------------------------------------------------------------
 select pg_temp.act_as('00000000-0000-0000-0000-00000000a002');
 select isnt(
-  public.employee_create('00000000-0000-0000-0000-0000000000e1', '2000000901', 'موظف جديد', null, null, null,
-    'employee', '00000d0a-0000-0000-0000-000000000000', '000000a3-0000-0000-0000-000000000000', 'ar'),
+  public.employee_create('00000000-0000-0000-0000-0000000000e1', '2000000901', 'employee',
+    jsonb_build_object('full_name_ar', 'موظف جديد', 'department_id', '00000d0a-0000-0000-0000-000000000000',
+      'manager_id', '000000a3-0000-0000-0000-000000000000', 'nationality', 'EG', 'contract_type', 'unlimited'),
+    jsonb_build_object('basic_salary', '4000', 'housing_allowance', '1000', 'iban', 'SA0380000000608010167519')),
   null, 'HR can create an employee');
 select throws_ok(
-  $$select public.employee_create('00000000-0000-0000-0000-0000000000e2', '1000000902', 'مالك مزيف', null, null, null, 'owner', null, null, 'ar')$$,
+  $$select public.employee_create('00000000-0000-0000-0000-0000000000e2', '1000000902', 'owner', jsonb_build_object('full_name_ar', 'مالك مزيف', 'locale', 'ar'), '{}')$$,
   '42501', null, 'HR cannot create an owner');
 select throws_ok($$select public.employee_create_begin('owner')$$, '42501', null,
   'HR is refused before any Auth account is created');
@@ -73,25 +75,25 @@ select lives_ok($$select public.employee_create_begin('employee') from generate_
 select throws_ok($$select public.employee_create_begin('employee')$$, 'P0001', 'rate_limited',
   'the 31st creation attempt in ten minutes is refused before touching Auth');
 select throws_ok(
-  $$select public.employee_create('00000000-0000-0000-0000-0000000000e2', '1000000902', 'موارد', null, null, null, 'hr', null, null, 'ar')$$,
+  $$select public.employee_create('00000000-0000-0000-0000-0000000000e2', '1000000902', 'hr', jsonb_build_object('full_name_ar', 'موارد', 'locale', 'ar'), '{}')$$,
   '42501', null, 'HR cannot create another HR');
 select throws_ok(
-  $$select public.employee_create('00000000-0000-0000-0000-0000000000e2', '1000000999', 'خطأ', null, null, null, 'employee', null, null, 'ar')$$,
+  $$select public.employee_create('00000000-0000-0000-0000-0000000000e2', '1000000999', 'employee', jsonb_build_object('full_name_ar', 'خطأ', 'locale', 'ar'), '{}')$$,
   'P0001', 'user_mismatch', 'the Auth user must match the national ID');
 select throws_ok(
-  $$select public.employee_create('00000000-0000-0000-0000-00000000a005', '2000000105', 'ربط حساب قائم', null, null, null, 'employee', null, null, 'ar')$$,
+  $$select public.employee_create('00000000-0000-0000-0000-00000000a005', '2000000105', 'employee', jsonb_build_object('full_name_ar', 'ربط حساب قائم', 'locale', 'ar'), '{}')$$,
   'P0001', 'user_mismatch', 'an Auth account already linked to an employee cannot be attached again');
 select throws_ok(
-  $$select public.employee_update('000000a1-0000-0000-0000-000000000000', 'مالك', null, null, null, 'owner', null, null)$$,
+  $$select public.employee_update('000000a1-0000-0000-0000-000000000000', 'owner', jsonb_build_object('full_name_ar', 'مالك'), '{}')$$,
   '42501', null, 'HR cannot edit the owner');
 select throws_ok(
-  $$select public.employee_update('000000a2-0000-0000-0000-000000000000', 'موارد', null, null, null, 'owner', null, null)$$,
+  $$select public.employee_update('000000a2-0000-0000-0000-000000000000', 'owner', jsonb_build_object('full_name_ar', 'موارد'), '{}')$$,
   '42501', null, 'HR cannot edit themself (no self-promotion)');
 select throws_ok(
-  $$select public.employee_update('000000a4-0000-0000-0000-000000000000', 'موظف', null, null, null, 'hr', null, null)$$,
+  $$select public.employee_update('000000a4-0000-0000-0000-000000000000', 'hr', jsonb_build_object('full_name_ar', 'موظف'), '{}')$$,
   '42501', null, 'HR cannot promote someone to HR');
 select lives_ok(
-  $$select public.employee_update('000000a4-0000-0000-0000-000000000000', 'موظف أ1 معدل', null, '0551112222', 'فني', 'employee', '00000d0a-0000-0000-0000-000000000000', '000000a3-0000-0000-0000-000000000000')$$,
+  $$select public.employee_update('000000a4-0000-0000-0000-000000000000', 'employee', jsonb_build_object('full_name_ar', 'موظف أ1 معدل', 'phone', '0551112222', 'job_title', 'فني', 'department_id', '00000d0a-0000-0000-0000-000000000000', 'manager_id', '000000a3-0000-0000-0000-000000000000'), '{}')$$,
   'HR can edit an employee');
 select throws_ok(
   $$select public.employee_set_status('000000b2-0000-0000-0000-000000000000', 'disabled')$$,
@@ -127,7 +129,7 @@ select is((select count(*) from audit_logs where action = 'employee.password_res
 -- ---------------------------------------------------------------------------
 select pg_temp.act_as('00000000-0000-0000-0000-00000000a003');
 select throws_ok(
-  $$select public.employee_create('00000000-0000-0000-0000-0000000000e2', '1000000902', 'x', null, null, null, 'employee', null, null, 'ar')$$,
+  $$select public.employee_create('00000000-0000-0000-0000-0000000000e2', '1000000902', 'employee', jsonb_build_object('full_name_ar', 'x', 'locale', 'ar'), '{}')$$,
   '42501', null, 'a manager cannot create employees');
 select throws_ok($$select public.employee_set_status('000000a4-0000-0000-0000-000000000000', 'disabled')$$,
   '42501', null, 'a manager cannot disable their own team member');
@@ -144,13 +146,13 @@ select pg_temp.act_as('00000000-0000-0000-0000-00000000a001');
 select throws_ok($$select public.employee_delete_begin('000000a1-0000-0000-0000-000000000000')$$,
   '42501', null, 'the owner cannot delete themself');
 select isnt(
-  public.employee_create('00000000-0000-0000-0000-0000000000e3', '1000000903', 'مالك ثان', null, null, null, 'owner', null, null, 'en'),
+  public.employee_create('00000000-0000-0000-0000-0000000000e3', '1000000903', 'owner', jsonb_build_object('full_name_ar', 'مالك ثان', 'locale', 'en'), '{}'),
   null, 'the owner can create a second owner');
 select lives_ok(
-  $$select public.employee_update('000000a2-0000-0000-0000-000000000000', 'موارد أ', null, null, null, 'manager', null, null)$$,
+  $$select public.employee_update('000000a2-0000-0000-0000-000000000000', 'manager', jsonb_build_object('full_name_ar', 'موارد أ'), '{}')$$,
   'the owner can change HR''s role');
 select throws_ok(
-  $$select public.employee_update('000000b2-0000-0000-0000-000000000000', 'x', null, null, null, 'employee', null, null)$$,
+  $$select public.employee_update('000000b2-0000-0000-0000-000000000000', 'employee', jsonb_build_object('full_name_ar', 'x'), '{}')$$,
   '42501', null, 'the owner cannot edit another company''s employee');
 reset role;
 
@@ -242,8 +244,12 @@ reset role;
 -- ---------------------------------------------------------------------------
 -- Profile and rate limits
 -- ---------------------------------------------------------------------------
+update employees set manager_id = '000000a1-0000-0000-0000-000000000000' where id = '000000a4-0000-0000-0000-000000000000';
 select pg_temp.act_as('00000000-0000-0000-0000-00000000a004');
 select public.profile_set_locale('en');
+select is(public.my_profile() ->> 'national_id', '2000000104', 'my_profile returns the caller''s own record');
+select ok(not (public.my_profile() ? 'manager_national_id') and (public.my_profile() -> 'manager_ar') is not null,
+  'my_profile names the manager without exposing their record');
 select throws_ok($$select public.company_update_profile('اسم جديد', null, null)$$, '42501', null,
   'only the owner edits the company profile');
 select public.consume_rate_limit('password_change') from generate_series(1, 5);

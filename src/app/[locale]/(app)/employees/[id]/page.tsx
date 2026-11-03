@@ -5,14 +5,19 @@ import { z } from "zod";
 import { updateEmployee } from "@/actions/employees";
 import { EmployeeActions } from "@/components/employees/employee-actions";
 import { EmployeeForm } from "@/components/employees/employee-form";
+import { FactsSection } from "@/components/form-section";
 import { StatusPill } from "@/components/status-pill";
 import { Link, redirect } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { requireMember } from "@/lib/auth/account";
 import { assignableRoles, canManageEmployee } from "@/lib/auth/permissions";
+import { nationalityName } from "@/lib/countries";
 import { employeeFormOptions, localName, one } from "@/lib/employees";
-import { formatDateTime } from "@/lib/format";
+import { formatDate, formatDateTime } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
+
+const EMPLOYEE_COLUMNS =
+  "id, national_id, id_type, full_name_ar, full_name_en, phone, email, employee_number, job_title, occupation, role, status, department_id, manager_id, nationality, gender, birth_date, marital_status, hire_date, contract_type, contract_start, contract_end, probation_days, created_at, department:departments(name_ar, name_en), manager:manager_id(full_name_ar, full_name_en)";
 
 export default async function EmployeePage({ params }: PageProps<"/[locale]/employees/[id]">) {
   const { locale: rawLocale, id: rawId } = await params;
@@ -22,16 +27,12 @@ export default async function EmployeePage({ params }: PageProps<"/[locale]/empl
   if (!id.success) notFound();
   if (id.data === member.employee_id) redirect({ href: "/profile", locale });
 
-  // RLS returns nothing for someone outside the caller's reach (another company, not on the team).
+  // RLS returns nothing outside the caller's reach; the pay row only to whoever manages the file.
   const supabase = await createClient();
-  const { data: e } = await supabase
-    .from("employees")
-    .select(
-      "id, national_id, full_name_ar, full_name_en, phone, job_title, role, status, department_id, manager_id, created_at, department:departments(name_ar, name_en), manager:manager_id(full_name_ar, full_name_en)",
-    )
-    .eq("id", id.data)
-    .neq("status", "deleted")
-    .maybeSingle();
+  const [{ data: e }, { data: pay }] = await Promise.all([
+    supabase.from("employees").select(EMPLOYEE_COLUMNS).eq("id", id.data).neq("status", "deleted").maybeSingle(),
+    supabase.from("employee_compensation").select("*").eq("employee_id", id.data).maybeSingle(),
+  ]);
   if (!e) notFound();
 
   const t = await getTranslations({ locale, namespace: "employees" });
@@ -41,9 +42,11 @@ export default async function EmployeePage({ params }: PageProps<"/[locale]/empl
   const manager = one(e.manager);
   const canManage = canManageEmployee(member, { id: e.id, role: e.role, status });
   const options = canManage ? await employeeFormOptions(locale, e.id) : null;
+  const date = (d: string | null) => (d ? formatDate(locale, d) : null);
+  const s = (x: string | number | null | undefined) => (x === null || x === undefined || x === "" ? "" : String(x));
 
   return (
-    <main className="flex flex-col gap-8">
+    <main className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
         <Link href="/employees" className="inline-flex min-h-11 w-fit items-center gap-2 text-label text-ink-soft hover:text-ink">
           <ArrowRight className="size-4 ltr:-scale-x-100" aria-hidden />
@@ -54,61 +57,80 @@ export default async function EmployeePage({ params }: PageProps<"/[locale]/empl
           <StatusPill tone={status === "active" ? "stamp" : "brick"}>{t(`status.${status}`)}</StatusPill>
         </div>
         <p className="text-secondary">
-          {tRoles(e.role)}
-          {e.job_title && ` · ${e.job_title}`}
+          {tRoles(e.role)} · <bdi dir="ltr">{e.national_id}</bdi> · {t("detail.createdAt")} {formatDateTime(locale, e.created_at)}
         </p>
       </div>
 
-      <dl className="grid gap-4 rounded-card border border-line bg-surface p-4 sm:grid-cols-2 md:p-6 xl:grid-cols-4">
-        <Fact label={t("columns.nationalId")} value={<bdi dir="ltr">{e.national_id}</bdi>} />
-        <Fact label={t("form.phone")} value={e.phone ? <bdi dir="ltr">{e.phone}</bdi> : "—"} />
-        <Fact label={t("columns.department")} value={e.department ? localName(locale, e.department.name_ar, e.department.name_en) : "—"} />
-        <Fact label={t("columns.manager")} value={manager ? localName(locale, manager.full_name_ar, manager.full_name_en) : "—"} />
-        <Fact label={t("detail.createdAt")} value={formatDateTime(locale, e.created_at)} />
-      </dl>
-
       {canManage && options ? (
         <>
-          <section aria-labelledby="edit" className="flex flex-col gap-4">
-            <h2 id="edit" className="text-section">
-              {t("detail.edit")}
-            </h2>
-            <EmployeeForm
-              mode="edit"
-              action={updateEmployee.bind(null, e.id)}
-              roles={assignableRoles(member.role)}
-              departments={options.departments}
-              managers={options.managers}
-              defaults={{
-                fullNameAr: e.full_name_ar,
-                fullNameEn: e.full_name_en ?? "",
-                phone: e.phone ?? "",
-                jobTitle: e.job_title ?? "",
-                role: e.role,
-                departmentId: e.department_id ?? "",
-                managerId: e.manager_id ?? "",
-              }}
-            />
-          </section>
-          <section aria-labelledby="account-actions" className="flex flex-col gap-4">
-            <h2 id="account-actions" className="text-section">
+          <EmployeeForm
+            mode="edit"
+            action={updateEmployee.bind(null, e.id)}
+            roles={assignableRoles(member.role)}
+            departments={options.departments}
+            managers={options.managers}
+            nationalities={options.nationalities}
+            idType={e.id_type}
+            defaults={{
+              fullNameAr: e.full_name_ar,
+              fullNameEn: s(e.full_name_en),
+              nationality: s(e.nationality),
+              gender: s(e.gender),
+              birthDate: s(e.birth_date),
+              maritalStatus: s(e.marital_status),
+              phone: s(e.phone),
+              email: s(e.email),
+              employeeNumber: s(e.employee_number),
+              jobTitle: s(e.job_title),
+              occupation: s(e.occupation),
+              role: e.role,
+              departmentId: s(e.department_id),
+              managerId: s(e.manager_id),
+              hireDate: s(e.hire_date),
+              contractType: s(e.contract_type),
+              contractStart: s(e.contract_start),
+              contractEnd: s(e.contract_end),
+              probationDays: s(e.probation_days),
+              basicSalary: s(pay?.basic_salary),
+              housingAllowance: s(pay?.housing_allowance),
+              transportAllowance: s(pay?.transport_allowance),
+              communicationAllowance: s(pay?.communication_allowance),
+              otherAllowances: s(pay?.other_allowances),
+              bankName: s(pay?.bank_name),
+              iban: s(pay?.iban),
+              gosiNumber: s(pay?.gosi_number),
+            }}
+          />
+          <section aria-labelledby="account-actions" className="flex flex-col gap-4 rounded-card border border-line bg-surface p-4 md:p-6">
+            <h2 id="account-actions" className="text-card">
               {t("detail.actions")}
             </h2>
             <EmployeeActions employeeId={e.id} name={name} status={status} />
           </section>
         </>
       ) : (
-        <p className="text-secondary">{member.role === "manager" ? t("detail.readOnly") : t("detail.noActions")}</p>
+        <>
+          <FactsSection
+            title={t("form.sections.identity")}
+            items={[
+              { label: t("form.nationality"), value: nationalityName(locale, e.nationality) },
+              { label: t("form.gender"), value: e.gender ? t(`options.gender.${e.gender as "male"}`) : null },
+              { label: t("form.phone"), value: e.phone ? <bdi dir="ltr">{e.phone}</bdi> : null },
+              { label: t("form.email"), value: e.email ? <bdi dir="ltr">{e.email}</bdi> : null },
+            ]}
+          />
+          <FactsSection
+            title={t("form.sections.work")}
+            items={[
+              { label: t("columns.department"), value: e.department ? localName(locale, e.department.name_ar, e.department.name_en) : null },
+              { label: t("columns.manager"), value: manager ? localName(locale, manager.full_name_ar, manager.full_name_en) : null },
+              { label: t("form.jobTitle"), value: e.job_title },
+              { label: t("form.hireDate"), value: date(e.hire_date) },
+            ]}
+          />
+          <p className="text-secondary">{member.role === "manager" ? t("detail.readOnly") : t("detail.noActions")}</p>
+        </>
       )}
     </main>
-  );
-}
-
-function Fact({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <dt className="text-secondary">{label}</dt>
-      <dd className="font-semibold tabular-nums">{value}</dd>
-    </div>
   );
 }

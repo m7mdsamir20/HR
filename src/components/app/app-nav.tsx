@@ -1,18 +1,19 @@
 "use client";
 
-import { House, Settings, UserRound, Users } from "lucide-react";
+import { House, Network, Settings, UserRound, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import type { Role } from "@/lib/auth/roles";
 import { cn } from "@/lib/utils";
 
-type Item = { href: string; key: "home" | "employees" | "team" | "settings" | "profile"; icon: typeof House };
+type Item = { href: string; key: "home" | "employees" | "team" | "departments" | "settings" | "profile"; icon: typeof House };
 
 function itemsFor(role: Role): Item[] {
   const items: Item[] = [{ href: "/", key: "home", icon: House }];
   if (role === "owner" || role === "hr") items.push({ href: "/employees", key: "employees", icon: Users });
   if (role === "manager") items.push({ href: "/employees", key: "team", icon: Users });
-  if (role === "owner" || role === "hr") items.push({ href: "/settings", key: "settings", icon: Settings });
+  if (role === "owner" || role === "hr") items.push({ href: "/departments", key: "departments", icon: Network });
+  if (role === "owner") items.push({ href: "/settings", key: "settings", icon: Settings });
   items.push({ href: "/profile", key: "profile", icon: UserRound });
   return items;
 }

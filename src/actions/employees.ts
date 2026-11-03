@@ -16,6 +16,7 @@ import { passwordSchema, invalidFields } from "@/lib/validation/company";
 import {
   createEmployeeFields,
   createEmployeeSchema,
+  toRpcPayload,
   updateEmployeeFields,
   updateEmployeeSchema,
   type EmployeeField,
@@ -26,8 +27,6 @@ const idSchema = z.uuid();
 const PEOPLE_ROLES = ["owner", "hr"] as const;
 // Banned until deleted or re-enabled; Supabase takes a duration, so this is effectively forever.
 const BAN_FOREVER = "876000h";
-// Optional uuid RPC arguments: the generated types mark them non-null, but SQL accepts null.
-const noUuid = (v: string | undefined) => (v ?? null) as string;
 
 export type EmployeeFormState =
   | {
@@ -72,17 +71,13 @@ export async function createEmployee(_prev: EmployeeFormState, formData: FormDat
     return { error: "unexpected", values };
   }
 
+  const { file, pay } = toRpcPayload(d, d.locale);
   const { data: employeeId, error } = await supabase.rpc("employee_create", {
     p_user_id: created.user.id,
     p_national_id: d.nationalId,
-    p_full_name_ar: d.fullNameAr,
-    p_full_name_en: d.fullNameEn ?? "",
-    p_phone: d.phone ?? "",
-    p_job_title: d.jobTitle ?? "",
     p_role: d.role,
-    p_department_id: noUuid(d.departmentId),
-    p_manager_id: noUuid(d.managerId),
-    p_locale: d.locale,
+    p_file: file,
+    p_pay: pay,
   });
   if (error || !employeeId) {
     await service.auth.admin.deleteUser(created.user.id);
@@ -104,15 +99,12 @@ export async function updateEmployee(employeeId: string, _prev: EmployeeFormStat
   const d = parsed.data;
 
   const supabase = await createClient();
+  const { file, pay } = toRpcPayload(d);
   const { error } = await supabase.rpc("employee_update", {
     p_employee_id: id.data,
-    p_full_name_ar: d.fullNameAr,
-    p_full_name_en: d.fullNameEn ?? "",
-    p_phone: d.phone ?? "",
-    p_job_title: d.jobTitle ?? "",
     p_role: d.role,
-    p_department_id: noUuid(d.departmentId),
-    p_manager_id: noUuid(d.managerId),
+    p_file: file,
+    p_pay: pay,
   });
   if (error) return { error: toActionError(error, "updateEmployee"), values };
 

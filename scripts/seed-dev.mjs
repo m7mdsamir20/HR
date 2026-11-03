@@ -20,10 +20,19 @@ const DEPARTMENTS = [
   { key: "admin", name_ar: "الشؤون الإدارية", name_en: "Administration" },
 ];
 const USERS = [
-  { nationalId: "1000000002", name_ar: "خالد العتيبي", name_en: "Khalid Alotaibi", role: "owner", dept: "admin" },
-  { nationalId: "1000000003", name_ar: "نورة القحطاني", name_en: "Noura Alqahtani", role: "hr", dept: "admin" },
-  { nationalId: "1000000004", name_ar: "فهد الشمري", name_en: "Fahad Alshammari", role: "manager", dept: "ops" },
-  { nationalId: "2000000005", name_ar: "أحمد حسن", name_en: "Ahmed Hassan", role: "employee", dept: "ops", reportsTo: "1000000004" },
+  { nationalId: "1000000002", name_ar: "خالد العتيبي", name_en: "Khalid Alotaibi", role: "owner", dept: "admin",
+    file: { gender: "male", job_title: "المدير العام", hire_date: "2020-01-05", contract_type: "unlimited" },
+    pay: { basic_salary: 30000, housing_allowance: 7500, transport_allowance: 1500 } },
+  { nationalId: "1000000003", name_ar: "نورة القحطاني", name_en: "Noura Alqahtani", role: "hr", dept: "admin",
+    file: { gender: "female", job_title: "أخصائية موارد بشرية", hire_date: "2022-03-01", contract_type: "unlimited" },
+    pay: { basic_salary: 12000, housing_allowance: 3000, transport_allowance: 800, iban: "SA0380000000608010167519", bank_name: "مصرف الراجحي" } },
+  { nationalId: "1000000004", name_ar: "فهد الشمري", name_en: "Fahad Alshammari", role: "manager", dept: "ops",
+    file: { gender: "male", job_title: "مشرف التشغيل", hire_date: "2021-09-12", contract_type: "unlimited" },
+    pay: { basic_salary: 9000, housing_allowance: 2250, transport_allowance: 700 } },
+  { nationalId: "2000000005", name_ar: "أحمد حسن", name_en: "Ahmed Hassan", role: "employee", dept: "ops", reportsTo: "1000000004",
+    file: { gender: "male", nationality: "EG", job_title: "فني صيانة", occupation: "فني كهرباء", marital_status: "married",
+      hire_date: "2024-02-01", contract_type: "fixed", contract_start: "2024-02-01", contract_end: "2026-12-31", probation_days: 90 },
+    pay: { basic_salary: 4000, housing_allowance: 1000, transport_allowance: 400, communication_allowance: 100 } },
 ];
 
 const admin = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
@@ -70,6 +79,8 @@ async function main() {
         full_name_ar: u.name_ar,
         full_name_en: u.name_en,
         role: u.role,
+        nationality: u.nationalId.startsWith("1") ? "SA" : u.file.nationality,
+        ...Object.fromEntries(Object.entries(u.file).filter(([k]) => k !== "nationality")),
         department_id: deptId(u.dept),
         manager_id: u.reportsTo ? ids.get(u.reportsTo) : null,
       })
@@ -77,6 +88,7 @@ async function main() {
       .single();
     if (e) throw e;
     ids.set(u.nationalId, data.id);
+    check(await admin.from("employee_compensation").insert({ employee_id: data.id, company_id: company.id, ...u.pay }));
   }
 
   console.log(`Seeded system admin ${ADMIN.nationalId} and ${USERS.length} company users (password in scripts/seed-dev.mjs).`);

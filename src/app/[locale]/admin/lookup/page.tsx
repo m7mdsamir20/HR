@@ -54,9 +54,9 @@ export default async function LookupPage({ params, searchParams }: PageProps<"/[
         <p className="text-secondary">{t("intro")}</p>
       </div>
 
-      <form role="search" className="flex max-w-xl flex-col gap-2">
+      <form role="search" className="flex flex-col gap-2 rounded-card border border-line bg-surface p-4 md:p-6">
         <Label htmlFor="id">{t("nationalId")}</Label>
-        <div className="flex gap-2">
+        <div className="flex max-w-xl gap-2">
           <Input
             id="id"
             name="id"
@@ -78,7 +78,7 @@ export default async function LookupPage({ params, searchParams }: PageProps<"/[
       </form>
 
       {valid && (
-        <section aria-live="polite" className="flex max-w-2xl flex-col gap-2">
+        <section aria-live="polite" className="grid gap-2 lg:grid-cols-2">
           {admin && <p className="rounded-card border border-line bg-surface p-4">{t("platformAdmin")}</p>}
           {matches.map((m) => (
             <Link

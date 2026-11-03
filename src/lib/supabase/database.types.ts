@@ -77,6 +77,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"employee_compensation": {
+                  Row: {
+                    "bank_name": string | null,"basic_salary": number,"communication_allowance": number,"company_id": string,"employee_id": string,"gosi_number": string | null,"housing_allowance": number,"iban": string | null,"other_allowances": number,"transport_allowance": number,"updated_at": string,"updated_by": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "bank_name"?: string | null,"basic_salary"?: number,"communication_allowance"?: number,"company_id": string,"employee_id": string,"gosi_number"?: string | null,"housing_allowance"?: number,"iban"?: string | null,"other_allowances"?: number,"transport_allowance"?: number,"updated_at"?: string,"updated_by"?: string | null
+                  }
+                  Update: {
+                    "bank_name"?: string | null,"basic_salary"?: number,"communication_allowance"?: number,"company_id"?: string,"employee_id"?: string,"gosi_number"?: string | null,"housing_allowance"?: number,"iban"?: string | null,"other_allowances"?: number,"transport_allowance"?: number,"updated_at"?: string,"updated_by"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "employee_compensation_company_id_employee_id_fkey"
+      columns: ["company_id","employee_id"]
+isOneToOne: false
+      referencedRelation: "employees"
+      referencedColumns: ["company_id","id"]
+    }
+                  ]
                 },"employee_documents": {
                   Row: {
                     "company_id": string,"created_at": string,"created_by": string | null,"doc_type": Database["public"]['Enums']["document_type"],"employee_id": string,"expiry_date": string | null,"file_name": string | null,"file_path": string | null,"id": string,"issue_date": string | null,"mime_type": string | null,"number": string | null,"size_bytes": number | null,"updated_at": string
@@ -99,14 +119,14 @@ isOneToOne: false
                   ]
                 },"employees": {
                   Row: {
-                    "company_id": string,"created_at": string,"created_by": string | null,"deleted_at": string | null,"department_id": string | null,"disabled_at": string | null,"full_name_ar": string,"full_name_en": string | null,"id": string,"id_type": Database["public"]['Enums']["id_type"],"job_title": string | null,"locale": string,"manager_id": string | null,"national_id": string,"phone": string | null,"role": Database["public"]['Enums']["employee_role"],"status": Database["public"]['Enums']["employee_status"],"updated_at": string,"user_id": string | null
+                    "birth_date": string | null,"company_id": string,"contract_end": string | null,"contract_start": string | null,"contract_type": string | null,"created_at": string,"created_by": string | null,"deleted_at": string | null,"department_id": string | null,"disabled_at": string | null,"email": string | null,"employee_number": string | null,"full_name_ar": string,"full_name_en": string | null,"gender": string | null,"hire_date": string | null,"id": string,"id_type": Database["public"]['Enums']["id_type"],"job_title": string | null,"locale": string,"manager_id": string | null,"marital_status": string | null,"national_id": string,"nationality": string | null,"occupation": string | null,"phone": string | null,"probation_days": number | null,"role": Database["public"]['Enums']["employee_role"],"status": Database["public"]['Enums']["employee_status"],"updated_at": string,"user_id": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "company_id": string,"created_at"?: string,"created_by"?: string | null,"deleted_at"?: string | null,"department_id"?: string | null,"disabled_at"?: string | null,"full_name_ar": string,"full_name_en"?: string | null,"id"?: string,"id_type": Database["public"]['Enums']["id_type"],"job_title"?: string | null,"locale"?: string,"manager_id"?: string | null,"national_id": string,"phone"?: string | null,"role"?: Database["public"]['Enums']["employee_role"],"status"?: Database["public"]['Enums']["employee_status"],"updated_at"?: string,"user_id"?: string | null
+                    "birth_date"?: string | null,"company_id": string,"contract_end"?: string | null,"contract_start"?: string | null,"contract_type"?: string | null,"created_at"?: string,"created_by"?: string | null,"deleted_at"?: string | null,"department_id"?: string | null,"disabled_at"?: string | null,"email"?: string | null,"employee_number"?: string | null,"full_name_ar": string,"full_name_en"?: string | null,"gender"?: string | null,"hire_date"?: string | null,"id"?: string,"id_type": Database["public"]['Enums']["id_type"],"job_title"?: string | null,"locale"?: string,"manager_id"?: string | null,"marital_status"?: string | null,"national_id": string,"nationality"?: string | null,"occupation"?: string | null,"phone"?: string | null,"probation_days"?: number | null,"role"?: Database["public"]['Enums']["employee_role"],"status"?: Database["public"]['Enums']["employee_status"],"updated_at"?: string,"user_id"?: string | null
                   }
                   Update: {
-                    "company_id"?: string,"created_at"?: string,"created_by"?: string | null,"deleted_at"?: string | null,"department_id"?: string | null,"disabled_at"?: string | null,"full_name_ar"?: string,"full_name_en"?: string | null,"id"?: string,"id_type"?: Database["public"]['Enums']["id_type"],"job_title"?: string | null,"locale"?: string,"manager_id"?: string | null,"national_id"?: string,"phone"?: string | null,"role"?: Database["public"]['Enums']["employee_role"],"status"?: Database["public"]['Enums']["employee_status"],"updated_at"?: string,"user_id"?: string | null
+                    "birth_date"?: string | null,"company_id"?: string,"contract_end"?: string | null,"contract_start"?: string | null,"contract_type"?: string | null,"created_at"?: string,"created_by"?: string | null,"deleted_at"?: string | null,"department_id"?: string | null,"disabled_at"?: string | null,"email"?: string | null,"employee_number"?: string | null,"full_name_ar"?: string,"full_name_en"?: string | null,"gender"?: string | null,"hire_date"?: string | null,"id"?: string,"id_type"?: Database["public"]['Enums']["id_type"],"job_title"?: string | null,"locale"?: string,"manager_id"?: string | null,"marital_status"?: string | null,"national_id"?: string,"nationality"?: string | null,"occupation"?: string | null,"phone"?: string | null,"probation_days"?: number | null,"role"?: Database["public"]['Enums']["employee_role"],"status"?: Database["public"]['Enums']["employee_status"],"updated_at"?: string,"user_id"?: string | null
                   }
                   Relationships: [
                     {
@@ -168,7 +188,7 @@ isOneToOne: false
 { Args: { "p_kind": string }; Returns: undefined
                            },
 "employee_create":
-{ Args: { "p_department_id": string,"p_full_name_ar": string,"p_full_name_en": string,"p_job_title": string,"p_locale": string,"p_manager_id": string,"p_national_id": string,"p_phone": string,"p_role": Database["public"]['Enums']["employee_role"],"p_user_id": string }; Returns: string
+{ Args: { "p_file": Json,"p_national_id": string,"p_pay": Json,"p_role": Database["public"]['Enums']["employee_role"],"p_user_id": string }; Returns: string
                            },
 "employee_create_begin":
 { Args: { "p_role": Database["public"]['Enums']["employee_role"] }; Returns: undefined
@@ -186,7 +206,7 @@ isOneToOne: false
 { Args: { "p_employee_id": string,"p_status": Database["public"]['Enums']["employee_status"] }; Returns: string
                            },
 "employee_update":
-{ Args: { "p_department_id": string,"p_employee_id": string,"p_full_name_ar": string,"p_full_name_en": string,"p_job_title": string,"p_manager_id": string,"p_phone": string,"p_role": Database["public"]['Enums']["employee_role"] }; Returns: undefined
+{ Args: { "p_employee_id": string,"p_file": Json,"p_pay": Json,"p_role": Database["public"]['Enums']["employee_role"] }; Returns: undefined
                            },
 "login_begin":
 { Args: { "p_id_hash": string,"p_ip_hash": string }; Returns: number
@@ -195,6 +215,9 @@ isOneToOne: false
 { Args: { "p_attempt": number }; Returns: undefined
                            },
 "my_account":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"my_profile":
 { Args: Record<PropertyKey, never>; Returns: Json
                            },
 "profile_password_changed":

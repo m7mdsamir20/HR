@@ -180,7 +180,8 @@
     "employees": "Employees",
     "team": "My team",
     "settings": "Settings",
-    "profile": "My profile"
+    "profile": "My profile",
+    "departments": "Departments"
   },
   "errors": {
     "invalid": "Check the fields marked in red.",
@@ -245,7 +246,47 @@
       "generate": "Suggest a password",
       "submitCreate": "Add employee",
       "submitting": "Adding…",
-      "saved": "Changes saved"
+      "saved": "Changes saved",
+      "sections": {
+        "identity": "Personal details",
+        "identityHint": "As on the national ID or Iqama.",
+        "work": "Work details",
+        "workHint": "The role decides what this person can see and manage.",
+        "contract": "Contract",
+        "contractHint": "Contract type, term and probation under the labour law.",
+        "pay": "Salary and bank",
+        "payHint": "Visible to the employee and to whoever manages their file, never to their supervisor.",
+        "account": "Sign-in account"
+      },
+      "nationality": "Nationality",
+      "nationalityCitizen": "Saudi (from the ID number)",
+      "choose": "Choose",
+      "gender": "Gender",
+      "birthDate": "Date of birth",
+      "maritalStatus": "Marital status",
+      "email": "Email",
+      "emailHint": "For contact only; not used to sign in.",
+      "employeeNumber": "Employee number",
+      "occupation": "Official occupation",
+      "occupationHint": "As on the Iqama or GOSI record.",
+      "hireDate": "Start date",
+      "contractType": "Contract type",
+      "contractStart": "Contract start",
+      "contractEnd": "Contract end",
+      "contractEndHint": "Required for a fixed-term contract.",
+      "probationDays": "Probation (days)",
+      "probationHint": "90 days, extendable to 180.",
+      "basicSalary": "Basic salary",
+      "housingAllowance": "Housing allowance",
+      "transportAllowance": "Transport allowance",
+      "communicationAllowance": "Communication allowance",
+      "otherAllowances": "Work-nature allowances",
+      "totalSalary": "Total monthly salary",
+      "currency": "SAR",
+      "bankName": "Bank name",
+      "iban": "IBAN",
+      "ibanHint": "Starts with SA, 24 characters.",
+      "gosiNumber": "GOSI subscription number"
     },
     "fields": {
       "nationalId": "ID number is 10 digits starting with 1 or 2.",
@@ -258,7 +299,27 @@
       "departmentId": "Pick a department from the list.",
       "managerId": "Pick a supervisor from the list.",
       "locale": "Pick a language.",
-      "password": "Password must be 8 to 72 characters."
+      "password": "Password must be 8 to 72 characters.",
+      "nationality": "Pick a nationality from the list.",
+      "gender": "Pick a gender.",
+      "birthDate": "The date of birth isn't valid.",
+      "maritalStatus": "Pick a marital status.",
+      "email": "The email address isn't valid.",
+      "employeeNumber": "Employee number is at most 30 characters and unique in the company.",
+      "occupation": "Occupation is at most 120 characters.",
+      "hireDate": "The start date isn't valid.",
+      "contractType": "Pick a contract type.",
+      "contractStart": "The contract start date isn't valid.",
+      "contractEnd": "Enter the contract end, after its start.",
+      "probationDays": "Probation is 0 to 180 days.",
+      "basicSalary": "Enter a valid amount (0 or more).",
+      "housingAllowance": "Enter a valid amount (0 or more).",
+      "transportAllowance": "Enter a valid amount (0 or more).",
+      "communicationAllowance": "Enter a valid amount (0 or more).",
+      "otherAllowances": "Enter a valid amount (0 or more).",
+      "bankName": "Bank name is at most 80 characters.",
+      "iban": "That IBAN isn't valid. Check all 24 characters.",
+      "gosiNumber": "GOSI number is digits only (up to 15)."
     },
     "detail": {
       "back": "Employees",
@@ -283,6 +344,22 @@
       "deleteBody": "The sign-in account is removed and the ID number becomes free for another company. Their task and report history stays. This can't be undone.",
       "deleteConfirm": "Delete account permanently",
       "noActions": "You can't manage this account."
+    },
+    "options": {
+      "gender": {
+        "male": "Male",
+        "female": "Female"
+      },
+      "maritalStatus": {
+        "single": "Single",
+        "married": "Married",
+        "divorced": "Divorced",
+        "widowed": "Widowed"
+      },
+      "contractType": {
+        "fixed": "Fixed term",
+        "unlimited": "Open-ended"
+      }
     }
   },
   "settings": {
@@ -305,20 +382,6 @@
       "remove": "Remove logo",
       "saved": "Logo updated"
     },
-    "departments": {
-      "title": "Departments",
-      "intro": "Use departments to organise employees. Deleting a department doesn't delete its people.",
-      "empty": "No departments yet. Add the first one below.",
-      "add": "Add a department",
-      "addSubmit": "Add",
-      "nameAr": "Department name (Arabic)",
-      "nameEn": "Department name (English)",
-      "rename": "Edit",
-      "delete": "Delete",
-      "deleteConfirm": "Delete the {name} department?",
-      "deleteNote": "{count} employees will be left without a department.",
-      "employees": "{count} employees"
-    },
     "fields": {
       "nameAr": "Enter the Arabic name (at least 2 characters).",
       "nameEn": "English name must be 2 to 120 characters.",
@@ -327,8 +390,52 @@
     },
     "errors": {
       "fileType": "That file type isn't supported. Use a PNG, JPG or WebP image.",
-      "fileSize": "The image is larger than 512 KB. Make it smaller and try again.",
+      "fileSize": "The image is larger than 512 KB. Make it smaller and try again."
+    }
+  },
+  "profile": {
+    "details": "My details",
+    "detailsNote": "To change your details, contact HR or your company manager.",
+    "password": {
+      "title": "Change password",
+      "current": "Current password",
+      "next": "New password",
+      "confirm": "Confirm new password",
+      "hint": "At least 8 characters. Your other devices will have to sign in again.",
+      "submit": "Change password",
+      "submitting": "Changing…",
+      "done": "Password changed",
+      "errors": {
+        "wrongCurrent": "The current password is incorrect.",
+        "mismatch": "The new passwords don't match.",
+        "weak": "The new password must be 8 to 72 characters.",
+        "samePassword": "The new password is the same as the current one. Pick a different one."
+      }
+    },
+    "language": {
+      "title": "Interface language",
+      "intro": "The interface opens in this language every time you sign in.",
+      "submit": "Save language"
+    }
+  },
+  "departments": {
+    "title": "Departments",
+    "intro": "Use departments to organise employees. Deleting a department doesn't delete its people.",
+    "empty": "No departments yet. Add the first one below.",
+    "add": "Add a department",
+    "addSubmit": "Add",
+    "nameAr": "Department name (Arabic)",
+    "nameEn": "Department name (English)",
+    "rename": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Delete the {name} department?",
+    "deleteNote": "{count} employees will be left without a department.",
+    "employees": "{count} employees",
+    "errors": {
       "duplicate": "A department with this name already exists."
+    },
+    "fields": {
+      "nameAr": "Enter the Arabic name (at least 2 characters)."
     }
   }
 }

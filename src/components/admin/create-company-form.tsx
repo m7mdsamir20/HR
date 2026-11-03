@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useActionState, useState } from "react";
 import { createCompany, type CreateCompanyState } from "@/actions/admin";
 import { FormField } from "@/components/form-field";
+import { FormSection } from "@/components/form-section";
 import { Button } from "@/components/ui/button";
 import { suggestPassword } from "@/lib/password";
 import type { CreateCompanyField } from "@/lib/validation/company";
@@ -25,17 +26,16 @@ export function CreateCompanyForm({ minDate }: { minDate: string }) {
   };
 
   return (
-    <form action={action} className="flex flex-col gap-8" noValidate>
+    <form action={action} className="flex flex-col gap-6" noValidate>
       <input type="hidden" name="locale" value={locale} />
 
       {state?.error && (
-        <p role="alert" className="max-w-3xl rounded-control border border-brick/30 bg-brick/5 px-3 py-2.5 text-label text-brick">
+        <p role="alert" className="rounded-control border border-brick/30 bg-brick/5 px-3 py-2.5 text-label text-brick">
           {t(`errors.${state.error}`)}
         </p>
       )}
 
-      <fieldset className="grid max-w-3xl gap-5 md:grid-cols-2">
-        <legend className="mb-4 text-section">{t("companySection")}</legend>
+      <FormSection title={t("companySection")}>
         <FormField name="nameAr" label={t("nameAr")} defaultValue={v("nameAr")} error={err("nameAr")} required dir="rtl" />
         <FormField
           name="nameEn"
@@ -54,12 +54,10 @@ export function CreateCompanyForm({ minDate }: { minDate: string }) {
           optionalLabel={tCommon("optional")}
           inputMode="numeric"
           dir="ltr"
-          className="md:col-span-2 md:max-w-sm"
         />
-      </fieldset>
+      </FormSection>
 
-      <fieldset className="grid max-w-3xl gap-5 md:grid-cols-2">
-        <legend className="mb-4 text-section">{t("subscriptionSection")}</legend>
+      <FormSection title={t("subscriptionSection")}>
         <FormField
           name="maxEmployees"
           label={t("maxEmployees")}
@@ -81,11 +79,9 @@ export function CreateCompanyForm({ minDate }: { minDate: string }) {
           required
           dir="ltr"
         />
-      </fieldset>
+      </FormSection>
 
-      <fieldset className="grid max-w-3xl gap-5 md:grid-cols-2">
-        <legend className="mb-1 text-section">{t("ownerSection")}</legend>
-        <p className="text-secondary md:col-span-2">{t("ownerHint")}</p>
+      <FormSection title={t("ownerSection")} description={t("ownerHint")}>
         <FormField
           name="ownerNationalId"
           label={t("ownerNationalId")}
@@ -130,14 +126,14 @@ export function CreateCompanyForm({ minDate }: { minDate: string }) {
           spellCheck={false}
           maxLength={72}
           dir="ltr"
-          className="md:col-span-2 md:max-w-lg"
+          className="sm:col-span-2"
         >
           <Button type="button" variant="outline" onClick={() => setPassword(suggestPassword())} className="shrink-0">
             <Sparkles aria-hidden />
             {t("generate")}
           </Button>
         </FormField>
-      </fieldset>
+      </FormSection>
 
       <div>
         <Button type="submit" size="lg" disabled={pending}>
