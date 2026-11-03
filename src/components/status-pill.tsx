@@ -1,14 +1,15 @@
 import { cn } from "@/lib/utils";
 
 // One color per meaning across every screen (CLAUDE.md §6): stamp = good, saffron = needs
-// attention soon, brick = stopped/overdue, indigo = in progress.
-export type Tone = "stamp" | "saffron" | "brick" | "indigo";
+// attention soon, brick = stopped/overdue, indigo = in progress, neutral = not started.
+export type Tone = "stamp" | "saffron" | "brick" | "indigo" | "neutral";
 
 const tones: Record<Tone, string> = {
   stamp: "bg-stamp/10 text-stamp",
   saffron: "bg-saffron/12 text-saffron",
   brick: "bg-brick/10 text-brick",
   indigo: "bg-indigo/10 text-indigo",
+  neutral: "bg-ink-soft/10 text-ink-soft",
 };
 
 export function StatusPill({ tone, children, className }: { tone: Tone; children: React.ReactNode; className?: string }) {

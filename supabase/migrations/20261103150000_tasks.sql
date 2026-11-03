@@ -125,7 +125,8 @@ language sql stable security definer set search_path = '' as $$
       and t.company_id = private.auth_company_id()
       and (
         t.assignee_id = private.auth_employee_id()
-        or t.created_by = private.auth_employee_id()
+        -- Creator rights follow the creator's current role: demoted to employee, they're gone.
+        or (t.created_by = private.auth_employee_id() and private.auth_role() in ('owner', 'manager'))
         or private.auth_role() = 'owner'
         or exists (select 1 from public.employees e where e.id = t.assignee_id and e.manager_id = private.auth_employee_id())
       )
@@ -141,7 +142,7 @@ language sql stable security definer set search_path = '' as $$
       and t.company_id = private.auth_company_id()
       and t.assignee_id <> private.auth_employee_id()
       and (
-        t.created_by = private.auth_employee_id()
+        (t.created_by = private.auth_employee_id() and private.auth_role() in ('owner', 'manager'))
         or private.auth_role() = 'owner'
         or exists (select 1 from public.employees e where e.id = t.assignee_id and e.manager_id = private.auth_employee_id())
       )

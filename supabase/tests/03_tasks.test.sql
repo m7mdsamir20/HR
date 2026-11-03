@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(38);
+select plan(42);
 
 create function pg_temp.mk_user(p_id uuid, p_nid text) returns void language sql as $$
   insert into auth.users (id, email, aud, role, instance_id, created_at)
@@ -161,6 +161,25 @@ reset role;
 select pg_temp.act_as('00000000-0000-0000-0000-0000000000a5');
 select is((select count(*) from notifications where recipient_id = '000000a4-0000-0000-0000-000000000000'), 0::bigint,
   'nobody reads someone else''s notifications');
+reset role;
+
+-- Review rights follow the current role: a demoted manager loses them on tasks they created
+select pg_temp.act_as('00000000-0000-0000-0000-0000000000a3');
+insert into ids select 't4', public.task_create(jsonb_build_object('title', 'مهمة قبل تغيير الدور', 'assignee_id', '000000a4-0000-0000-0000-000000000000', 'due_date', current_date));
+reset role;
+update employees set role = 'employee', manager_id = null where id = '000000a3-0000-0000-0000-000000000000';
+update employees set manager_id = null where id = '000000a4-0000-0000-0000-000000000000';
+select pg_temp.act_as('00000000-0000-0000-0000-0000000000a3');
+select is(private.can_review_task((select id from ids where name = 't4')), false, 'a creator demoted to employee can no longer review');
+select is((select count(*) from tasks where id = (select id from ids where name = 't4')), 0::bigint, 'nor see the task they created');
+reset role;
+
+-- Display names: same company only, names only
+select pg_temp.act_as('00000000-0000-0000-0000-0000000000a4');
+select is((select full_name_ar from public.people_names(array['000000a3-0000-0000-0000-000000000000'::uuid])), 'مشرف',
+  'an employee can see their manager''s name');
+select is((select count(*) from public.people_names(array['000000b1-0000-0000-0000-000000000000'::uuid])), 0::bigint,
+  'names from another company are never returned');
 reset role;
 
 select * from finish();

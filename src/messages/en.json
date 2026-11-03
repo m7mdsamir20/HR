@@ -181,7 +181,10 @@
     "team": "My team",
     "settings": "Settings",
     "profile": "My profile",
-    "departments": "Departments"
+    "departments": "Departments",
+    "tasks": "Tasks",
+    "myTasks": "My tasks",
+    "notifications": "Notifications"
   },
   "errors": {
     "invalid": "Check the fields marked in red.",
@@ -478,5 +481,177 @@
       "fileSize": "The file is larger than 10 MB.",
       "upload": "The file couldn't be uploaded. Check your connection and try again."
     }
+  },
+  "tasks": {
+    "title": "Tasks",
+    "myTitle": "My tasks",
+    "add": "New task",
+    "search": "Search by task title",
+    "searchSubmit": "Search",
+    "empty": "No tasks yet. Create the first one and set who does it and when.",
+    "emptyMine": "Nothing is assigned to you right now.",
+    "noResults": "No matching tasks.",
+    "filter": {
+      "label": "Status",
+      "open": "Open",
+      "review": "Awaiting review",
+      "all": "All"
+    },
+    "groups": {
+      "overdue": "Overdue",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "later": "Later",
+      "done": "Approved"
+    },
+    "status": {
+      "assigned": "New",
+      "in_progress": "In progress",
+      "submitted": "Awaiting review",
+      "changes_requested": "Changes requested",
+      "approved": "Approved"
+    },
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "overdue": "Overdue",
+    "columns": {
+      "title": "Task",
+      "assignee": "Assignee",
+      "due": "Due",
+      "priority": "Priority",
+      "status": "Status"
+    },
+    "dueAt": "by {time}",
+    "form": {
+      "sections": {
+        "task": "Task",
+        "assignment": "Assignment and due date"
+      },
+      "title": "Task title",
+      "description": "Details",
+      "descriptionHint": "What exactly is needed, and what counts as done.",
+      "location": "Location",
+      "assignee": "Assignee",
+      "chooseAssignee": "Choose an employee",
+      "noAssignees": "There's nobody you can assign tasks to.",
+      "priority": "Priority",
+      "dueDate": "Due date",
+      "dueTime": "Time",
+      "expectedHours": "Expected hours",
+      "submit": "Assign task",
+      "submitting": "Assigning…",
+      "saved": "Changes saved"
+    },
+    "fields": {
+      "title": "Enter a title of 3 to 200 characters.",
+      "description": "Details are at most 4000 characters.",
+      "location": "Location is at most 200 characters.",
+      "assigneeId": "Choose who does the task.",
+      "priority": "Choose a priority.",
+      "dueDate": "Choose a due date.",
+      "dueTime": "That time isn't valid.",
+      "expectedHours": "Enter valid hours (quarter hours).",
+      "summary": "Describe what you did (at least 3 characters).",
+      "hoursSpent": "Enter valid hours (quarter hours).",
+      "obstacles": "Obstacles are at most 2000 characters.",
+      "links": "Links must start with https://, up to 5.",
+      "rating": "Choose a rating from 1 to 5.",
+      "note": "Say what needs changing (at least 3 characters)."
+    },
+    "errors": {
+      "taskClosed": "The task is approved and can't be edited.",
+      "taskStarted": "Work has started on this task, so it can't be deleted.",
+      "notSubmitted": "There's no report waiting for review.",
+      "fileType": "Unsupported file type. Use an image, PDF, Word or Excel file.",
+      "fileSize": "One of the files is larger than 10 MB.",
+      "tooManyFiles": "At most 10 files per report.",
+      "upload": "A file couldn't be uploaded. Check your connection and try again."
+    },
+    "detail": {
+      "back": "Tasks",
+      "createdBy": "Created by {name}",
+      "assignee": "Assignee",
+      "due": "Due",
+      "expectedHours": "Expected hours",
+      "location": "Location",
+      "hours": "{count} h",
+      "start": "Start work",
+      "starting": "Starting…",
+      "edit": "Edit task",
+      "delete": "Delete task",
+      "deleteConfirm": "Delete the task permanently? Only possible before work starts.",
+      "cancel": "Cancel",
+      "waitingReview": "The report is waiting for the supervisor's review."
+    },
+    "report": {
+      "title": "Completion report",
+      "resubmitTitle": "Revised completion report",
+      "summary": "What did you do?",
+      "summaryHint": "Describe the work in detail.",
+      "hoursSpent": "Hours spent",
+      "obstacles": "Obstacles and notes",
+      "links": "Delivery links",
+      "linksHint": "Up to 5 links starting with https://",
+      "addLink": "Add link",
+      "files": "Proof photos and files",
+      "filesHint": "Site photos, invoices, documents, Excel. Up to 10 files, 10 MB each. Large photos are shrunk automatically.",
+      "camera": "Take a photo",
+      "submit": "Send report",
+      "submitting": "Sending…",
+      "uploading": "Uploading files ({done} of {total})…",
+      "round": "Report {round}",
+      "hoursOf": "{spent} of {expected} h",
+      "hoursOnly": "{spent} h",
+      "attachments": "Attachments",
+      "open": "View",
+      "download": "Download",
+      "history": "Report history",
+      "reviewNote": "Reviewer's note"
+    },
+    "review": {
+      "title": "Review the report",
+      "approve": "Approve report",
+      "changes": "Request changes",
+      "rating": "Quality rating",
+      "ratingValue": "{value} of 5",
+      "note": "Note",
+      "noteChanges": "What needs changing?",
+      "submitApprove": "Approve report",
+      "submitChanges": "Send change request",
+      "submitting": "Saving…"
+    },
+    "stamp": {
+      "label": "Approved",
+      "by": "Approved by {name}",
+      "on": "on {date}"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications.",
+    "markAll": "Mark all as read",
+    "unread": "{count} unread",
+    "bell": "Notifications ({count} unread)",
+    "types": {
+      "task_assigned": "{actor} assigned you a task: {title}",
+      "task_submitted": "{actor} sent a completion report: {title}",
+      "task_approved": "{actor} approved your report: {title}",
+      "task_changes_requested": "{actor} asked for changes on: {title}"
+    }
+  },
+  "home": {
+    "awaitingReview": "Waiting for your review",
+    "overdue": "Overdue tasks",
+    "expiringDocs": "Documents expiring within 60 days",
+    "nothingToReview": "No reports are waiting for your review.",
+    "nothingOverdue": "No overdue tasks.",
+    "nothingExpiring": "No documents are close to expiring.",
+    "quickLinks": "Manage the company",
+    "viewAll": "View all",
+    "expiresOn": "Expires {date}"
   }
 }

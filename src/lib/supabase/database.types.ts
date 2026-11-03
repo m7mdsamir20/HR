@@ -333,6 +333,11 @@ isOneToOne: false
 "notifications_mark_read":
 { Args: { "p_ids": (number)[] }; Returns: undefined
                            },
+"people_names":
+{ Args: { "p_ids": (string)[] }; Returns: {
+              "full_name_ar": string,"full_name_en": string,"id": string
+            }[]
+                           },
 "profile_password_changed":
 { Args: Record<PropertyKey, never>; Returns: undefined
                            },

@@ -181,7 +181,10 @@
     "team": "فريقي",
     "settings": "الإعدادات",
     "profile": "ملفي",
-    "departments": "الأقسام"
+    "departments": "الأقسام",
+    "tasks": "المهام",
+    "myTasks": "مهامي",
+    "notifications": "الإشعارات"
   },
   "errors": {
     "invalid": "راجع الحقول المحددة باللون الأحمر.",
@@ -478,5 +481,177 @@
       "fileSize": "حجم الملف أكبر من 10 ميجابايت.",
       "upload": "تعذر رفع الملف. تحقق من الاتصال ثم حاول مرة أخرى."
     }
+  },
+  "tasks": {
+    "title": "المهام",
+    "myTitle": "مهامي",
+    "add": "مهمة جديدة",
+    "search": "ابحث بعنوان المهمة",
+    "searchSubmit": "بحث",
+    "empty": "لا توجد مهام بعد. أنشئ أول مهمة وحدد المكلف وموعد الإنجاز.",
+    "emptyMine": "لا توجد مهام مسندة إليك الآن.",
+    "noResults": "لا توجد مهام مطابقة.",
+    "filter": {
+      "label": "الحالة",
+      "open": "المفتوحة",
+      "review": "بانتظار المراجعة",
+      "all": "الكل"
+    },
+    "groups": {
+      "overdue": "متأخرة",
+      "today": "اليوم",
+      "tomorrow": "غداً",
+      "later": "لاحقاً",
+      "done": "معتمدة"
+    },
+    "status": {
+      "assigned": "جديدة",
+      "in_progress": "قيد التنفيذ",
+      "submitted": "بانتظار المراجعة",
+      "changes_requested": "مطلوب تعديل",
+      "approved": "معتمدة"
+    },
+    "priority": {
+      "low": "منخفضة",
+      "medium": "متوسطة",
+      "high": "عالية",
+      "urgent": "عاجلة"
+    },
+    "overdue": "متأخرة",
+    "columns": {
+      "title": "المهمة",
+      "assignee": "المكلف",
+      "due": "موعد الإنجاز",
+      "priority": "الأولوية",
+      "status": "الحالة"
+    },
+    "dueAt": "قبل {time}",
+    "form": {
+      "sections": {
+        "task": "المهمة",
+        "assignment": "الإسناد والموعد"
+      },
+      "title": "عنوان المهمة",
+      "description": "التفاصيل",
+      "descriptionHint": "ما المطلوب بالضبط، وما الذي يُعد إنجازاً.",
+      "location": "الموقع",
+      "assignee": "المكلف",
+      "chooseAssignee": "اختر الموظف",
+      "noAssignees": "لا يوجد موظفون يمكنك إسناد مهام إليهم.",
+      "priority": "الأولوية",
+      "dueDate": "تاريخ الإنجاز",
+      "dueTime": "الوقت",
+      "expectedHours": "الساعات المتوقعة",
+      "submit": "إسناد المهمة",
+      "submitting": "جارٍ الإسناد…",
+      "saved": "تم حفظ التغييرات"
+    },
+    "fields": {
+      "title": "اكتب عنواناً من 3 إلى 200 حرف.",
+      "description": "التفاصيل 4000 حرف على الأكثر.",
+      "location": "الموقع 200 حرف على الأكثر.",
+      "assigneeId": "اختر الموظف المكلف.",
+      "priority": "اختر الأولوية.",
+      "dueDate": "اختر تاريخ الإنجاز.",
+      "dueTime": "الوقت غير صحيح.",
+      "expectedHours": "أدخل عدد ساعات صحيحاً (بأرباع الساعة).",
+      "summary": "اكتب ما أنجزته (3 أحرف على الأقل).",
+      "hoursSpent": "أدخل عدد ساعات صحيحاً (بأرباع الساعة).",
+      "obstacles": "المعوقات 2000 حرف على الأكثر.",
+      "links": "الروابط يجب أن تبدأ بـ https://، وبحد أقصى 5.",
+      "rating": "اختر تقييماً من 1 إلى 5.",
+      "note": "اكتب ما المطلوب تعديله (3 أحرف على الأقل)."
+    },
+    "errors": {
+      "taskClosed": "المهمة معتمدة ولا يمكن تعديلها.",
+      "taskStarted": "بدأ العمل على المهمة، فلا يمكن حذفها.",
+      "notSubmitted": "لا يوجد تقرير بانتظار المراجعة.",
+      "fileType": "نوع ملف غير مدعوم. استخدم صورة أو PDF أو Word أو Excel.",
+      "fileSize": "أحد الملفات أكبر من 10 ميجابايت.",
+      "tooManyFiles": "10 ملفات على الأكثر في التقرير الواحد.",
+      "upload": "تعذر رفع أحد الملفات. تحقق من الاتصال ثم حاول مرة أخرى."
+    },
+    "detail": {
+      "back": "المهام",
+      "createdBy": "أنشأها {name}",
+      "assignee": "المكلف",
+      "due": "موعد الإنجاز",
+      "expectedHours": "الساعات المتوقعة",
+      "location": "الموقع",
+      "hours": "{count} ساعة",
+      "start": "بدء العمل",
+      "starting": "جارٍ البدء…",
+      "edit": "تعديل المهمة",
+      "delete": "حذف المهمة",
+      "deleteConfirm": "حذف المهمة نهائياً؟ يمكن الحذف فقط قبل بدء العمل.",
+      "cancel": "إلغاء",
+      "waitingReview": "التقرير بانتظار مراجعة المشرف."
+    },
+    "report": {
+      "title": "تقرير الإنجاز",
+      "resubmitTitle": "تقرير إنجاز معدّل",
+      "summary": "ما الذي أنجزته؟",
+      "summaryHint": "صف العمل المنجز بالتفصيل.",
+      "hoursSpent": "الساعات المستغرقة",
+      "obstacles": "المعوقات والملاحظات",
+      "links": "روابط التسليم",
+      "linksHint": "حتى 5 روابط تبدأ بـ https://",
+      "addLink": "إضافة رابط",
+      "files": "صور وملفات الإثبات",
+      "filesHint": "صور من الموقع، فواتير، مستندات، Excel. حتى 10 ملفات، 10 ميجابايت للملف. تُصغَّر الصور الكبيرة تلقائياً.",
+      "camera": "التقاط صورة",
+      "submit": "إرسال التقرير",
+      "submitting": "جارٍ الإرسال…",
+      "uploading": "جارٍ رفع الملفات ({done} من {total})…",
+      "round": "التقرير {round}",
+      "hoursOf": "{spent} من {expected} ساعة",
+      "hoursOnly": "{spent} ساعة",
+      "attachments": "المرفقات",
+      "open": "عرض",
+      "download": "تنزيل",
+      "history": "سجل التقارير",
+      "reviewNote": "ملاحظة المراجع"
+    },
+    "review": {
+      "title": "مراجعة التقرير",
+      "approve": "اعتماد التقرير",
+      "changes": "طلب تعديل",
+      "rating": "تقييم الجودة",
+      "ratingValue": "{value} من 5",
+      "note": "ملاحظة",
+      "noteChanges": "ما المطلوب تعديله؟",
+      "submitApprove": "اعتماد التقرير",
+      "submitChanges": "إرسال طلب التعديل",
+      "submitting": "جارٍ الحفظ…"
+    },
+    "stamp": {
+      "label": "معتمد",
+      "by": "اعتمده {name}",
+      "on": "في {date}"
+    }
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "empty": "لا توجد إشعارات.",
+    "markAll": "تعليم الكل كمقروء",
+    "unread": "{count} غير مقروء",
+    "bell": "الإشعارات ({count} غير مقروء)",
+    "types": {
+      "task_assigned": "أسند إليك {actor} مهمة: {title}",
+      "task_submitted": "رفع {actor} تقرير إنجاز: {title}",
+      "task_approved": "اعتمد {actor} تقريرك: {title}",
+      "task_changes_requested": "طلب {actor} تعديلاً على: {title}"
+    }
+  },
+  "home": {
+    "awaitingReview": "بانتظار مراجعتك",
+    "overdue": "مهام متأخرة",
+    "expiringDocs": "وثائق تنتهي خلال 60 يوماً",
+    "nothingToReview": "لا توجد تقارير بانتظار مراجعتك.",
+    "nothingOverdue": "لا توجد مهام متأخرة.",
+    "nothingExpiring": "لا توجد وثائق تقترب من الانتهاء.",
+    "quickLinks": "إدارة الشركة",
+    "viewAll": "عرض الكل",
+    "expiresOn": "تنتهي {date}"
   }
 }
