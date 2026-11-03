@@ -184,7 +184,8 @@
     "departments": "Departments",
     "tasks": "Tasks",
     "myTasks": "My tasks",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "unread": "{count} unread"
   },
   "errors": {
     "invalid": "Check the fields marked in red.",
@@ -653,5 +654,13 @@
     "quickLinks": "Manage the company",
     "viewAll": "View all",
     "expiresOn": "Expires {date}"
+  },
+  "errorPages": {
+    "notFoundTitle": "Page not found",
+    "notFoundBody": "The link is wrong, or you no longer have access to it.",
+    "home": "Back to home",
+    "errorTitle": "Something went wrong",
+    "errorBody": "We couldn't load this page. Try again, and contact support if it keeps happening.",
+    "retry": "Try again"
   }
 }

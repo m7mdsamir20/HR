@@ -91,6 +91,25 @@ async function main() {
     check(await admin.from("employee_compensation").insert({ employee_id: data.id, company_id: company.id, ...u.pay }));
   }
 
+  // Demo tasks in different states (written with the service role: users can only write through RPCs).
+  const day = (offset) => new Date(Date.now() + offset * 86_400_000).toISOString().slice(0, 10);
+  const manager = ids.get("1000000004");
+  const ahmed = ids.get("2000000005");
+  check(
+    await admin.from("tasks").insert([
+      { company_id: company.id, created_by: manager, assignee_id: ahmed, title: "صيانة مكيفات المستودع", priority: "urgent", due_date: day(-1), status: "in_progress", started_at: new Date().toISOString(), location: "المستودع الرئيسي", expected_hours: 3 },
+      { company_id: company.id, created_by: manager, assignee_id: ahmed, title: "فحص لوحات الكهرباء بالفرع الثاني", priority: "high", due_date: day(0), due_time: "15:00", status: "assigned", expected_hours: 2 },
+      { company_id: company.id, created_by: manager, assignee_id: ahmed, title: "جرد قطع الغيار", priority: "medium", due_date: day(1), status: "assigned" },
+      { company_id: company.id, created_by: manager, assignee_id: ahmed, title: "تدريب الفنيين الجدد على السلامة", priority: "low", due_date: day(5), status: "assigned", expected_hours: 6 },
+    ]),
+  );
+  check(
+    await admin.from("employee_documents").insert([
+      { company_id: company.id, employee_id: ahmed, doc_type: "iqama", number: "2000000005", issue_date: "2023-01-10", expiry_date: day(20) },
+      { company_id: company.id, employee_id: ahmed, doc_type: "health_card", expiry_date: day(200) },
+    ]),
+  );
+
   console.log(`Seeded system admin ${ADMIN.nationalId} and ${USERS.length} company users (password in scripts/seed-dev.mjs).`);
 }
 

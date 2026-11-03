@@ -58,7 +58,10 @@ export function ReportForm({ taskId, resubmit, expectedHours }: { taskId: string
 
   function addFiles(list: FileList | null) {
     if (!list) return;
-    setFiles((current) => [...current, ...Array.from(list)].filter((f) => f.size <= MAX_DOCUMENT_BYTES * 3).slice(0, MAX_FILES));
+    // Copy now: the input is reset right after this call, which empties its live FileList before a
+    // deferred state update would read it.
+    const picked = Array.from(list);
+    setFiles((current) => [...current, ...picked].filter((f) => f.size <= MAX_DOCUMENT_BYTES * 3).slice(0, MAX_FILES));
   }
 
   const failed = state && !state.ok ? state : undefined;
