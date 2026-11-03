@@ -643,7 +643,10 @@
       "task_submitted": "{actor} sent a completion report: {title}",
       "task_approved": "{actor} approved your report: {title}",
       "task_changes_requested": "{actor} asked for changes on: {title}"
-    }
+    },
+    "documentExpiring": "{employee}'s {document} expires in {days} days",
+    "documentToday": "{employee}'s {document} expires today",
+    "documentExpired": "{employee}'s {document} expired {days} days ago"
   },
   "home": {
     "awaitingReview": "Waiting for your review",

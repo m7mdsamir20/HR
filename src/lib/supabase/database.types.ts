@@ -157,14 +157,14 @@ isOneToOne: false
                   ]
                 },"notifications": {
                   Row: {
-                    "actor_id": string | null,"company_id": string,"created_at": string,"id": number,"read_at": string | null,"recipient_id": string,"task_id": string | null,"type": string
+                    "actor_id": string | null,"company_id": string,"created_at": string,"days_left": number | null,"document_id": string | null,"id": number,"read_at": string | null,"recipient_id": string,"task_id": string | null,"type": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "actor_id"?: string | null,"company_id": string,"created_at"?: string,"id"?: never,"read_at"?: string | null,"recipient_id": string,"task_id"?: string | null,"type": string
+                    "actor_id"?: string | null,"company_id": string,"created_at"?: string,"days_left"?: number | null,"document_id"?: string | null,"id"?: never,"read_at"?: string | null,"recipient_id": string,"task_id"?: string | null,"type": string
                   }
                   Update: {
-                    "actor_id"?: string | null,"company_id"?: string,"created_at"?: string,"id"?: never,"read_at"?: string | null,"recipient_id"?: string,"task_id"?: string | null,"type"?: string
+                    "actor_id"?: string | null,"company_id"?: string,"created_at"?: string,"days_left"?: number | null,"document_id"?: string | null,"id"?: never,"read_at"?: string | null,"recipient_id"?: string,"task_id"?: string | null,"type"?: string
                   }
                   Relationships: [
                     {
@@ -173,6 +173,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "employees"
       referencedColumns: ["company_id","id"]
+    },{
+      foreignKeyName: "notifications_document_id_fkey"
+      columns: ["document_id"]
+isOneToOne: false
+      referencedRelation: "employee_documents"
+      referencedColumns: ["id"]
     },{
       foreignKeyName: "notifications_task_id_fkey"
       columns: ["task_id"]
@@ -332,6 +338,11 @@ isOneToOne: false
                            },
 "notifications_mark_read":
 { Args: { "p_ids": (number)[] }; Returns: undefined
+                           },
+"orphan_files":
+{ Args: { "p_older_than"?: string }; Returns: {
+              "name": string
+            }[]
                            },
 "people_names":
 { Args: { "p_ids": (string)[] }; Returns: {

@@ -193,6 +193,10 @@ reset role;
 -- ---------------------------------------------------------------------------
 -- Documents and storage paths
 -- ---------------------------------------------------------------------------
+-- Documents may only cite files that exist in storage, so create the objects first.
+insert into storage.objects (bucket_id, name, metadata) values
+  ('company-files', '0000000a-0000-0000-0000-000000000000/documents/000000a4-0000-0000-0000-000000000000/11111111-1111-1111-1111-111111111111.pdf', '{"size": 1000}'),
+  ('company-files', '0000000b-0000-0000-0000-000000000000/documents/000000b2-0000-0000-0000-000000000000/11111111-1111-1111-1111-111111111111.pdf', '{"size": 1000}');
 select pg_temp.act_as('00000000-0000-0000-0000-00000000a001');
 insert into employee_documents (id, company_id, employee_id, doc_type, number, expiry_date, file_path, file_name, mime_type, size_bytes)
 values ('0000d0c0-0000-0000-0000-000000000001', '0000000a-0000-0000-0000-000000000000', '000000a4-0000-0000-0000-000000000000',

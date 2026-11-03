@@ -643,7 +643,10 @@
       "task_submitted": "رفع {actor} تقرير إنجاز: {title}",
       "task_approved": "اعتمد {actor} تقريرك: {title}",
       "task_changes_requested": "طلب {actor} تعديلاً على: {title}"
-    }
+    },
+    "documentExpiring": "تنتهي وثيقة {document} للموظف {employee} خلال {days} يوم",
+    "documentToday": "تنتهي اليوم وثيقة {document} للموظف {employee}",
+    "documentExpired": "انتهت وثيقة {document} للموظف {employee} منذ {days} يوم"
   },
   "home": {
     "awaitingReview": "بانتظار مراجعتك",
