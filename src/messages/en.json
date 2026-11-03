@@ -654,7 +654,9 @@
     "nothingExpiring": "No documents are close to expiring.",
     "quickLinks": "Manage the company",
     "viewAll": "View all",
-    "expiresOn": "Expires {date}"
+    "expiresOn": "Expires {date}",
+    "recentlyApproved": "Recently approved",
+    "nothingApproved": "Nothing has been approved yet."
   },
   "errorPages": {
     "notFoundTitle": "Page not found",

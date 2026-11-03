@@ -30,7 +30,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 
   // Everything below is scoped by RLS to what this person may see.
   const supabase = await createClient();
-  const [mine, review, overdue, docs] = await Promise.all([
+  const [mine, review, overdue, approved, docs] = await Promise.all([
     supabase.from("tasks").select(TASK_COLUMNS).eq("assignee_id", member.employee_id).neq("status", "approved").order("due_date").limit(6),
     manages
       ? supabase.from("tasks").select(TASK_COLUMNS).eq("status", "submitted").neq("assignee_id", member.employee_id).order("submitted_at").limit(6)
@@ -38,12 +38,15 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
     manages
       ? supabase.from("tasks").select(TASK_COLUMNS).in("status", ["assigned", "in_progress", "changes_requested"]).lt("due_date", today).neq("assignee_id", member.employee_id).order("due_date").limit(6)
       : Promise.resolve({ data: [] }),
+    manages
+      ? supabase.from("tasks").select(TASK_COLUMNS).eq("status", "approved").neq("assignee_id", member.employee_id).order("approved_at", { ascending: false }).limit(4)
+      : Promise.resolve({ data: [] }),
     managesPeople
       ? supabase.from("employee_documents").select("id, employee_id, doc_type, expiry_date").not("expiry_date", "is", null).lte("expiry_date", soon).order("expiry_date").limit(8)
       : Promise.resolve({ data: [] }),
   ]);
 
-  const taskRows = [...(mine.data ?? []), ...(review.data ?? []), ...(overdue.data ?? [])];
+  const taskRows = [...(mine.data ?? []), ...(review.data ?? []), ...(overdue.data ?? []), ...(approved.data ?? [])];
   const names = await loadNames(locale, [...taskRows.map((r) => r.assignee_id), ...(docs.data ?? []).map((d) => d.employee_id)]);
   const toRows = (rows: typeof taskRows): TaskRow[] =>
     rows.map((r) => ({
@@ -77,6 +80,9 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           </Section>
           <Section title={t("overdue")}>
             {(overdue.data ?? []).length === 0 ? <Empty>{t("nothingOverdue")}</Empty> : <TaskGrid rows={toRows(overdue.data ?? [])} locale={locale} showAssignee />}
+          </Section>
+          <Section title={t("recentlyApproved")} href="/tasks" more={t("viewAll")}>
+            {(approved.data ?? []).length === 0 ? <Empty>{t("nothingApproved")}</Empty> : <TaskGrid rows={toRows(approved.data ?? [])} locale={locale} showAssignee />}
           </Section>
         </>
       )}

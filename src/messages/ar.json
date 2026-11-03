@@ -654,7 +654,9 @@
     "nothingExpiring": "لا توجد وثائق تقترب من الانتهاء.",
     "quickLinks": "إدارة الشركة",
     "viewAll": "عرض الكل",
-    "expiresOn": "تنتهي {date}"
+    "expiresOn": "تنتهي {date}",
+    "recentlyApproved": "آخر المهام المعتمدة",
+    "nothingApproved": "لا توجد مهام معتمدة بعد."
   },
   "errorPages": {
     "notFoundTitle": "الصفحة غير موجودة",
