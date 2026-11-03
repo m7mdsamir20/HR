@@ -57,16 +57,56 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
-                },"employees": {
+                },"departments": {
                   Row: {
-                    "company_id": string,"created_at": string,"created_by": string | null,"deleted_at": string | null,"disabled_at": string | null,"full_name_ar": string,"full_name_en": string | null,"id": string,"id_type": Database["public"]['Enums']["id_type"],"job_title": string | null,"locale": string,"manager_id": string | null,"national_id": string,"phone": string | null,"role": Database["public"]['Enums']["employee_role"],"status": Database["public"]['Enums']["employee_status"],"updated_at": string,"user_id": string | null
+                    "company_id": string,"created_at": string,"id": string,"name_ar": string,"name_en": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "company_id": string,"created_at"?: string,"created_by"?: string | null,"deleted_at"?: string | null,"disabled_at"?: string | null,"full_name_ar": string,"full_name_en"?: string | null,"id"?: string,"id_type": Database["public"]['Enums']["id_type"],"job_title"?: string | null,"locale"?: string,"manager_id"?: string | null,"national_id": string,"phone"?: string | null,"role"?: Database["public"]['Enums']["employee_role"],"status"?: Database["public"]['Enums']["employee_status"],"updated_at"?: string,"user_id"?: string | null
+                    "company_id": string,"created_at"?: string,"id"?: string,"name_ar": string,"name_en"?: string | null
                   }
                   Update: {
-                    "company_id"?: string,"created_at"?: string,"created_by"?: string | null,"deleted_at"?: string | null,"disabled_at"?: string | null,"full_name_ar"?: string,"full_name_en"?: string | null,"id"?: string,"id_type"?: Database["public"]['Enums']["id_type"],"job_title"?: string | null,"locale"?: string,"manager_id"?: string | null,"national_id"?: string,"phone"?: string | null,"role"?: Database["public"]['Enums']["employee_role"],"status"?: Database["public"]['Enums']["employee_status"],"updated_at"?: string,"user_id"?: string | null
+                    "company_id"?: string,"created_at"?: string,"id"?: string,"name_ar"?: string,"name_en"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "departments_company_id_fkey"
+      columns: ["company_id"]
+isOneToOne: false
+      referencedRelation: "companies"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"employee_documents": {
+                  Row: {
+                    "company_id": string,"created_at": string,"created_by": string | null,"doc_type": Database["public"]['Enums']["document_type"],"employee_id": string,"expiry_date": string | null,"file_name": string | null,"file_path": string | null,"id": string,"issue_date": string | null,"mime_type": string | null,"number": string | null,"size_bytes": number | null,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "company_id": string,"created_at"?: string,"created_by"?: string | null,"doc_type": Database["public"]['Enums']["document_type"],"employee_id": string,"expiry_date"?: string | null,"file_name"?: string | null,"file_path"?: string | null,"id"?: string,"issue_date"?: string | null,"mime_type"?: string | null,"number"?: string | null,"size_bytes"?: number | null,"updated_at"?: string
+                  }
+                  Update: {
+                    "company_id"?: string,"created_at"?: string,"created_by"?: string | null,"doc_type"?: Database["public"]['Enums']["document_type"],"employee_id"?: string,"expiry_date"?: string | null,"file_name"?: string | null,"file_path"?: string | null,"id"?: string,"issue_date"?: string | null,"mime_type"?: string | null,"number"?: string | null,"size_bytes"?: number | null,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "employee_documents_company_id_employee_id_fkey"
+      columns: ["company_id","employee_id"]
+isOneToOne: false
+      referencedRelation: "employees"
+      referencedColumns: ["company_id","id"]
+    }
+                  ]
+                },"employees": {
+                  Row: {
+                    "company_id": string,"created_at": string,"created_by": string | null,"deleted_at": string | null,"department_id": string | null,"disabled_at": string | null,"full_name_ar": string,"full_name_en": string | null,"id": string,"id_type": Database["public"]['Enums']["id_type"],"job_title": string | null,"locale": string,"manager_id": string | null,"national_id": string,"phone": string | null,"role": Database["public"]['Enums']["employee_role"],"status": Database["public"]['Enums']["employee_status"],"updated_at": string,"user_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "company_id": string,"created_at"?: string,"created_by"?: string | null,"deleted_at"?: string | null,"department_id"?: string | null,"disabled_at"?: string | null,"full_name_ar": string,"full_name_en"?: string | null,"id"?: string,"id_type": Database["public"]['Enums']["id_type"],"job_title"?: string | null,"locale"?: string,"manager_id"?: string | null,"national_id": string,"phone"?: string | null,"role"?: Database["public"]['Enums']["employee_role"],"status"?: Database["public"]['Enums']["employee_status"],"updated_at"?: string,"user_id"?: string | null
+                  }
+                  Update: {
+                    "company_id"?: string,"created_at"?: string,"created_by"?: string | null,"deleted_at"?: string | null,"department_id"?: string | null,"disabled_at"?: string | null,"full_name_ar"?: string,"full_name_en"?: string | null,"id"?: string,"id_type"?: Database["public"]['Enums']["id_type"],"job_title"?: string | null,"locale"?: string,"manager_id"?: string | null,"national_id"?: string,"phone"?: string | null,"role"?: Database["public"]['Enums']["employee_role"],"status"?: Database["public"]['Enums']["employee_status"],"updated_at"?: string,"user_id"?: string | null
                   }
                   Relationships: [
                     {
@@ -80,6 +120,12 @@ isOneToOne: false
       columns: ["company_id","manager_id"]
 isOneToOne: false
       referencedRelation: "employees"
+      referencedColumns: ["company_id","id"]
+    },{
+      foreignKeyName: "employees_department_fk"
+      columns: ["company_id","department_id"]
+isOneToOne: false
+      referencedRelation: "departments"
       referencedColumns: ["company_id","id"]
     }
                   ]
@@ -106,6 +152,33 @@ isOneToOne: false
             "admin_create_company":
 { Args: { "p_commercial_reg": string,"p_max_employees": number,"p_name_ar": string,"p_name_en": string,"p_owner_name_ar": string,"p_owner_name_en": string,"p_owner_national_id": string,"p_owner_phone": string,"p_owner_user_id": string,"p_subscription_ends_at": string }; Returns: string
                            },
+"company_set_logo":
+{ Args: { "p_logo_path": string }; Returns: string
+                           },
+"company_update_profile":
+{ Args: { "p_commercial_reg": string,"p_name_ar": string,"p_name_en": string }; Returns: undefined
+                           },
+"consume_rate_limit":
+{ Args: { "p_kind": string }; Returns: undefined
+                           },
+"employee_create":
+{ Args: { "p_department_id": string,"p_full_name_ar": string,"p_full_name_en": string,"p_job_title": string,"p_locale": string,"p_manager_id": string,"p_national_id": string,"p_phone": string,"p_role": Database["public"]['Enums']["employee_role"],"p_user_id": string }; Returns: string
+                           },
+"employee_delete_begin":
+{ Args: { "p_employee_id": string }; Returns: string
+                           },
+"employee_delete_finish":
+{ Args: { "p_employee_id": string }; Returns: undefined
+                           },
+"employee_password_reset_begin":
+{ Args: { "p_employee_id": string }; Returns: string
+                           },
+"employee_set_status":
+{ Args: { "p_employee_id": string,"p_status": Database["public"]['Enums']["employee_status"] }; Returns: string
+                           },
+"employee_update":
+{ Args: { "p_department_id": string,"p_employee_id": string,"p_full_name_ar": string,"p_full_name_en": string,"p_job_title": string,"p_manager_id": string,"p_phone": string,"p_role": Database["public"]['Enums']["employee_role"] }; Returns: undefined
+                           },
 "login_begin":
 { Args: { "p_id_hash": string,"p_ip_hash": string }; Returns: number
                            },
@@ -114,10 +187,16 @@ isOneToOne: false
                            },
 "my_account":
 { Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"profile_password_changed":
+{ Args: Record<PropertyKey, never>; Returns: undefined
+                           },
+"profile_set_locale":
+{ Args: { "p_locale": string }; Returns: undefined
                            }
           }
           Enums: {
-            "company_status": "active"|"suspended","employee_role": "owner"|"hr"|"manager"|"employee","employee_status": "active"|"disabled"|"deleted","id_type": "citizen"|"resident"
+            "company_status": "active"|"suspended","document_type": "iqama"|"national_id"|"work_permit"|"passport"|"health_card"|"contract","employee_role": "owner"|"hr"|"manager"|"employee","employee_status": "active"|"disabled"|"deleted","id_type": "citizen"|"resident"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -237,7 +316,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "company_status": ["active", "suspended"],"employee_role": ["owner", "hr", "manager", "employee"],"employee_status": ["active", "disabled", "deleted"],"id_type": ["citizen", "resident"]
+            "company_status": ["active", "suspended"],"document_type": ["iqama", "national_id", "work_permit", "passport", "health_card", "contract"],"employee_role": ["owner", "hr", "manager", "employee"],"employee_status": ["active", "disabled", "deleted"],"id_type": ["citizen", "resident"]
           }
         }
 } as const

@@ -15,11 +15,15 @@ if (process.env.VERCEL_ENV === "production" || !/^http:\/\/(127\.0\.0\.1|localho
 const PASSWORD = "Dev-pass-2026";
 const ADMIN = { nationalId: "1000000001", name: "مدير النظام" };
 const COMPANY = { name_ar: "شركة الإنشاءات التجريبية", name_en: "Demo Construction Co.", max_employees: 25 };
+const DEPARTMENTS = [
+  { key: "ops", name_ar: "التشغيل والصيانة", name_en: "Operations" },
+  { key: "admin", name_ar: "الشؤون الإدارية", name_en: "Administration" },
+];
 const USERS = [
-  { nationalId: "1000000002", name_ar: "خالد العتيبي", name_en: "Khalid Alotaibi", role: "owner" },
-  { nationalId: "1000000003", name_ar: "نورة القحطاني", name_en: "Noura Alqahtani", role: "hr" },
-  { nationalId: "1000000004", name_ar: "فهد الشمري", name_en: "Fahad Alshammari", role: "manager" },
-  { nationalId: "2000000005", name_ar: "أحمد حسن", name_en: "Ahmed Hassan", role: "employee", reportsTo: "1000000004" },
+  { nationalId: "1000000002", name_ar: "خالد العتيبي", name_en: "Khalid Alotaibi", role: "owner", dept: "admin" },
+  { nationalId: "1000000003", name_ar: "نورة القحطاني", name_en: "Noura Alqahtani", role: "hr", dept: "admin" },
+  { nationalId: "1000000004", name_ar: "فهد الشمري", name_en: "Fahad Alshammari", role: "manager", dept: "ops" },
+  { nationalId: "2000000005", name_ar: "أحمد حسن", name_en: "Ahmed Hassan", role: "employee", dept: "ops", reportsTo: "1000000004" },
 ];
 
 const admin = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
@@ -46,6 +50,13 @@ async function main() {
     .single();
   if (error) throw error;
 
+  const { data: depts, error: deptError } = await admin
+    .from("departments")
+    .insert(DEPARTMENTS.map(({ name_ar, name_en }) => ({ company_id: company.id, name_ar, name_en })))
+    .select("id, name_ar");
+  if (deptError) throw deptError;
+  const deptId = (key) => depts.find((d) => d.name_ar === DEPARTMENTS.find((x) => x.key === key).name_ar).id;
+
   const ids = new Map();
   for (const u of USERS) {
     const userId = await authUser(u.nationalId);
@@ -59,6 +70,7 @@ async function main() {
         full_name_ar: u.name_ar,
         full_name_en: u.name_en,
         role: u.role,
+        department_id: deptId(u.dept),
         manager_id: u.reportsTo ? ids.get(u.reportsTo) : null,
       })
       .select("id")
