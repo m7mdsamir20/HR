@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(16);
+select plan(17);
 
 create function pg_temp.mk_user(p_id uuid, p_nid text) returns void language sql as $$
   insert into auth.users (id, email, aud, role, instance_id, created_at)
@@ -103,6 +103,10 @@ select is((select basic_salary + housing_allowance + transport_allowance from em
   where employee_id = '000000a4-0000-0000-0000-000000000000'), 6750.00::numeric, 'all pay parts are saved');
 select is((select actor_id from audit_logs where action = 'compensation.update' order by id desc limit 1),
   '00000000-0000-0000-0000-00000000a002'::uuid, 'pay changes are audited with their actor');
+select ok(
+  (select meta::text not like '%5000%' and meta::text not like '%SA03%' and meta -> 'changed' ? 'basic_salary'
+     from audit_logs where action = 'compensation.update' order by id desc limit 1),
+  'the pay audit names the changed fields without their amounts or the IBAN');
 
 -- Citizens are Saudi whatever the form sends
 select pg_temp.act_as('00000000-0000-0000-0000-00000000a001');

@@ -67,6 +67,17 @@ begin
     if v_meta -> 'changes' = '{}'::jsonb then
       return new;
     end if;
+    -- Pay and personal details: record which fields changed, never their values (the audit log is
+    -- readable by the system admin across companies). Role and status keep from/to, since that's
+    -- what tracing permission changes needs.
+    if v_entity in ('compensation', 'employee') then
+      v_meta := jsonb_build_object(
+        'changed', (select coalesce(jsonb_agg(k order by k), '[]'::jsonb) from jsonb_object_keys(v_meta -> 'changes') as k),
+        'changes', (select coalesce(jsonb_object_agg(k, v), '{}'::jsonb)
+                    from jsonb_each(v_meta -> 'changes') as c(k, v)
+                    where v_entity = 'employee' and k in ('role', 'status'))
+      );
+    end if;
   else
     v_meta := case v_entity
       when 'company' then jsonb_build_object('name_ar', v_row -> 'name_ar')
@@ -274,3 +285,14 @@ language sql stable security definer set search_path = '' as $$
   left join public.employee_compensation c on c.employee_id = e.id
   where e.id = private.auth_employee_id();
 $$;
+
+-- ---------------------------------------------------------------------------
+-- Whether the caller may manage this employee (the same rule RLS uses). Lets the app check before
+-- handing out a storage upload URL. Reveals only the caller's own permission.
+-- ---------------------------------------------------------------------------
+create function public.can_manage_employee(p_employee_id uuid) returns boolean
+language sql stable security definer set search_path = '' as $$
+  select private.can_manage_employee(p_employee_id);
+$$;
+revoke execute on function public.can_manage_employee(uuid) from public, anon;
+grant execute on function public.can_manage_employee(uuid) to authenticated;

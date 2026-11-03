@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { updateEmployee } from "@/actions/employees";
+import { DocumentsPanel } from "@/components/documents/documents-panel";
 import { EmployeeActions } from "@/components/employees/employee-actions";
 import { EmployeeForm } from "@/components/employees/employee-form";
 import { FactsSection } from "@/components/form-section";
@@ -12,6 +13,7 @@ import type { Locale } from "@/i18n/routing";
 import { requireMember } from "@/lib/auth/account";
 import { assignableRoles, canManageEmployee } from "@/lib/auth/permissions";
 import { nationalityName } from "@/lib/countries";
+import { loadDocuments } from "@/lib/employee-documents";
 import { employeeFormOptions, localName, one } from "@/lib/employees";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
@@ -41,7 +43,10 @@ export default async function EmployeePage({ params }: PageProps<"/[locale]/empl
   const status = e.status as "active" | "disabled";
   const manager = one(e.manager);
   const canManage = canManageEmployee(member, { id: e.id, role: e.role, status });
-  const options = canManage ? await employeeFormOptions(locale, e.id) : null;
+  const [options, documents] = await Promise.all([
+    canManage ? employeeFormOptions(locale, e.id) : Promise.resolve(null),
+    canManage ? loadDocuments(locale, e.id) : Promise.resolve([]),
+  ]);
   const date = (d: string | null) => (d ? formatDate(locale, d) : null);
   const s = (x: string | number | null | undefined) => (x === null || x === undefined || x === "" ? "" : String(x));
 
@@ -101,6 +106,7 @@ export default async function EmployeePage({ params }: PageProps<"/[locale]/empl
               gosiNumber: s(pay?.gosi_number),
             }}
           />
+          <DocumentsPanel employeeId={e.id} documents={documents} canManage />
           <section aria-labelledby="account-actions" className="flex flex-col gap-4 rounded-card border border-line bg-surface p-4 md:p-6">
             <h2 id="account-actions" className="text-card">
               {t("detail.actions")}

@@ -178,6 +178,9 @@ isOneToOne: false
             "admin_create_company":
 { Args: { "p_commercial_reg": string,"p_max_employees": number,"p_name_ar": string,"p_name_en": string,"p_owner_name_ar": string,"p_owner_name_en": string,"p_owner_national_id": string,"p_owner_phone": string,"p_owner_user_id": string,"p_subscription_ends_at": string }; Returns: string
                            },
+"can_manage_employee":
+{ Args: { "p_employee_id": string }; Returns: boolean
+                           },
 "company_set_logo":
 { Args: { "p_logo_path": string }; Returns: string
                            },

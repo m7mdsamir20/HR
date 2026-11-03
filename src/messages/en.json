@@ -437,5 +437,46 @@
     "fields": {
       "nameAr": "Enter the Arabic name (at least 2 characters)."
     }
+  },
+  "documents": {
+    "title": "Documents",
+    "intro": "Iqama, work permit, passport, health card and contract, with their expiry dates.",
+    "empty": "No documents recorded.",
+    "emptyManage": "No documents yet. Add the Iqama or national ID first so expiry alerts can reach you.",
+    "types": {
+      "iqama": "Iqama",
+      "national_id": "National ID",
+      "work_permit": "Work permit",
+      "passport": "Passport",
+      "health_card": "Health card",
+      "contract": "Employment contract"
+    },
+    "status": {
+      "valid": "Valid",
+      "expiring": "Expiring soon",
+      "expired": "Expired"
+    },
+    "type": "Document type",
+    "number": "Document number",
+    "issueDate": "Issue date",
+    "expiryDate": "Expiry date",
+    "file": "Document photo or file",
+    "fileHint": "JPG, PNG, WebP, HEIC, PDF, Word or Excel, up to 10 MB. You can take a photo with the phone camera.",
+    "add": "Add a document",
+    "addHint": "The file is optional; you can record just the number and dates.",
+    "save": "Save document",
+    "saving": "Saving…",
+    "download": "Download",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "deleteConfirm": "Delete the document and its file?",
+    "fields": {
+      "expiryDate": "The expiry date must be after the issue date."
+    },
+    "errors": {
+      "fileType": "That file type isn't supported. Use an image, PDF, Word or Excel file.",
+      "fileSize": "The file is larger than 10 MB.",
+      "upload": "The file couldn't be uploaded. Check your connection and try again."
+    }
   }
 }

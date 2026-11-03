@@ -1,9 +1,11 @@
 import { getTranslations } from "next-intl/server";
+import { DocumentsPanel } from "@/components/documents/documents-panel";
 import { FactsSection } from "@/components/form-section";
 import { ChangePasswordForm, LanguageForm } from "@/components/profile/profile-forms";
 import type { Locale } from "@/i18n/routing";
 import { requireMember } from "@/lib/auth/account";
 import { nationalityName } from "@/lib/countries";
+import { loadDocuments } from "@/lib/employee-documents";
 import { localName } from "@/lib/employees";
 import { formatDate } from "@/lib/format";
 import { formatAmount } from "@/lib/money";
@@ -42,6 +44,7 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
       <bdi dir="ltr">{formatAmount(v)}</bdi> <span className="text-secondary">{te("form.currency")}</span>
     </>
   );
+  const documents = await loadDocuments(locale, member.employee_id);
   const pay = me.pay;
   const total = pay
     ? pay.basic_salary + pay.housing_allowance + pay.transport_allowance + pay.communication_allowance + pay.other_allowances
@@ -103,6 +106,7 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
           ]}
         />
       )}
+      <DocumentsPanel employeeId={member.employee_id} documents={documents} canManage={false} />
       <p className="text-secondary">{t("detailsNote")}</p>
 
       <ChangePasswordForm />
