@@ -19,7 +19,7 @@ create function pg_temp.act_as(p_id uuid) returns void language sql as $$
   set local role authenticated;
 $$;
 
-select pg_temp.mk_user('00000000-0000-0000-0000-0000000000ad', '1000000001'); -- system admin
+select pg_temp.mk_user('00000000-0000-0000-0000-0000000000ad', '1000000091'); -- system admin
 select pg_temp.mk_user('00000000-0000-0000-0000-00000000a001', '1000000101'); -- A owner
 select pg_temp.mk_user('00000000-0000-0000-0000-00000000a002', '1000000102'); -- A hr
 select pg_temp.mk_user('00000000-0000-0000-0000-00000000a003', '1000000103'); -- A manager
@@ -33,7 +33,7 @@ select pg_temp.mk_user('00000000-0000-0000-0000-00000000d001', '1000000401'); --
 select pg_temp.mk_user('00000000-0000-0000-0000-0000000000ee', '1000000501'); -- new owner via RPC
 
 insert into platform_admins (user_id, national_id, full_name)
-values ('00000000-0000-0000-0000-0000000000ad', '1000000001', 'System Admin');
+values ('00000000-0000-0000-0000-0000000000ad', '1000000091', 'System Admin');
 
 insert into companies (id, name_ar, max_employees, subscription_ends_at, status) values
   ('0000000a-0000-0000-0000-000000000000', 'شركة أ', 10, current_date + 30, 'active'),
@@ -178,7 +178,9 @@ reset role;
 -- System admin
 -- ---------------------------------------------------------------------------
 select pg_temp.act_as('00000000-0000-0000-0000-0000000000ad');
-select is((select count(*) from companies), 5::bigint, 'the system admin sees every company');
+-- Counts only this test's companies, so it also passes on a seeded local database.
+select is((select count(*) from companies where id::text like '0000000_-0000-0000-0000-000000000000'), 5::bigint,
+  'the system admin sees every company');
 select is(public.my_account() ->> 'kind', 'platform_admin', 'my_account identifies the system admin');
 
 select isnt_empty($$update companies set status = 'suspended'

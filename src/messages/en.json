@@ -173,5 +173,116 @@
         "deleted": "Deleted account (number is free)"
       }
     }
+  },
+  "nav": {
+    "label": "Main navigation",
+    "home": "Home",
+    "employees": "Employees",
+    "team": "My team",
+    "settings": "Settings",
+    "profile": "My profile"
+  },
+  "errors": {
+    "invalid": "Check the fields marked in red.",
+    "forbidden": "You don't have permission to do this.",
+    "employeeLimit": "The company has reached its subscription's employee limit. Contact the platform team to raise it.",
+    "lastOwner": "At least one active company manager must remain.",
+    "invalidManager": "Pick an active supervisor from the same company.",
+    "rateLimited": "Too many actions in a short time. Wait a moment and try again.",
+    "nationalIdTaken": "This ID number is already registered. Contact support.",
+    "notFound": "This item no longer exists.",
+    "unexpected": "Something went wrong. Try again, and contact support if it keeps happening."
+  },
+  "employees": {
+    "title": "Employees",
+    "teamTitle": "My team",
+    "add": "Add employee",
+    "search": "Search by name or ID number",
+    "searchSubmit": "Search",
+    "filter": {
+      "label": "Status",
+      "active": "Active",
+      "disabled": "Disabled",
+      "all": "All"
+    },
+    "empty": "No employees yet. Add the first one and set their role and supervisor.",
+    "emptyTeam": "Nobody is on your team yet.",
+    "noResults": "No matching results.",
+    "count": "{count} employees",
+    "columns": {
+      "name": "Name",
+      "nationalId": "ID number",
+      "role": "Role",
+      "department": "Department",
+      "manager": "Supervisor",
+      "status": "Status"
+    },
+    "status": {
+      "active": "Active",
+      "disabled": "Disabled",
+      "deleted": "Deleted"
+    },
+    "form": {
+      "personal": "Basic details",
+      "work": "Work",
+      "account": "Sign-in account",
+      "nationalId": "National ID / Iqama",
+      "nationalIdHint": "10 digits starting with 1 or 2. It can't be changed after adding.",
+      "fullNameAr": "Name (Arabic)",
+      "fullNameEn": "Name (English)",
+      "phone": "Mobile",
+      "phoneHint": "Starts with 05",
+      "jobTitle": "Job title",
+      "role": "Role",
+      "roleHint": "Decides what this person can see and manage.",
+      "department": "Department",
+      "noDepartment": "No department",
+      "manager": "Direct supervisor",
+      "noManager": "No supervisor",
+      "locale": "Interface language",
+      "password": "Password",
+      "passwordHint": "At least 8 characters. Share it with the employee yourself.",
+      "generate": "Suggest a password",
+      "submitCreate": "Add employee",
+      "submitting": "Adding…",
+      "saved": "Changes saved"
+    },
+    "fields": {
+      "nationalId": "ID number is 10 digits starting with 1 or 2.",
+      "nationalIdTaken": "This number is already registered.",
+      "fullNameAr": "Enter the Arabic name (at least 2 characters).",
+      "fullNameEn": "English name must be 2 to 120 characters.",
+      "phone": "Mobile is 10 digits starting with 05.",
+      "jobTitle": "Job title is at most 120 characters.",
+      "role": "Pick a role.",
+      "departmentId": "Pick a department from the list.",
+      "managerId": "Pick a supervisor from the list.",
+      "locale": "Pick a language.",
+      "password": "Password must be 8 to 72 characters."
+    },
+    "detail": {
+      "back": "Employees",
+      "backTeam": "My team",
+      "createdAt": "Added on",
+      "edit": "Edit details",
+      "readOnly": "You can view your team's details only.",
+      "actions": "Account actions",
+      "disable": "Disable account",
+      "enable": "Enable account",
+      "disableTitle": "Disable {name}'s account?",
+      "disableBody": "They can't sign in and their open sessions end now. Their data is kept and you can enable them later.",
+      "enableTitle": "Enable {name}'s account?",
+      "enableBody": "They can sign in again with their ID number and current password.",
+      "resetPassword": "Set a new password",
+      "resetTitle": "New password for {name}",
+      "resetBody": "Their open sessions end and only the new password works. Share it with them yourself.",
+      "resetSubmit": "Save new password",
+      "resetDone": "New password set. Share it with the employee.",
+      "delete": "Delete account",
+      "deleteTitle": "Permanently delete {name}'s account?",
+      "deleteBody": "The sign-in account is removed and the ID number becomes free for another company. Their task and report history stays. This can't be undone.",
+      "deleteConfirm": "Delete account permanently",
+      "noActions": "You can't manage this account."
+    }
   }
 }

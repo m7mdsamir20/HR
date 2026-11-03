@@ -6,15 +6,8 @@ import { useActionState, useState } from "react";
 import { createCompany, type CreateCompanyState } from "@/actions/admin";
 import { FormField } from "@/components/form-field";
 import { Button } from "@/components/ui/button";
+import { suggestPassword } from "@/lib/password";
 import type { CreateCompanyField } from "@/lib/validation/company";
-
-// No look-alike characters (0/O, 1/l/I) so the manager can read it out to the owner.
-const ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
-
-function suggestPassword(length = 12): string {
-  const bytes = crypto.getRandomValues(new Uint32Array(length));
-  return Array.from(bytes, (b) => ALPHABET[b % ALPHABET.length]).join("");
-}
 
 export function CreateCompanyForm({ minDate }: { minDate: string }) {
   const t = useTranslations("admin.create");

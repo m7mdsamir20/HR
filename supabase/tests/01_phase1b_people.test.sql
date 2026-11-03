@@ -3,11 +3,11 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(50);
+select plan(52);
 
 create function pg_temp.mk_user(p_id uuid, p_nid text) returns void language sql as $$
-  insert into auth.users (id, email, aud, role, instance_id)
-  values (p_id, p_nid || '@users.invalid', 'authenticated', 'authenticated', '00000000-0000-0000-0000-000000000000');
+  insert into auth.users (id, email, aud, role, instance_id, created_at)
+  values (p_id, p_nid || '@users.invalid', 'authenticated', 'authenticated', '00000000-0000-0000-0000-000000000000', now());
 $$;
 create function pg_temp.act_as(p_id uuid) returns void language sql as $$
   select set_config('request.jwt.claims', json_build_object('sub', p_id, 'role', 'authenticated')::text, true);
@@ -72,6 +72,9 @@ select throws_ok(
 select throws_ok(
   $$select public.employee_create('00000000-0000-0000-0000-0000000000e2', '1000000999', 'خطأ', null, null, null, 'employee', null, null, 'ar')$$,
   'P0001', 'user_mismatch', 'the Auth user must match the national ID');
+select throws_ok(
+  $$select public.employee_create('00000000-0000-0000-0000-00000000a005', '2000000105', 'ربط حساب قائم', null, null, null, 'employee', null, null, 'ar')$$,
+  'P0001', 'user_mismatch', 'an Auth account already linked to an employee cannot be attached again');
 select throws_ok(
   $$select public.employee_update('000000a1-0000-0000-0000-000000000000', 'مالك', null, null, null, 'owner', null, null)$$,
   '42501', null, 'HR cannot edit the owner');
@@ -149,6 +152,12 @@ reset role;
 select pg_temp.act_as('00000000-0000-0000-0000-00000000a001');
 select is(public.employee_delete_begin('000000a3-0000-0000-0000-000000000000'),
   '00000000-0000-0000-0000-00000000a003'::uuid, 'delete_begin returns the Auth user to remove');
+select throws_ok($$select public.employee_delete_finish('000000a3-0000-0000-0000-000000000000')$$,
+  'P0001', 'auth_user_exists', 'delete_finish refuses while the Auth account still exists');
+reset role;
+-- What the Server Action does in between: remove the Auth user (the FK nulls employees.user_id)
+delete from auth.users where id = '00000000-0000-0000-0000-00000000a003';
+select pg_temp.act_as('00000000-0000-0000-0000-00000000a001');
 select lives_ok($$select public.employee_delete_finish('000000a3-0000-0000-0000-000000000000')$$, 'delete_finish marks the row deleted');
 reset role;
 select is((select status::text || ':' || coalesce(user_id::text, 'null') from employees where id = '000000a3-0000-0000-0000-000000000000'),

@@ -7,8 +7,9 @@ import type { Locale } from "@/i18n/routing";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/database.types";
 
-export const ROLES = ["owner", "hr", "manager", "employee"] as const;
-export type Role = (typeof ROLES)[number];
+import { ROLES, type Role } from "./roles";
+
+export { ROLES, type Role };
 
 const companySchema = z.object({
   id: z.uuid(),

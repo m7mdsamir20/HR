@@ -21,6 +21,12 @@ alter table public.employees
   references public.departments (company_id, id) on delete set null (department_id);
 create index employees_department on public.employees (department_id);
 
+-- PostgREST can't embed through the composite self-reference (company_id, manager_id), so a plain
+-- FK gives it one to follow (select "manager:manager_id(...)"). The composite FK still guarantees
+-- the manager is in the same company.
+alter table public.employees
+  add constraint employees_manager_fk foreign key (manager_id) references public.employees (id);
+
 -- ---------------------------------------------------------------------------
 -- Integrity triggers on employees
 -- ---------------------------------------------------------------------------
@@ -209,9 +215,15 @@ begin
   end if;
   perform private.take_rate_limit('employee_create', v_company::text, 30, interval '10 minutes');
 
+  -- Only a fresh Auth user made for this national ID: an old or leftover account (with a password
+  -- someone else knows) can never be attached to a new employee row.
   if not exists (
-    select 1 from auth.users where id = p_user_id and email = p_national_id || '@users.invalid'
-  ) or exists (select 1 from public.platform_admins where user_id = p_user_id) then
+    select 1 from auth.users
+    where id = p_user_id
+      and email = p_national_id || '@users.invalid'
+      and created_at > now() - interval '10 minutes'
+  ) or exists (select 1 from public.platform_admins where user_id = p_user_id)
+    or exists (select 1 from public.employees where user_id = p_user_id) then
     raise exception 'user_mismatch' using errcode = 'P0001';
   end if;
 
@@ -309,6 +321,11 @@ language plpgsql security definer set search_path = '' as $$
 begin
   if not private.can_manage_employee(p_employee_id) then
     raise exception 'forbidden' using errcode = '42501';
+  end if;
+  -- The order is enforced here, not only in the app: the row is marked deleted only once its
+  -- Auth account is gone (deleting it nulls user_id through the FK).
+  if exists (select 1 from public.employees where id = p_employee_id and user_id is not null) then
+    raise exception 'auth_user_exists' using errcode = 'P0001';
   end if;
   update public.employees
     set status = 'deleted', user_id = null, deleted_at = now(), manager_id = null

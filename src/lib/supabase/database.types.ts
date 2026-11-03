@@ -127,6 +127,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "departments"
       referencedColumns: ["company_id","id"]
+    },{
+      foreignKeyName: "employees_manager_fk"
+      columns: ["manager_id"]
+isOneToOne: false
+      referencedRelation: "employees"
+      referencedColumns: ["id"]
     }
                   ]
                 },"platform_admins": {
