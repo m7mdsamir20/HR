@@ -677,9 +677,8 @@
     "reports": "Completion reports",
     "noReports": "No completion report has been submitted yet.",
     "otherFiles": "Other files",
-    "print": "Print / PDF",
-    "taskPdf": "PDF report",
-    "cardPdf": "PDF card",
-    "rateLimited": "Too many files in a short time. Wait a moment."
+    "rateLimited": "Too many files in a short time. Wait a moment.",
+    "view": "View and print PDF",
+    "download": "Download PDF"
   }
 }

@@ -48,11 +48,12 @@ export function issuedNow(locale: Locale): string {
   return formatDateTime(locale, new Date().toISOString());
 }
 
-export function pdfResponse(pdf: Buffer, filename: string): Response {
+/** `download` forces a save dialog; otherwise the browser's viewer opens it (with its print button). */
+export function pdfResponse(pdf: Buffer, filename: string, download = false): Response {
   return new Response(new Uint8Array(pdf), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename="${filename}"`,
+      "Content-Disposition": `${download ? "attachment" : "inline"}; filename="${filename}"`,
       "Cache-Control": "private, no-store",
     },
   });

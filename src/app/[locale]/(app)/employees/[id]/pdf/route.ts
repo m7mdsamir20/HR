@@ -10,7 +10,7 @@ export const maxDuration = 60;
 
 // Employee data card (owner and HR within their reach). The export is authorized by the database
 // (record_export → can_manage_employee), rate limited and audited before anything is built.
-export async function GET(_request: Request, ctx: RouteContext<"/[locale]/employees/[id]/pdf">) {
+export async function GET(request: Request, ctx: RouteContext<"/[locale]/employees/[id]/pdf">) {
   const { locale, id: rawId } = await ctx.params;
   const id = z.uuid().safeParse(rawId);
   const member = await pdfMember();
@@ -23,5 +23,5 @@ export async function GET(_request: Request, ctx: RouteContext<"/[locale]/employ
   if (error) return new Response(null, { status: error.message === "rate_limited" ? 429 : 404 });
 
   const built = await buildEmployeeCardPdf(locale, member, id.data);
-  return built ? pdfResponse(built.pdf, built.filename) : new Response(null, { status: 404 });
+  return built ? pdfResponse(built.pdf, built.filename, new URL(request.url).searchParams.get("download") === "1") : new Response(null, { status: 404 });
 }
