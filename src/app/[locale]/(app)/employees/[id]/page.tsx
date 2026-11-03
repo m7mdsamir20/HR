@@ -1,4 +1,4 @@
-import { ArrowRight, Download, Printer } from "lucide-react";
+import { ArrowRight, Printer } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { z } from "zod";
@@ -62,23 +62,15 @@ export default async function EmployeePage({ params }: PageProps<"/[locale]/empl
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-page">{name}</h1>
           <StatusPill tone={status === "active" ? "stamp" : "brick"}>{t(`status.${status}`)}</StatusPill>
-        </div>
-        {canManage && (
-          <div className="flex flex-wrap gap-2">
-            <Button asChild>
+          {canManage && (
+            <Button asChild className="ms-auto">
               <a href={`${locale === "en" ? "/en" : ""}/employees/${e.id}/pdf`} target="_blank" rel="noopener">
                 <Printer aria-hidden />
                 {tPdf("view")}
               </a>
             </Button>
-            <Button asChild variant="outline">
-              <a href={`${locale === "en" ? "/en" : ""}/employees/${e.id}/pdf?download=1`}>
-                <Download aria-hidden />
-                {tPdf("download")}
-              </a>
-            </Button>
-          </div>
-        )}
+          )}
+        </div>
         <p className="text-secondary">
           {tRoles(e.role)} · <bdi dir="ltr">{e.national_id}</bdi> · {t("detail.createdAt")} {formatDateTime(locale, e.created_at)}
         </p>

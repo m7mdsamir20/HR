@@ -678,7 +678,6 @@
     "noReports": "No completion report has been submitted yet.",
     "otherFiles": "Other files",
     "rateLimited": "Too many files in a short time. Wait a moment.",
-    "view": "View and print PDF",
-    "download": "Download PDF"
+    "view": "View and print PDF"
   }
 }
