@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, FileText } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { z } from "zod";
@@ -8,6 +8,7 @@ import { EmployeeActions } from "@/components/employees/employee-actions";
 import { EmployeeForm } from "@/components/employees/employee-form";
 import { FactsSection } from "@/components/form-section";
 import { StatusPill } from "@/components/status-pill";
+import { Button } from "@/components/ui/button";
 import { Link, redirect } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { requireMember } from "@/lib/auth/account";
@@ -39,6 +40,7 @@ export default async function EmployeePage({ params }: PageProps<"/[locale]/empl
 
   const t = await getTranslations({ locale, namespace: "employees" });
   const tRoles = await getTranslations({ locale, namespace: "roles" });
+  const tPdf = await getTranslations({ locale, namespace: "pdf" });
   const name = localName(locale, e.full_name_ar, e.full_name_en);
   const status = e.status as "active" | "disabled";
   const manager = one(e.manager);
@@ -60,6 +62,14 @@ export default async function EmployeePage({ params }: PageProps<"/[locale]/empl
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-page">{name}</h1>
           <StatusPill tone={status === "active" ? "stamp" : "brick"}>{t(`status.${status}`)}</StatusPill>
+          {canManage && (
+            <Button asChild variant="outline" size="sm" className="ms-auto">
+              <a href={`${locale === "en" ? "/en" : ""}/employees/${e.id}/pdf`} target="_blank" rel="noopener">
+                <FileText aria-hidden />
+                {tPdf("cardPdf")}
+              </a>
+            </Button>
+          )}
         </div>
         <p className="text-secondary">
           {tRoles(e.role)} · <bdi dir="ltr">{e.national_id}</bdi> · {t("detail.createdAt")} {formatDateTime(locale, e.created_at)}

@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, FileText } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { z } from "zod";
@@ -12,6 +12,7 @@ import { AttachmentLinks, DeleteTaskButton, ReviewForm, StartButton } from "@/co
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { requireMember } from "@/lib/auth/account";
+import { Button } from "@/components/ui/button";
 import { formatDate, formatDateTime, todayInRiyadh } from "@/lib/format";
 import { assigneeOptions, loadNames } from "@/lib/task-data";
 import { isOverdue, statusTone, type TaskStatus } from "@/lib/tasks";
@@ -36,6 +37,7 @@ export default async function TaskPage({ params }: PageProps<"/[locale]/tasks/[i
   const names = await loadNames(locale, [task.created_by, task.assignee_id, ...(reports ?? []).map((r) => r.reviewed_by)]);
 
   const t = await getTranslations({ locale, namespace: "tasks" });
+  const tPdf = await getTranslations({ locale, namespace: "pdf" });
   const status = task.status as TaskStatus;
   const isAssignee = task.assignee_id === member.employee_id;
   const isReviewer = !isAssignee && (member.role === "owner" || member.role === "manager");
@@ -55,6 +57,15 @@ export default async function TaskPage({ params }: PageProps<"/[locale]/tasks/[i
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-page">{task.title}</h1>
           <StatusPill tone={statusTone[status]}>{t(`status.${status}`)}</StatusPill>
+          {reports && reports.length > 0 && (
+            <Button asChild variant="outline" size="sm" className="ms-auto">
+              {/* A route handler, not a page: a plain anchor, opened in a new tab. */}
+              <a href={`${locale === "en" ? "/en" : ""}/tasks/${task.id}/pdf`} target="_blank" rel="noopener">
+                <FileText aria-hidden />
+                {tPdf("taskPdf")}
+              </a>
+            </Button>
+          )}
         </div>
         <p className="text-secondary">{t("detail.createdBy", { name: names.get(task.created_by) ?? "—" })}</p>
       </div>

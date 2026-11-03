@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
-import { buildCsp } from "@/lib/security/csp";
+import { buildCsp, isPdfPath, PDF_CSP } from "@/lib/security/csp";
 import { refreshSession } from "@/lib/supabase/proxy";
 
 const handleI18n = createIntlMiddleware(routing);
@@ -17,7 +17,7 @@ export default async function proxy(request: NextRequest) {
 
   const response = handleI18n(request);
   await refreshSession(request, response);
-  response.headers.set("content-security-policy", csp);
+  response.headers.set("content-security-policy", isPdfPath(request.nextUrl.pathname) ? PDF_CSP : csp);
   return response;
 }
 

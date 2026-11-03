@@ -20,3 +20,17 @@ export function buildCsp(nonce: string) {
     ...(isDev ? [] : ["upgrade-insecure-requests"]),
   ].join("; ");
 }
+
+/**
+ * Generated PDFs are served by two Route Handlers. The page policy lists `object-src 'none'`, which
+ * can stop a browser's built-in PDF viewer from opening them, and a PDF has no scripts or
+ * subresources for the policy to restrict. They get a policy without `default-src`/`object-src`
+ * that still forbids framing, forms and base tags.
+ */
+export const PDF_CSP = "frame-ancestors 'none'; base-uri 'none'; form-action 'none'";
+
+const PDF_PATH = /^(\/en)?\/(tasks|employees)\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/pdf$/;
+
+export function isPdfPath(pathname: string): boolean {
+  return PDF_PATH.test(pathname);
+}

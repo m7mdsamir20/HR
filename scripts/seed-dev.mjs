@@ -1,6 +1,8 @@
 // Local development data: a system admin and one demo company with a user per role.
 // Refuses to run anywhere but a local Supabase (CLAUDE.md §5.17).
 // Run after `supabase db reset`: pnpm db:seed
+import { randomUUID } from "node:crypto";
+import { crc32, deflateSync } from "node:zlib";
 import { createClient } from "@supabase/supabase-js";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
@@ -34,6 +36,39 @@ const USERS = [
       hire_date: "2024-02-01", contract_type: "fixed", contract_start: "2024-02-01", contract_end: "2026-12-31", probation_days: 90 },
     pay: { basic_salary: 4000, housing_allowance: 1000, transport_allowance: 400, communication_allowance: 100 } },
 ];
+
+// A small gradient PNG standing in for a site photo in the demo report.
+function demoPhoto(width = 480, height = 320) {
+  const rows = [];
+  for (let y = 0; y < height; y++) {
+    const row = Buffer.alloc(1 + width * 3);
+    for (let x = 0; x < width; x++) {
+      row[1 + x * 3] = 47 + Math.round((x / width) * 120);
+      row[2 + x * 3] = 74 + Math.round((y / height) * 120);
+      row[3 + x * 3] = 158;
+    }
+    rows.push(row);
+  }
+  const chunk = (type, data) => {
+    const body = Buffer.concat([Buffer.from(type), data]);
+    const out = Buffer.alloc(8 + data.length + 4);
+    out.writeUInt32BE(data.length, 0);
+    body.copy(out, 4);
+    out.writeUInt32BE(crc32(body), 8 + data.length);
+    return out;
+  };
+  const header = Buffer.alloc(13);
+  header.writeUInt32BE(width, 0);
+  header.writeUInt32BE(height, 4);
+  header[8] = 8; // bit depth
+  header[9] = 2; // RGB
+  return Buffer.concat([
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    chunk("IHDR", header),
+    chunk("IDAT", deflateSync(Buffer.concat(rows))),
+    chunk("IEND", Buffer.alloc(0)),
+  ]);
+}
 
 const admin = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 
@@ -103,6 +138,41 @@ async function main() {
       { company_id: company.id, created_by: manager, assignee_id: ahmed, title: "تدريب الفنيين الجدد على السلامة", priority: "low", due_date: day(5), status: "assigned", expected_hours: 6 },
     ]),
   );
+  // One finished task: approved with a rating, its report and a proof photo.
+  const { data: done, error: doneError } = await admin
+    .from("tasks")
+    .insert({
+      company_id: company.id, created_by: manager, assignee_id: ahmed, title: "تركيب كاميرات مراقبة فرع العليا", priority: "high",
+      due_date: day(-3), due_time: "16:00", status: "approved", rating: 5, location: "فرع العليا", expected_hours: 4,
+      description: "تركيب 6 كاميرات وتجربة التسجيل وتسليم لوحة التحكم.",
+      started_at: new Date(Date.now() - 4 * 86_400_000).toISOString(), submitted_at: new Date(Date.now() - 3 * 86_400_000).toISOString(),
+      approved_at: new Date(Date.now() - 2 * 86_400_000).toISOString(),
+    })
+    .select("id")
+    .single();
+  if (doneError) throw doneError;
+  const { data: doneReport, error: reportError } = await admin
+    .from("task_reports")
+    .insert({
+      company_id: company.id, task_id: done.id, submitted_by: ahmed, round: 1, status: "approved", rating: 5,
+      summary: "تم تركيب 6 كاميرات وربطها بجهاز التسجيل، وتجربة التسجيل والعرض عن بعد، وتسليم كلمة المرور لمسؤول الفرع.",
+      hours_spent: 4.5, obstacles: "تأخر وصول الكابلات ساعة.", links: ["https://example.com/handover/1042"],
+      review_note: "عمل ممتاز وتسليم منظم.", reviewed_by: manager, reviewed_at: new Date(Date.now() - 2 * 86_400_000).toISOString(),
+    })
+    .select("id")
+    .single();
+  if (reportError) throw reportError;
+  const photo = demoPhoto();
+  const photoPath = `${company.id}/reports/${done.id}/${randomUUID()}.png`;
+  const { error: uploadError } = await admin.storage.from("company-files").upload(photoPath, photo, { contentType: "image/png" });
+  if (uploadError) throw uploadError;
+  check(
+    await admin.from("report_attachments").insert({
+      company_id: company.id, task_id: done.id, report_id: doneReport.id, file_path: photoPath, file_name: "الكاميرات بعد التركيب.png",
+      mime_type: "image/png", size_bytes: photo.length,
+    }),
+  );
+
   check(
     await admin.from("employee_documents").insert([
       { company_id: company.id, employee_id: ahmed, doc_type: "iqama", number: "2000000005", issue_date: "2023-01-10", expiry_date: day(20) },

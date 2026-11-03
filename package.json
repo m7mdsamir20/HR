@@ -17,6 +17,7 @@
     "db:types": "supabase gen types typescript --local > src/lib/supabase/database.types.ts"
   },
   "dependencies": {
+    "@sparticuz/chromium": "153.0.0",
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.118.0",
     "class-variance-authority": "0.7.1",
@@ -24,6 +25,7 @@
     "lucide-react": "1.66.0",
     "next": "16.4.3",
     "next-intl": "4.14.9",
+    "puppeteer-core": "25.16.0",
     "radix-ui": "1.8.1",
     "react": "19.3.0",
     "react-dom": "19.3.0",

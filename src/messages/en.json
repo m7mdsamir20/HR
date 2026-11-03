@@ -496,7 +496,8 @@
       "label": "Status",
       "open": "Open",
       "review": "Awaiting review",
-      "all": "All"
+      "all": "All",
+      "mine": "Assigned to me"
     },
     "groups": {
       "overdue": "Overdue",
@@ -662,5 +663,21 @@
     "errorTitle": "Something went wrong",
     "errorBody": "We couldn't load this page. Try again, and contact support if it keeps happening.",
     "retry": "Try again"
+  },
+  "pdf": {
+    "taskReportTitle": "Task completion report",
+    "employeeCardTitle": "Employee data card",
+    "number": "Document no.",
+    "issued": "Issued",
+    "page": "Page",
+    "of": "of",
+    "taskDetails": "Task details",
+    "reports": "Completion reports",
+    "noReports": "No completion report has been submitted yet.",
+    "otherFiles": "Other files",
+    "print": "Print / PDF",
+    "taskPdf": "PDF report",
+    "cardPdf": "PDF card",
+    "rateLimited": "Too many files in a short time. Wait a moment."
   }
 }

@@ -344,6 +344,9 @@ isOneToOne: false
 "profile_set_locale":
 { Args: { "p_locale": string }; Returns: undefined
                            },
+"record_export":
+{ Args: { "p_kind": string,"p_target": string }; Returns: undefined
+                           },
 "task_create":
 { Args: { "p": Json }; Returns: string
                            },

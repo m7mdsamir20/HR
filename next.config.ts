@@ -19,6 +19,13 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   productionBrowserSourceMaps: false,
+  // PDF generation (CLAUDE.md §6.1): the Chromium build is loaded at runtime, not bundled, and the
+  // committed fonts must ship with the two PDF routes on Vercel.
+  serverExternalPackages: ["@sparticuz/chromium", "puppeteer-core"],
+  outputFileTracingIncludes: {
+    "/[locale]/tasks/[id]/pdf": ["./src/assets/fonts/**"],
+    "/[locale]/employees/[id]/pdf": ["./src/assets/fonts/**"],
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
