@@ -155,6 +155,32 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"notifications": {
+                  Row: {
+                    "actor_id": string | null,"company_id": string,"created_at": string,"id": number,"read_at": string | null,"recipient_id": string,"task_id": string | null,"type": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "actor_id"?: string | null,"company_id": string,"created_at"?: string,"id"?: never,"read_at"?: string | null,"recipient_id": string,"task_id"?: string | null,"type": string
+                  }
+                  Update: {
+                    "actor_id"?: string | null,"company_id"?: string,"created_at"?: string,"id"?: never,"read_at"?: string | null,"recipient_id"?: string,"task_id"?: string | null,"type"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "notifications_company_id_recipient_id_fkey"
+      columns: ["company_id","recipient_id"]
+isOneToOne: false
+      referencedRelation: "employees"
+      referencedColumns: ["company_id","id"]
+    },{
+      foreignKeyName: "notifications_task_id_fkey"
+      columns: ["task_id"]
+isOneToOne: false
+      referencedRelation: "tasks"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"platform_admins": {
                   Row: {
                     "created_at": string,"full_name": string,"national_id": string,"user_id": string
@@ -169,6 +195,84 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"report_attachments": {
+                  Row: {
+                    "company_id": string,"created_at": string,"file_name": string,"file_path": string,"id": string,"mime_type": string,"report_id": string,"size_bytes": number,"task_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "company_id": string,"created_at"?: string,"file_name": string,"file_path": string,"id"?: string,"mime_type": string,"report_id": string,"size_bytes": number,"task_id": string
+                  }
+                  Update: {
+                    "company_id"?: string,"created_at"?: string,"file_name"?: string,"file_path"?: string,"id"?: string,"mime_type"?: string,"report_id"?: string,"size_bytes"?: number,"task_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "report_attachments_company_id_report_id_fkey"
+      columns: ["company_id","report_id"]
+isOneToOne: false
+      referencedRelation: "task_reports"
+      referencedColumns: ["company_id","id"]
+    }
+                  ]
+                },"task_reports": {
+                  Row: {
+                    "company_id": string,"created_at": string,"hours_spent": number,"id": string,"links": (string)[],"obstacles": string | null,"rating": number | null,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"round": number,"status": Database["public"]['Enums']["report_status"],"submitted_by": string,"summary": string,"task_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "company_id": string,"created_at"?: string,"hours_spent": number,"id"?: string,"links"?: (string)[],"obstacles"?: string | null,"rating"?: number | null,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"round": number,"status"?: Database["public"]['Enums']["report_status"],"submitted_by": string,"summary": string,"task_id": string
+                  }
+                  Update: {
+                    "company_id"?: string,"created_at"?: string,"hours_spent"?: number,"id"?: string,"links"?: (string)[],"obstacles"?: string | null,"rating"?: number | null,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"round"?: number,"status"?: Database["public"]['Enums']["report_status"],"submitted_by"?: string,"summary"?: string,"task_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "task_reports_company_id_submitted_by_fkey"
+      columns: ["company_id","submitted_by"]
+isOneToOne: false
+      referencedRelation: "employees"
+      referencedColumns: ["company_id","id"]
+    },{
+      foreignKeyName: "task_reports_company_id_task_id_fkey"
+      columns: ["company_id","task_id"]
+isOneToOne: false
+      referencedRelation: "tasks"
+      referencedColumns: ["company_id","id"]
+    }
+                  ]
+                },"tasks": {
+                  Row: {
+                    "approved_at": string | null,"assignee_id": string,"company_id": string,"created_at": string,"created_by": string,"description": string | null,"due_date": string,"due_time": string | null,"expected_hours": number | null,"id": string,"location": string | null,"priority": Database["public"]['Enums']["task_priority"],"rating": number | null,"started_at": string | null,"status": Database["public"]['Enums']["task_status"],"submitted_at": string | null,"title": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "approved_at"?: string | null,"assignee_id": string,"company_id": string,"created_at"?: string,"created_by": string,"description"?: string | null,"due_date": string,"due_time"?: string | null,"expected_hours"?: number | null,"id"?: string,"location"?: string | null,"priority"?: Database["public"]['Enums']["task_priority"],"rating"?: number | null,"started_at"?: string | null,"status"?: Database["public"]['Enums']["task_status"],"submitted_at"?: string | null,"title": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "approved_at"?: string | null,"assignee_id"?: string,"company_id"?: string,"created_at"?: string,"created_by"?: string,"description"?: string | null,"due_date"?: string,"due_time"?: string | null,"expected_hours"?: number | null,"id"?: string,"location"?: string | null,"priority"?: Database["public"]['Enums']["task_priority"],"rating"?: number | null,"started_at"?: string | null,"status"?: Database["public"]['Enums']["task_status"],"submitted_at"?: string | null,"title"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "tasks_company_id_assignee_id_fkey"
+      columns: ["company_id","assignee_id"]
+isOneToOne: false
+      referencedRelation: "employees"
+      referencedColumns: ["company_id","id"]
+    },{
+      foreignKeyName: "tasks_company_id_created_by_fkey"
+      columns: ["company_id","created_by"]
+isOneToOne: false
+      referencedRelation: "employees"
+      referencedColumns: ["company_id","id"]
+    },{
+      foreignKeyName: "tasks_company_id_fkey"
+      columns: ["company_id"]
+isOneToOne: false
+      referencedRelation: "companies"
+      referencedColumns: ["id"]
+    }
+                  ]
                 }
           }
           Views: {
@@ -180,6 +284,9 @@ isOneToOne: false
                            },
 "can_manage_employee":
 { Args: { "p_employee_id": string }; Returns: boolean
+                           },
+"can_submit_task":
+{ Args: { "p_task_id": string }; Returns: boolean
                            },
 "company_set_logo":
 { Args: { "p_logo_path": string }; Returns: string
@@ -223,15 +330,36 @@ isOneToOne: false
 "my_profile":
 { Args: Record<PropertyKey, never>; Returns: Json
                            },
+"notifications_mark_read":
+{ Args: { "p_ids": (number)[] }; Returns: undefined
+                           },
 "profile_password_changed":
 { Args: Record<PropertyKey, never>; Returns: undefined
                            },
 "profile_set_locale":
 { Args: { "p_locale": string }; Returns: undefined
+                           },
+"task_create":
+{ Args: { "p": Json }; Returns: string
+                           },
+"task_delete":
+{ Args: { "p_task_id": string }; Returns: undefined
+                           },
+"task_review":
+{ Args: { "p_decision": string,"p_note": string,"p_rating": number,"p_task_id": string }; Returns: undefined
+                           },
+"task_start":
+{ Args: { "p_task_id": string }; Returns: undefined
+                           },
+"task_submit_report":
+{ Args: { "p": Json,"p_attachments": Json,"p_task_id": string }; Returns: string
+                           },
+"task_update":
+{ Args: { "p": Json,"p_task_id": string }; Returns: undefined
                            }
           }
           Enums: {
-            "company_status": "active"|"suspended","document_type": "iqama"|"national_id"|"work_permit"|"passport"|"health_card"|"contract","employee_role": "owner"|"hr"|"manager"|"employee","employee_status": "active"|"disabled"|"deleted","id_type": "citizen"|"resident"
+            "company_status": "active"|"suspended","document_type": "iqama"|"national_id"|"work_permit"|"passport"|"health_card"|"contract","employee_role": "owner"|"hr"|"manager"|"employee","employee_status": "active"|"disabled"|"deleted","id_type": "citizen"|"resident","report_status": "submitted"|"changes_requested"|"approved","task_priority": "low"|"medium"|"high"|"urgent","task_status": "assigned"|"in_progress"|"submitted"|"changes_requested"|"approved"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -351,7 +479,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "company_status": ["active", "suspended"],"document_type": ["iqama", "national_id", "work_permit", "passport", "health_card", "contract"],"employee_role": ["owner", "hr", "manager", "employee"],"employee_status": ["active", "disabled", "deleted"],"id_type": ["citizen", "resident"]
+            "company_status": ["active", "suspended"],"document_type": ["iqama", "national_id", "work_permit", "passport", "health_card", "contract"],"employee_role": ["owner", "hr", "manager", "employee"],"employee_status": ["active", "disabled", "deleted"],"id_type": ["citizen", "resident"],"report_status": ["submitted", "changes_requested", "approved"],"task_priority": ["low", "medium", "high", "urgent"],"task_status": ["assigned", "in_progress", "submitted", "changes_requested", "approved"]
           }
         }
 } as const
