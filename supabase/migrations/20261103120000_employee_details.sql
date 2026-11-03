@@ -67,17 +67,18 @@ begin
     if v_meta -> 'changes' = '{}'::jsonb then
       return new;
     end if;
-    -- Pay and personal details: record which fields changed, never their values (the audit log is
-    -- readable by the system admin across companies). Role and status keep from/to, since that's
-    -- what tracing permission changes needs.
-    if v_entity in ('compensation', 'employee') then
-      v_meta := jsonb_build_object(
-        'changed', (select coalesce(jsonb_agg(k order by k), '[]'::jsonb) from jsonb_object_keys(v_meta -> 'changes') as k),
-        'changes', (select coalesce(jsonb_object_agg(k, v), '{}'::jsonb)
-                    from jsonb_each(v_meta -> 'changes') as c(k, v)
-                    where v_entity = 'employee' and k in ('role', 'status'))
-      );
-    end if;
+    -- Deny by default: record which fields changed, and keep from/to values only for an explicit
+    -- allowlist. The audit log is readable by the system admin across companies, so pay, personal
+    -- details and document numbers never land in it. Company subscription fields and department
+    -- names are platform/business data; an employee's role and status trace permission changes.
+    v_meta := jsonb_build_object(
+      'changed', (select coalesce(jsonb_agg(k order by k), '[]'::jsonb) from jsonb_object_keys(v_meta -> 'changes') as k),
+      'changes', (select coalesce(jsonb_object_agg(k, v), '{}'::jsonb)
+                  from jsonb_each(v_meta -> 'changes') as c(k, v)
+                  where (v_entity = 'employee' and k in ('role', 'status'))
+                     or (v_entity = 'company' and k in ('status', 'max_employees', 'subscription_ends_at', 'name_ar', 'name_en'))
+                     or (v_entity = 'department' and k in ('name_ar', 'name_en')))
+    );
   else
     v_meta := case v_entity
       when 'company' then jsonb_build_object('name_ar', v_row -> 'name_ar')

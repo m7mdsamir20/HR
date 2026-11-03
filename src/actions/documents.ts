@@ -74,8 +74,15 @@ export async function saveDocument(employeeId: string, _prev: DocumentState, for
   });
   const path = String(formData.get("path") ?? "");
   const supabase = await createClient();
+  // Only a path this flow could have produced: the caller's company, this employee, a random name.
+  // Checked before anything else, so a crafted path can never reach the storage delete below.
+  const expected = new RegExp(`^${member.company.id}/documents/${id.data}/[0-9a-f-]{36}\\.(jpg|png|webp|heic|pdf|docx|xlsx)$`);
+  if (path && !expected.test(path)) return { ok: false, error: "forbidden" };
+  // Removes a just-uploaded file that won't be recorded, never one an existing document points at.
   const discard = async () => {
-    if (path) await supabase.storage.from(BUCKET).remove([path]);
+    if (!path) return;
+    const { count } = await supabase.from("employee_documents").select("id", { count: "exact", head: true }).eq("file_path", path);
+    if (count === 0) await supabase.storage.from(BUCKET).remove([path]);
   };
   if (!parsed.success) {
     await discard();
@@ -84,10 +91,6 @@ export async function saveDocument(employeeId: string, _prev: DocumentState, for
 
   let file: { file_path: string; file_name: string; mime_type: string; size_bytes: number } | null = null;
   if (path) {
-    // Only a path this flow could have produced: the caller's company, this employee, a random name.
-    const expected = new RegExp(`^${member.company.id}/documents/${id.data}/[0-9a-f-]{36}\\.(jpg|png|webp|heic|pdf|docx|xlsx)$`);
-    if (!expected.test(path)) return { ok: false, error: "forbidden" };
-
     const { data: blob, error: downloadError } = await supabase.storage.from(BUCKET).download(path);
     if (downloadError || !blob) return { ok: false, error: "unexpected" };
     if (blob.size > MAX_DOCUMENT_BYTES) {

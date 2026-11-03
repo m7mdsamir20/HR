@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(17);
+select plan(18);
 
 create function pg_temp.mk_user(p_id uuid, p_nid text) returns void language sql as $$
   insert into auth.users (id, email, aud, role, instance_id, created_at)
@@ -107,6 +107,15 @@ select ok(
   (select meta::text not like '%5000%' and meta::text not like '%SA03%' and meta -> 'changed' ? 'basic_salary'
      from audit_logs where action = 'compensation.update' order by id desc limit 1),
   'the pay audit names the changed fields without their amounts or the IBAN');
+
+-- Document edits: the audit names the changed fields, never the document number
+insert into employee_documents (id, company_id, employee_id, doc_type, number)
+values ('0000d0c0-0000-0000-0000-000000000009', '0000000a-0000-0000-0000-000000000000', '000000a4-0000-0000-0000-000000000000', 'passport', 'A1234567');
+update employee_documents set number = 'B7654321' where id = '0000d0c0-0000-0000-0000-000000000009';
+select ok(
+  (select meta::text not like '%7654321%' and meta::text not like '%1234567%' and meta -> 'changed' ? 'number'
+     from audit_logs where action = 'document.update' order by id desc limit 1),
+  'document edits are audited without the document number');
 
 -- Citizens are Saudi whatever the form sends
 select pg_temp.act_as('00000000-0000-0000-0000-00000000a001');
