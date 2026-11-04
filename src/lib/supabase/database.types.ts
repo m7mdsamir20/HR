@@ -291,16 +291,68 @@ isOneToOne: false
       referencedColumns: ["company_id","id"]
     }
                   ]
-                },"notifications": {
+                },"leave_adjustments": {
                   Row: {
-                    "actor_id": string | null,"company_id": string,"created_at": string,"days_left": number | null,"document_id": string | null,"id": number,"read_at": string | null,"recipient_id": string,"task_id": string | null,"type": string
+                    "company_id": string,"created_at": string,"created_by": string | null,"days": number,"employee_id": string,"id": string,"reason": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "actor_id"?: string | null,"company_id": string,"created_at"?: string,"days_left"?: number | null,"document_id"?: string | null,"id"?: never,"read_at"?: string | null,"recipient_id": string,"task_id"?: string | null,"type": string
+                    "company_id": string,"created_at"?: string,"created_by"?: string | null,"days": number,"employee_id": string,"id"?: string,"reason": string
                   }
                   Update: {
-                    "actor_id"?: string | null,"company_id"?: string,"created_at"?: string,"days_left"?: number | null,"document_id"?: string | null,"id"?: never,"read_at"?: string | null,"recipient_id"?: string,"task_id"?: string | null,"type"?: string
+                    "company_id"?: string,"created_at"?: string,"created_by"?: string | null,"days"?: number,"employee_id"?: string,"id"?: string,"reason"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "leave_adjustments_company_id_employee_id_fkey"
+      columns: ["company_id","employee_id"]
+isOneToOne: false
+      referencedRelation: "employees"
+      referencedColumns: ["company_id","id"]
+    },{
+      foreignKeyName: "leave_adjustments_company_id_fkey"
+      columns: ["company_id"]
+isOneToOne: false
+      referencedRelation: "companies"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"leave_requests": {
+                  Row: {
+                    "company_id": string,"created_at": string,"days": number,"days_full": number | null,"days_three_quarter": number | null,"days_unpaid": number | null,"decided_at": string | null,"decided_by": string | null,"decision_note": string | null,"employee_id": string,"end_date": string,"id": string,"manager_approved_at": string | null,"manager_approved_by": string | null,"medical_ref": string | null,"reason": string | null,"start_date": string,"status": string,"type": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "company_id": string,"created_at"?: string,"days": number,"days_full"?: number | null,"days_three_quarter"?: number | null,"days_unpaid"?: number | null,"decided_at"?: string | null,"decided_by"?: string | null,"decision_note"?: string | null,"employee_id": string,"end_date": string,"id"?: string,"manager_approved_at"?: string | null,"manager_approved_by"?: string | null,"medical_ref"?: string | null,"reason"?: string | null,"start_date": string,"status": string,"type": string
+                  }
+                  Update: {
+                    "company_id"?: string,"created_at"?: string,"days"?: number,"days_full"?: number | null,"days_three_quarter"?: number | null,"days_unpaid"?: number | null,"decided_at"?: string | null,"decided_by"?: string | null,"decision_note"?: string | null,"employee_id"?: string,"end_date"?: string,"id"?: string,"manager_approved_at"?: string | null,"manager_approved_by"?: string | null,"medical_ref"?: string | null,"reason"?: string | null,"start_date"?: string,"status"?: string,"type"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "leave_requests_company_id_employee_id_fkey"
+      columns: ["company_id","employee_id"]
+isOneToOne: false
+      referencedRelation: "employees"
+      referencedColumns: ["company_id","id"]
+    },{
+      foreignKeyName: "leave_requests_company_id_fkey"
+      columns: ["company_id"]
+isOneToOne: false
+      referencedRelation: "companies"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"notifications": {
+                  Row: {
+                    "actor_id": string | null,"company_id": string,"created_at": string,"days_left": number | null,"document_id": string | null,"id": number,"leave_id": string | null,"read_at": string | null,"recipient_id": string,"task_id": string | null,"type": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "actor_id"?: string | null,"company_id": string,"created_at"?: string,"days_left"?: number | null,"document_id"?: string | null,"id"?: never,"leave_id"?: string | null,"read_at"?: string | null,"recipient_id": string,"task_id"?: string | null,"type": string
+                  }
+                  Update: {
+                    "actor_id"?: string | null,"company_id"?: string,"created_at"?: string,"days_left"?: number | null,"document_id"?: string | null,"id"?: never,"leave_id"?: string | null,"read_at"?: string | null,"recipient_id"?: string,"task_id"?: string | null,"type"?: string
                   }
                   Relationships: [
                     {
@@ -314,6 +366,12 @@ isOneToOne: false
       columns: ["document_id"]
 isOneToOne: false
       referencedRelation: "employee_documents"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "notifications_leave_id_fkey"
+      columns: ["leave_id"]
+isOneToOne: false
+      referencedRelation: "leave_requests"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "notifications_task_id_fkey"
@@ -494,6 +552,21 @@ isOneToOne: false
                            },
 "employee_update":
 { Args: { "p_employee_id": string,"p_file": Json,"p_pay": Json,"p_role": Database["public"]['Enums']["employee_role"] }; Returns: undefined
+                           },
+"leave_adjust":
+{ Args: { "p_days": number,"p_employee": string,"p_reason": string }; Returns: undefined
+                           },
+"leave_balance":
+{ Args: { "p_employee": string }; Returns: Json
+                           },
+"leave_request_cancel":
+{ Args: { "p_id": string,"p_note"?: string }; Returns: undefined
+                           },
+"leave_request_create":
+{ Args: { "p": Json }; Returns: string
+                           },
+"leave_request_decide":
+{ Args: { "p_decision": string,"p_id": string,"p_note"?: string }; Returns: undefined
                            },
 "login_begin":
 { Args: { "p_id_hash": string,"p_ip_hash": string }; Returns: number
