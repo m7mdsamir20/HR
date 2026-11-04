@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import type { Member } from "@/lib/auth/account";
 import { monthRange } from "@/lib/attendance";
+import { leaveDates } from "@/lib/attendance-data";
 import { localName } from "@/lib/employees";
 import { formatMonth } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
@@ -21,7 +22,7 @@ export async function buildAttendanceSheetPdf(locale: Locale, member: Member, mo
   const { from, to } = monthRange(month);
   const lastDay = Number(to.slice(8));
 
-  const [{ data: employees }, { data: records }, { data: deductions }, { data: shifts }, { data: holidays }] = await Promise.all([
+  const [{ data: employees }, { data: records }, { data: deductions }, { data: shifts }, { data: holidays }, { data: leaves }] = await Promise.all([
     supabase.from("employees").select("id, full_name_ar, full_name_en, shift_id").neq("status", "deleted").order("full_name_ar"),
     supabase
       .from("attendance_records")
@@ -31,6 +32,7 @@ export async function buildAttendanceSheetPdf(locale: Locale, member: Member, mo
     supabase.from("attendance_deductions").select("employee_id, day_fraction").eq("status", "approved").gte("work_date", from).lte("work_date", to),
     supabase.from("shifts").select("id, work_days"),
     supabase.from("company_calendar").select("start_date, end_date").eq("kind", "holiday").lte("start_date", to).gte("end_date", from),
+    supabase.from("leave_requests").select("id, employee_id, type, start_date, end_date").eq("status", "approved").lte("start_date", to).gte("end_date", from),
   ]);
 
   const withRecords = new Set((records ?? []).map((r) => r.employee_id));
@@ -54,11 +56,15 @@ export async function buildAttendanceSheetPdf(locale: Locale, member: Member, mo
   const late: Mark = { text: locale === "ar" ? "ت" : "L", color: "#B23A2B" };
   const absent: Mark = { text: locale === "ar" ? "غ" : "A", color: "#B23A2B" };
   const off: Mark = { text: "·", color: "#9AA3B2" };
+  const onLeave: Mark = { text: locale === "ar" ? "إ" : "V", color: "#2F4A9E" };
 
   const dayHeads = Array.from({ length: lastDay }, (_, i) => `<th class="d">${i + 1}</th>`).join("");
   const bodyRows = rows
     .map((e) => {
       const days = byEmployee.get(e.id) ?? new Map();
+      const leaveOn = new Set(
+        leaveDates((leaves ?? []).filter((l) => l.employee_id === e.id), { from, to }, e.shift_id !== null ? (workDays.get(e.shift_id) ?? []) : [], new Set(days.keys())).map((x) => x.date),
+      );
       let presentDays = 0;
       let absentDays = 0;
       let lateCount = 0;
@@ -73,6 +79,8 @@ export async function buildAttendanceSheetPdf(locale: Locale, member: Member, mo
           presentDays += 1;
           if (rec.late > 0) lateCount += 1;
           mark = rec.late > 0 ? late : present;
+        } else if (leaveOn.has(iso)) {
+          mark = onLeave;
         } else {
           const dow = new Date(`${iso}T00:00:00Z`).getUTCDay();
           const scheduled = e.shift_id !== null && (workDays.get(e.shift_id) ?? []).includes(dow) && !isHoliday(iso);
@@ -83,7 +91,7 @@ export async function buildAttendanceSheetPdf(locale: Locale, member: Member, mo
       const approved = approvedDays.get(e.id) ?? 0;
       return `<tr>
         <th class="n" scope="row">${txt(localName(locale, e.full_name_ar, e.full_name_en))}</th>${cells}
-        <td class="t">${ltr(presentDays)}</td><td class="t">${ltr(absentDays)}</td><td class="t">${ltr(lateCount)}</td>
+        <td class="t">${ltr(presentDays)}</td><td class="t">${ltr(absentDays)}</td><td class="t">${ltr(leaveOn.size)}</td><td class="t">${ltr(lateCount)}</td>
         <td class="t">${ltr(approved ? Math.round(approved * 100) / 100 : 0)}</td>
       </tr>`;
     })
@@ -98,19 +106,20 @@ export async function buildAttendanceSheetPdf(locale: Locale, member: Member, mo
       table.sheet th.t{font-size:6pt;line-height:1.2}
       table.sheet td.d{font-size:8pt;font-weight:700}
       table.sheet th.n{width:30mm;text-align:start;padding-inline:3px;font-weight:600;font-size:7pt;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-      table.sheet .d{width:3.6mm}
+      table.sheet .d{width:3.3mm}
       table.sheet .t{width:9mm;font-weight:600}
       .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}
     </style>
     <h2>${esc(monthLabel)}</h2>
     <table class="sheet"><thead><tr>
       <th class="n">${esc(tr("employee"))}</th>${dayHeads}
-      <th class="t">${esc(tp("sheetPresent"))}</th><th class="t">${esc(tp("sheetAbsent"))}</th><th class="t">${esc(tp("sheetLate"))}</th><th class="t">${esc(tp("sheetDeduction"))}</th>
+      <th class="t">${esc(tp("sheetPresent"))}</th><th class="t">${esc(tp("sheetAbsent"))}</th><th class="t">${esc(tp("sheetLeave"))}</th><th class="t">${esc(tp("sheetLate"))}</th><th class="t">${esc(tp("sheetDeduction"))}</th>
     </tr></thead><tbody>${bodyRows}</tbody></table>
     <div class="legend muted">
       <span><b style="color:${present.color}">${esc(present.text)}</b> ${esc(tp("legendPresent"))}</span>
       <span><b style="color:${late.color}">${esc(late.text)}</b> ${esc(tp("legendLate"))}</span>
       <span><b style="color:${absent.color}">${esc(absent.text)}</b> ${esc(tp("legendAbsent"))}</span>
+      <span><b style="color:${onLeave.color}">${esc(onLeave.text)}</b> ${esc(tp("legendLeave"))}</span>
       <span><b style="color:${off.color}">${esc(off.text)}</b> ${esc(tp("legendOff"))}</span>
     </div>
     <p class="muted" style="margin-top:6px">${esc(tp("sheetDeductionNote"))}</p>`;

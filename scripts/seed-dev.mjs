@@ -215,6 +215,22 @@ async function main() {
     check(await hr.rpc("attendance_correct", { p_employee_id: ahmed, p_date: day(-ago), p_check_in: checkIn, p_check_out: checkOut, p_note: note }));
   }
 
+  // Leave: an opening balance, one approved annual leave (manager then HR), and requests waiting.
+  const signIn = async (nid) => {
+    const c = createClient(url, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "", { auth: { persistSession: false } });
+    check(await c.auth.signInWithPassword({ email: `${nid}@users.invalid`, password: PASSWORD }));
+    return c;
+  };
+  check(await hr.rpc("leave_adjust", { p_employee: ahmed, p_days: 10, p_reason: "رصيد افتتاحي من النظام السابق" }));
+  const ahmedClient = await signIn("2000000005");
+  const fahadClient = await signIn("1000000004");
+  const approvedLeave = await ahmedClient.rpc("leave_request_create", { p: { type: "annual", start_date: day(14), end_date: day(18), reason: "إجازة عائلية" } });
+  check(approvedLeave);
+  check(await fahadClient.rpc("leave_request_decide", { p_id: approvedLeave.data, p_decision: "approve" }));
+  check(await hr.rpc("leave_request_decide", { p_id: approvedLeave.data, p_decision: "approve", p_note: "موافق" }));
+  check(await ahmedClient.rpc("leave_request_create", { p: { type: "sick", start_date: day(1), end_date: day(2), reason: "مراجعة المستشفى", medical_ref: "SH-2026-48213" } }));
+  check(await (await signIn("1000000003")).rpc("leave_request_create", { p: { type: "annual", start_date: day(30), end_date: day(34) } }));
+
   console.log(`Seeded system admin ${ADMIN.nationalId} and ${USERS.length} company users (password in scripts/seed-dev.mjs).`);
 }
 

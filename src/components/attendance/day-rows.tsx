@@ -6,7 +6,7 @@ import { formatDayShort, formatDuration, formatTime } from "@/lib/format";
 export type DayRow = {
   id: string;
   date: string;
-  status: "present" | "absent";
+  status: "present" | "absent" | "leave";
   source: "device" | "manual";
   checkIn: string | null;
   checkOut: string | null;
@@ -19,6 +19,8 @@ export type DayRow = {
   /** The day is over and the departure was never recorded. */
   missingCheckout: boolean;
   note: string | null;
+  /** Set on days excused by an approved leave. */
+  leaveType?: string;
 };
 
 function Flags({ day }: { day: DayRow }) {
@@ -27,6 +29,7 @@ function Flags({ day }: { day: DayRow }) {
   return (
     <span className="flex flex-wrap gap-1.5">
       {day.status === "absent" && <StatusPill tone="brick">{t("absent")}</StatusPill>}
+      {day.status === "leave" && <StatusPill tone="indigo">{t("leave")}</StatusPill>}
       {day.late > 0 && <StatusPill tone="brick">{t("late", { minutes: day.late })}</StatusPill>}
       {day.early > 0 && <StatusPill tone="saffron">{t("early", { minutes: day.early })}</StatusPill>}
       {day.outside && <StatusPill tone="saffron">{t("outside")}</StatusPill>}

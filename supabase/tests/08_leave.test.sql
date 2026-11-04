@@ -4,7 +4,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(73);
+select plan(75);
 
 create function pg_temp.mk_user(p_id uuid, p_nid text) returns void language sql as $$
   insert into auth.users (id, email, aud, role, instance_id, created_at)
@@ -227,6 +227,11 @@ select pg_temp.act_as('00000000-0000-0000-0000-0000000000a3');
 select is((select count(distinct employee_id) from leave_requests), 2::bigint, 'a manager sees their own and their team''s requests');
 select throws_ok($$select public.leave_balance('000000a5-0000-0000-0000-000000000000')$$, '42501', null, 'but not the balance of someone outside the team');
 reset role;
+select pg_temp.act_as('00000000-0000-0000-0000-0000000000a5');
+select is(public.leave_request_trail((select id from ids where name = 'emp2')) ->> 'decider_name_ar', 'موارد', 'the printed copy names who approved the leave');
+select is(public.leave_request_trail((select id from ids where name = 'emp1')), null, 'and gives nothing for someone else''s request');
+reset role;
+
 select pg_temp.act_as('00000000-0000-0000-0000-0000000000a5');
 select is((select count(distinct employee_id) from leave_requests), 1::bigint, 'an employee sees only their own requests');
 select throws_ok($$select public.record_export('leave_request', (select id from ids where name = 'emp1'))$$, '42501', null, 'and cannot export someone else''s leave');

@@ -6,7 +6,7 @@ import { MonthNav } from "@/components/attendance/month-nav";
 import type { Locale } from "@/i18n/routing";
 import { requireMember } from "@/lib/auth/account";
 import { hhmm, monthRange } from "@/lib/attendance";
-import { monthParam, RECORD_COLUMNS, toDayRow } from "@/lib/attendance-data";
+import { leaveDayRows, monthParam, RECORD_COLUMNS, toDayRow } from "@/lib/attendance-data";
 import { formatTime, todayInRiyadh } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 
@@ -30,7 +30,7 @@ export default async function AttendancePage({ params, searchParams }: PageProps
 
   const supabase = await createClient();
   const { data: me } = await supabase.from("employees").select("shift_id, branch_id").eq("id", member.employee_id).single();
-  const [shiftQuery, branchQuery, todayQuery, monthQuery, calendarQuery] = await Promise.all([
+  const [shiftQuery, branchQuery, todayQuery, monthQuery, calendarQuery, leaveQuery] = await Promise.all([
     me?.shift_id
       ? supabase.from("shifts").select("name_ar, name_en, start_time, end_time, work_days, ramadan_hours").eq("id", me.shift_id).single()
       : null,
@@ -38,6 +38,13 @@ export default async function AttendancePage({ params, searchParams }: PageProps
     supabase.from("attendance_records").select(RECORD_COLUMNS).eq("employee_id", member.employee_id).eq("work_date", today).maybeSingle(),
     supabase.from("attendance_records").select(RECORD_COLUMNS).eq("employee_id", member.employee_id).gte("work_date", from).lte("work_date", to).order("work_date", { ascending: false }),
     supabase.from("company_calendar").select("kind, name_ar, name_en").lte("start_date", today).gte("end_date", today),
+    supabase
+      .from("leave_requests")
+      .select("id, type, start_date, end_date")
+      .eq("employee_id", member.employee_id)
+      .eq("status", "approved")
+      .lte("start_date", to)
+      .gte("end_date", from),
   ]);
 
   const shift = shiftQuery?.data ?? null;
@@ -58,7 +65,11 @@ export default async function AttendancePage({ params, searchParams }: PageProps
   else if (!shift.work_days.includes(new Date(`${today}T00:00:00Z`).getUTCDay())) state = "dayOff";
   else if (nowInRiyadh() >= endTime) state = "shiftOver";
 
-  const days = (monthQuery.data ?? []).map((r) => toDayRow(r, today));
+  const recorded = new Set((monthQuery.data ?? []).map((r) => r.work_date));
+  const days = [
+    ...(monthQuery.data ?? []).map((r) => toDayRow(r, today)),
+    ...leaveDayRows(leaveQuery.data ?? [], { from, to }, shift?.work_days ?? [], recorded),
+  ].sort((a, b) => b.date.localeCompare(a.date));
   const todayRow = record ? toDayRow(record, today) : undefined;
 
   return (

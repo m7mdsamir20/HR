@@ -699,7 +699,22 @@
     "legendLate": "حاضر متأخراً",
     "legendAbsent": "غائب",
     "legendOff": "عطلة أو خارج أيام الدوام",
-    "sheetDeductionNote": "الخصم بالأيام يشمل الخصومات المعتمدة فقط. الخصومات المقترحة التي لم يُتخذ فيها قرار لا تدخل هنا."
+    "sheetDeductionNote": "الخصم بالأيام يشمل الخصومات المعتمدة فقط. الخصومات المقترحة التي لم يُتخذ فيها قرار لا تدخل هنا.",
+    "leaveRequestTitle": "طلب إجازة معتمد",
+    "leaveEmployee": "بيانات الموظف",
+    "leaveDetails": "تفاصيل الإجازة",
+    "leaveDays": "عدد الأيام",
+    "leavePay": "الأجر",
+    "leavePaidFull": "بأجر كامل",
+    "leaveApprovals": "الاعتمادات",
+    "leaveStep": "الخطوة",
+    "leaveBy": "بواسطة",
+    "leaveWhen": "التاريخ والوقت",
+    "leaveRequestedStep": "تقديم الطلب",
+    "leaveManagerStep": "موافقة المشرف المباشر",
+    "leaveFinalStep": "الاعتماد النهائي",
+    "sheetLeave": "إجازة",
+    "legendLeave": "في إجازة معتمدة"
   },
   "attendance": {
     "title": "الحضور والانصراف",
@@ -757,7 +772,8 @@
       "noLocation": "بدون موقع",
       "missingCheckout": "لم يُسجَّل الانصراف",
       "manual": "تعديل يدوي",
-      "onTime": "في الموعد"
+      "onTime": "في الموعد",
+      "leave": "في إجازة"
     },
     "days": {
       "empty": "لا توجد سجلات في هذا الشهر.",
@@ -777,7 +793,8 @@
       "absent": "أيام الغياب",
       "late": "التأخير",
       "early": "الانصراف المبكر",
-      "flagged": "للمراجعة"
+      "flagged": "للمراجعة",
+      "leave": "إجازة"
     },
     "correct": {
       "title": "تسجيل أو تعديل يوم",

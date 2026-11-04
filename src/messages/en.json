@@ -699,7 +699,22 @@
     "legendLate": "Present, late",
     "legendAbsent": "Absent",
     "legendOff": "Holiday or not a working day",
-    "sheetDeductionNote": "Deduction days count approved deductions only. Suggestions still awaiting a decision are not included."
+    "sheetDeductionNote": "Deduction days count approved deductions only. Suggestions still awaiting a decision are not included.",
+    "leaveRequestTitle": "Approved leave request",
+    "leaveEmployee": "Employee",
+    "leaveDetails": "Leave details",
+    "leaveDays": "Days",
+    "leavePay": "Pay",
+    "leavePaidFull": "On full pay",
+    "leaveApprovals": "Approvals",
+    "leaveStep": "Step",
+    "leaveBy": "By",
+    "leaveWhen": "Date and time",
+    "leaveRequestedStep": "Request made",
+    "leaveManagerStep": "Direct supervisor's approval",
+    "leaveFinalStep": "Final approval",
+    "sheetLeave": "Leave",
+    "legendLeave": "On approved leave"
   },
   "attendance": {
     "title": "Attendance",
@@ -757,7 +772,8 @@
       "noLocation": "No location",
       "missingCheckout": "No check-out recorded",
       "manual": "Edited by hand",
-      "onTime": "On time"
+      "onTime": "On time",
+      "leave": "On leave"
     },
     "days": {
       "empty": "No records this month.",
@@ -777,7 +793,8 @@
       "absent": "Days absent",
       "late": "Late",
       "early": "Left early",
-      "flagged": "To review"
+      "flagged": "To review",
+      "leave": "Leave"
     },
     "correct": {
       "title": "Record or fix a day",

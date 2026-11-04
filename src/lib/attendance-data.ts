@@ -50,3 +50,40 @@ export function monthParam(value: string | string[] | undefined): string {
   const parsed = monthSchema.safeParse(v);
   return parsed.success ? parsed.data : todayInRiyadh().slice(0, 7);
 }
+
+export type LeaveSpan = { id: string; type: string; start_date: string; end_date: string };
+
+/** Working days (per the shift's weekdays) of the approved leaves that fall in the month and have no record. */
+export function leaveDates(spans: LeaveSpan[], range: { from: string; to: string }, workDays: number[], recorded: ReadonlySet<string>): { date: string; span: LeaveSpan }[] {
+  const out: { date: string; span: LeaveSpan }[] = [];
+  const seen = new Set<string>();
+  for (const span of spans) {
+    const last = span.end_date < range.to ? span.end_date : range.to;
+    for (let d = span.start_date > range.from ? span.start_date : range.from; d <= last; d = new Date(Date.parse(d) + 86_400_000).toISOString().slice(0, 10)) {
+      if (recorded.has(d) || seen.has(d) || !workDays.includes(new Date(`${d}T00:00:00Z`).getUTCDay())) continue;
+      seen.add(d);
+      out.push({ date: d, span });
+    }
+  }
+  return out;
+}
+
+/** Day rows for leave days, to merge with the attendance records of the same month. */
+export function leaveDayRows(spans: LeaveSpan[], range: { from: string; to: string }, workDays: number[], recorded: ReadonlySet<string>): DayRow[] {
+  return leaveDates(spans, range, workDays, recorded).map(({ date, span }) => ({
+    id: `leave-${span.id}-${date}`,
+    date,
+    status: "leave",
+    source: "device",
+    checkIn: null,
+    checkOut: null,
+    late: 0,
+    early: 0,
+    worked: null,
+    outside: false,
+    noLocation: false,
+    missingCheckout: false,
+    note: null,
+    leaveType: span.type,
+  }));
+}

@@ -568,6 +568,9 @@ isOneToOne: false
 "leave_request_decide":
 { Args: { "p_decision": string,"p_id": string,"p_note"?: string }; Returns: undefined
                            },
+"leave_request_trail":
+{ Args: { "p_id": string }; Returns: Json
+                           },
 "login_begin":
 { Args: { "p_id_hash": string,"p_ip_hash": string }; Returns: number
                            },

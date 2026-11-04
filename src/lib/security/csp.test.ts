@@ -5,6 +5,8 @@ const id = "47431093-68ad-4021-a259-6deb78249487";
 
 describe("isPdfPath", () => {
   it("matches only the PDF routes", () => {
+    expect(isPdfPath(`/leave/${id}/pdf`)).toBe(true);
+    expect(isPdfPath(`/leave/${id}`)).toBe(false);
     expect(isPdfPath("/attendance/sheet/pdf")).toBe(true);
     expect(isPdfPath("/en/attendance/sheet/pdf")).toBe(true);
     expect(isPdfPath("/attendance/sheet/pdf/extra")).toBe(false);
