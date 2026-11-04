@@ -188,7 +188,8 @@
     "unread": "{count} unread",
     "attendance": "Attendance",
     "branches": "Branches",
-    "shifts": "Shifts"
+    "shifts": "Shifts",
+    "leave": "Leave"
   },
   "errors": {
     "invalid": "Check the fields marked in red.",
@@ -649,7 +650,11 @@
     },
     "documentExpiring": "{employee}'s {document} expires in {days} days",
     "documentToday": "{employee}'s {document} expires today",
-    "documentExpired": "{employee}'s {document} expired {days} days ago"
+    "documentExpired": "{employee}'s {document} expired {days} days ago",
+    "leaveRequested": "{actor} requested {type} for {days} days and is waiting for your decision.",
+    "leaveApproved": "Your request for {type} was approved.",
+    "leaveRejected": "Your request for {type} was rejected.",
+    "leaveCancelled": "Your request for {type} was cancelled."
   },
   "home": {
     "awaitingReview": "Waiting for your review",
@@ -938,6 +943,143 @@
       "submit": "Apply to {count, plural, one {# employee} other {# employees}}",
       "saved": "Assigned",
       "invalid": "Choose at least one employee."
+    }
+  },
+  "leave": {
+    "title": "Leave",
+    "tabs": {
+      "label": "Leave sections",
+      "mine": "My leave",
+      "requests": "Leave requests",
+      "balances": "Balances"
+    },
+    "types": {
+      "annual": "Annual leave",
+      "sick": "Sick leave",
+      "marriage": "Marriage leave",
+      "death": "Bereavement leave",
+      "newborn": "Newborn leave",
+      "hajj": "Hajj leave",
+      "maternity": "Maternity leave"
+    },
+    "typeHints": {
+      "annual": "Taken from your annual balance. Only your working days are counted, so weekly rest days and public holidays aren't charged.",
+      "sick": "Up to 120 days a year: 30 on full pay, then 60 on three quarters, then 30 unpaid. Days are counted consecutively.",
+      "marriage": "Up to 5 days on full pay.",
+      "death": "Up to 5 days on full pay on the death of a spouse, parent or child.",
+      "newborn": "Up to 3 days on full pay for a father when a baby is born.",
+      "hajj": "10 to 15 days on full pay, once in your service and after two years of work.",
+      "maternity": "Up to 12 weeks (84 days) for a female employee."
+    },
+    "status": {
+      "pending_manager": "Waiting for the supervisor",
+      "pending_hr": "Waiting for HR",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    },
+    "balance": {
+      "title": "My balance",
+      "annual": "Annual leave",
+      "remaining": "days left",
+      "earned": "Earned so far",
+      "adjustments": "Balance adjustments",
+      "used": "Used (approved)",
+      "pending": "Held for requests under review",
+      "entitlement": "{days} days a year",
+      "service": "{years} years of service",
+      "sick": "Sick leave",
+      "sickRemaining": "days left this year",
+      "sickUsed": "{used} of 120 days used",
+      "sickTiers": "The first 30 days on full pay, then 60 on three quarters, then 30 unpaid.",
+      "hajj": "Hajj leave",
+      "hajjTaken": "Requested or used",
+      "hajjAvailable": "Available",
+      "hajjNote": "Once in your service, after two years of continuous work."
+    },
+    "form": {
+      "title": "Request leave",
+      "daysNote": "Days are counted when you send the request, using the working days of your shift. It goes to your supervisor, then HR.",
+      "type": "Type of leave",
+      "startDate": "From",
+      "endDate": "To",
+      "reason": "Reason or note",
+      "medicalRef": "Medical report number",
+      "medicalRefHint": "The sick leave number from Sehhaty. Optional.",
+      "submit": "Send request",
+      "sent": "Request sent",
+      "invalid": "Check this field."
+    },
+    "requests": {
+      "title": "My requests",
+      "empty": "No requests yet. Use the form above to request leave.",
+      "days": "{days, plural, one {# day} other {# days}}",
+      "paySplit": "{full} days on full pay, {three} on three quarters, {unpaid} unpaid",
+      "medicalRef": "Report number",
+      "pdf": "View and print PDF"
+    },
+    "inbox": {
+      "intro": "Leave requests waiting for your decision, and your team's history. A request starts with the direct supervisor, then HR.",
+      "filter": {
+        "label": "Filter requests",
+        "action": "Waiting for me",
+        "approved": "Approved",
+        "closed": "Rejected and cancelled",
+        "all": "All"
+      },
+      "empty": {
+        "action": "No requests are waiting for your decision.",
+        "approved": "No approved requests.",
+        "closed": "No rejected or cancelled requests.",
+        "all": "No leave requests."
+      },
+      "note": "Decision note",
+      "notePlaceholder": "Note (required to reject)",
+      "approve": "Approve",
+      "reject": "Reject",
+      "noteRequired": "Write the reason for rejecting."
+    },
+    "cancel": {
+      "note": "Reason for cancelling",
+      "notePlaceholder": "Reason for cancelling (required)",
+      "noteRequired": "Write the reason for cancelling.",
+      "submit": "Cancel request"
+    },
+    "balances": {
+      "intro": "Each employee's annual leave balance. It accrues daily (21 days a year, 30 after five years). Use an adjustment to enter an opening or carried-over balance.",
+      "employee": "Employee",
+      "service": "Years of service",
+      "earned": "Earned",
+      "used": "Used",
+      "pending": "Held",
+      "remaining": "Remaining",
+      "sick": "Sick (this year)",
+      "adjust": {
+        "title": "Adjust a balance",
+        "intro": "Add or remove days from the annual balance, with a reason. The adjustment goes in the audit log.",
+        "employee": "Employee",
+        "days": "Days",
+        "daysHint": "Positive to add, negative to remove, in half-day steps.",
+        "reason": "Reason",
+        "submit": "Save adjustment",
+        "saved": "Adjustment saved",
+        "invalid": "Check this field."
+      }
+    },
+    "errors": {
+      "invalid": "Check the details you entered.",
+      "noShift": "You have no shift yet, so leave days can't be counted. Ask HR.",
+      "overlap": "You already have a leave request that overlaps these dates.",
+      "insufficientBalance": "Your annual balance doesn't cover this many days.",
+      "noWorkingDays": "These dates are all outside your working days, so no leave is needed.",
+      "invalidDates": "The dates aren't valid. Leave can start at most 30 days ago or a year ahead.",
+      "crossYear": "Sick leave that spans two years has to be split into two requests.",
+      "sickLimit": "This goes over the yearly sick leave limit (120 days).",
+      "specialLimit": "The length is outside the legal limit for this kind of leave.",
+      "genderRequired": "This type isn't available for you based on your file.",
+      "hajjUsed": "You already have a Hajj leave requested or used.",
+      "hajjService": "Hajj leave needs two years of service.",
+      "alreadyDecided": "This request has already been decided."
     }
   }
 }

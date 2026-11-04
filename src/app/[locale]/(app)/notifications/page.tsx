@@ -18,26 +18,32 @@ export default async function NotificationsPage({ params }: PageProps<"/[locale]
   await requireMember(locale);
   const t = await getTranslations({ locale, namespace: "notifications" });
   const tDocs = await getTranslations({ locale, namespace: "documents" });
+  const tLeave = await getTranslations({ locale, namespace: "leave" });
 
   // Only the caller's own notifications come back (RLS: recipient = me).
   const supabase = await createClient();
   const { data } = await supabase
     .from("notifications")
-    .select("id, type, task_id, actor_id, document_id, days_left, read_at, created_at")
+    .select("id, type, task_id, actor_id, document_id, leave_id, days_left, read_at, created_at")
     .order("created_at", { ascending: false })
     .limit(50);
   const items = data ?? [];
   const taskIds = [...new Set(items.map((n) => n.task_id).filter((i): i is string => !!i))];
   const documentIds = [...new Set(items.map((n) => n.document_id).filter((i): i is string => !!i))];
-  const [{ data: tasks }, { data: docs }] = await Promise.all([
+  const leaveIds = [...new Set(items.map((n) => n.leave_id).filter((i): i is string => !!i))];
+  const [{ data: tasks }, { data: docs }, { data: leaves }] = await Promise.all([
     taskIds.length ? supabase.from("tasks").select("id, title").in("id", taskIds) : Promise.resolve({ data: [] as { id: string; title: string }[] }),
     documentIds.length
       ? supabase.from("employee_documents").select("id, doc_type, employee_id").in("id", documentIds)
       : Promise.resolve({ data: [] as { id: string; doc_type: string; employee_id: string }[] }),
+    leaveIds.length
+      ? supabase.from("leave_requests").select("id, type, days, status").in("id", leaveIds)
+      : Promise.resolve({ data: [] as { id: string; type: string; days: number; status: string }[] }),
   ]);
   const names = await loadNames(locale, [...items.map((n) => n.actor_id), ...(docs ?? []).map((d) => d.employee_id)]);
   const titles = new Map((tasks ?? []).map((x) => [x.id, x.title]));
   const documents = new Map((docs ?? []).map((d) => [d.id, d]));
+  const leaveById = new Map((leaves ?? []).map((l) => [l.id, l]));
   const unread = items.filter((n) => !n.read_at).length;
 
   return (
@@ -71,6 +77,15 @@ export default async function NotificationsPage({ params }: PageProps<"/[locale]
               const key = days > 0 ? "documentExpiring" : days === 0 ? "documentToday" : "documentExpired";
               text = t(key, { document: tDocs(`types.${doc.doc_type as "iqama"}`), employee: names.get(doc.employee_id) ?? "—", days: Math.abs(days) });
               href = `/employees/${doc.employee_id}`;
+            } else if (n.type === "leave_requested" && n.leave_id && leaveById.has(n.leave_id)) {
+              const l = leaveById.get(n.leave_id)!;
+              text = t("leaveRequested", { actor: names.get(n.actor_id ?? "") ?? "—", type: tLeave(`types.${l.type as "annual"}`), days: l.days });
+              href = "/leave/requests";
+            } else if (n.type === "leave_decided" && n.leave_id && leaveById.has(n.leave_id)) {
+              const l = leaveById.get(n.leave_id)!;
+              const key = l.status === "approved" ? "leaveApproved" : l.status === "rejected" ? "leaveRejected" : "leaveCancelled";
+              text = t(key, { type: tLeave(`types.${l.type as "annual"}`) });
+              href = "/leave";
             } else if ((TYPES as readonly string[]).includes(n.type)) {
               text = t(`types.${n.type as NotificationType}`, { actor: names.get(n.actor_id ?? "") ?? "—", title: titles.get(n.task_id ?? "") ?? "—" });
             }

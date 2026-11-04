@@ -1,12 +1,12 @@
 "use client";
 
-import { Bell, CalendarClock, Clock, House, ListChecks, MapPin, Network, Settings, UserRound, Users } from "lucide-react";
+import { Bell, CalendarClock, CalendarDays, Clock, House, ListChecks, MapPin, Network, Settings, UserRound, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import type { Role } from "@/lib/auth/roles";
 import { cn } from "@/lib/utils";
 
-type Key = "home" | "tasks" | "myTasks" | "employees" | "team" | "departments" | "attendance" | "branches" | "shifts" | "notifications" | "settings" | "profile";
+type Key = "home" | "tasks" | "myTasks" | "employees" | "team" | "departments" | "attendance" | "leave" | "branches" | "shifts" | "notifications" | "settings" | "profile";
 type Item = { href: string; key: Key; icon: typeof House; badge?: boolean; tab: boolean };
 
 // `tab: false` items live in the sidebar only; on phones they're reached from the home page.
@@ -20,6 +20,7 @@ function itemsFor(role: Role): Item[] {
   if (role === "manager") items.push({ href: "/employees", key: "team", icon: Users, tab: true });
   // Attendance is the employee's daily action, so it gets a tab for them; others reach it from the sidebar or home.
   items.push({ href: "/attendance", key: "attendance", icon: Clock, tab: role === "employee" });
+  items.push({ href: "/leave", key: "leave", icon: CalendarDays, tab: false });
   if (role === "owner" || role === "hr") {
     items.push({ href: "/departments", key: "departments", icon: Network, tab: false });
     items.push({ href: "/branches", key: "branches", icon: MapPin, tab: false });
