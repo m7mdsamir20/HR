@@ -37,3 +37,4 @@ describe("GOSI calculation", () => {
     expect(result.employerShare).toBe(0);
   });
 });
+

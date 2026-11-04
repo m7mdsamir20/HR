@@ -110,3 +110,4 @@ export function generateWpsSif(header: WpsHeaderRecord, employees: WpsEmployeeRe
 
   return lines.join("\r\n") + "\r\n";
 }
+

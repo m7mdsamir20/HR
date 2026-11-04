@@ -231,3 +231,4 @@ select throws_ok(
 );
 
 rollback;
+

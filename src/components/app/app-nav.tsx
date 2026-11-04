@@ -1,12 +1,44 @@
 "use client";
 
-import { Banknote, Bell, CalendarClock, CalendarDays, Clock, HandCoins, House, ListChecks, MapPin, Network, Settings, UserRound, Users } from "lucide-react";
+import {
+  Banknote,
+  BarChart3,
+  Bell,
+  CalendarClock,
+  CalendarDays,
+  Clock,
+  HandCoins,
+  House,
+  ListChecks,
+  MapPin,
+  Network,
+  Settings,
+  UserRound,
+  Users,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import type { Role } from "@/lib/auth/roles";
 import { cn } from "@/lib/utils";
 
-type Key = "home" | "tasks" | "myTasks" | "employees" | "team" | "departments" | "attendance" | "leave" | "payroll" | "advances" | "branches" | "shifts" | "notifications" | "settings" | "profile";
+type Key =
+  | "home"
+  | "tasks"
+  | "myTasks"
+  | "employees"
+  | "team"
+  | "analytics"
+  | "departments"
+  | "attendance"
+  | "leave"
+  | "payroll"
+  | "advances"
+  | "branches"
+  | "shifts"
+  | "notifications"
+  | "settings"
+  | "profile";
+
 type Item = { href: string; key: Key; icon: typeof House; badge?: boolean; tab: boolean };
 
 // `tab: false` items live in the sidebar only; on phones they're reached from the home page.
@@ -20,6 +52,7 @@ function itemsFor(role: Role): Item[] {
   if (role === "manager") items.push({ href: "/employees", key: "team", icon: Users, tab: true });
   // Attendance is the employee's daily action, so it gets a tab for them; others reach it from the sidebar or home.
   items.push({ href: "/attendance", key: "attendance", icon: Clock, tab: role === "employee" });
+  items.push({ href: "/analytics", key: "analytics", icon: BarChart3, tab: false });
   items.push({ href: "/leave", key: "leave", icon: CalendarDays, tab: false });
   if (role === "owner" || role === "hr" || role === "employee") {
     items.push({ href: "/payroll", key: "payroll", icon: Banknote, tab: false });
@@ -98,7 +131,7 @@ export function AppNav({ role, variant, unread = 0 }: { role: Role; variant: "si
               <Icon className="size-4.5 shrink-0" aria-hidden />
               {badge && unread > 0 && <Badge count={unread} label={t("unread", { count: unread })} />}
             </span>
-            {t(key)}
+            <span className="grow truncate">{t(key)}</span>
           </Link>
         );
       })}
@@ -108,9 +141,11 @@ export function AppNav({ role, variant, unread = 0 }: { role: Role; variant: "si
 
 function Badge({ count, label }: { count: number; label: string }) {
   return (
-    <span className="absolute -top-1.5 -end-2 grid min-w-4 place-items-center rounded-full bg-brick px-1 text-[0.625rem] leading-4 font-semibold text-on-accent tabular-nums">
-      <span aria-hidden>{count > 9 ? "9+" : count}</span>
-      <span className="sr-only">{label}</span>
+    <span
+      aria-label={label}
+      className="absolute -top-1 -end-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brick px-1 text-[10px] font-bold text-white tabular-nums"
+    >
+      {count > 99 ? "99+" : count}
     </span>
   );
 }

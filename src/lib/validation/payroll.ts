@@ -23,3 +23,4 @@ export const payrollRunDeleteSchema = z.object({
 
 export type PayrollRunCreateInput = z.infer<typeof payrollRunCreateSchema>;
 export type PayrollSlipAdjustInput = z.infer<typeof payrollSlipAdjustSchema>;
+

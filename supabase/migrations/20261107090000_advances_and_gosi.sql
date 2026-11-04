@@ -431,3 +431,4 @@ grant execute on function public.advance_request_create(numeric, integer, text) 
 grant execute on function public.advance_request_decide(uuid, text, text) to authenticated;
 grant execute on function public.advance_request_cancel(uuid) to authenticated;
 grant execute on function public.advance_manual_repayment(uuid, numeric, text) to authenticated;
+

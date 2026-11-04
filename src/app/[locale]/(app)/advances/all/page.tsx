@@ -74,3 +74,4 @@ export default async function AllAdvancesPage({ params }: PageProps<"/[locale]">
     </main>
   );
 }
+

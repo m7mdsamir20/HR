@@ -36,3 +36,4 @@ export type AdvanceRequestInput = z.infer<typeof advanceRequestSchema>;
 export type AdvanceDecisionInput = z.infer<typeof advanceDecisionSchema>;
 export type AdvanceCancelInput = z.infer<typeof advanceCancelSchema>;
 export type AdvanceRepaymentInput = z.infer<typeof advanceRepaymentSchema>;
+

@@ -563,7 +563,11 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "admin_create_company":
+            "get_analytics_summary": {
+  Args: Record<PropertyKey, never>;
+  Returns: Json;
+},
+"admin_create_company":
 { Args: { "p_commercial_reg": string,"p_max_employees": number,"p_name_ar": string,"p_name_en": string,"p_owner_name_ar": string,"p_owner_name_en": string,"p_owner_national_id": string,"p_owner_phone": string,"p_owner_user_id": string,"p_subscription_ends_at": string }; Returns: string
                            },
 "attendance_assign":

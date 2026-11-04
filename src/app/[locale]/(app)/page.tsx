@@ -1,5 +1,20 @@
-import { Banknote, CalendarClock, CalendarDays, Clock, HandCoins, MapPin, Network, Settings } from "lucide-react";
+import {
+  Banknote,
+  BarChart3,
+  CalendarClock,
+  CalendarDays,
+  Clock,
+  DollarSign,
+  HandCoins,
+  ListChecks,
+  MapPin,
+  Network,
+  Settings,
+  Star,
+  Users,
+} from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { KpiCard } from "@/components/analytics/kpi-card";
 import { StatusPill } from "@/components/status-pill";
 import { TaskCard, type TaskRow } from "@/components/tasks/task-card";
 import { Link } from "@/i18n/navigation";
@@ -9,7 +24,9 @@ import { documentStatus, documentStatusTone, EXPIRY_WARNING_DAYS } from "@/lib/d
 import { formatDate, todayInRiyadh } from "@/lib/format";
 import { loadNames } from "@/lib/task-data";
 import { type Priority, type TaskStatus } from "@/lib/tasks";
+import { formatAmount } from "@/lib/money";
 import { createClient } from "@/lib/supabase/server";
+import type { AnalyticsSummary } from "@/lib/analytics";
 
 const TASK_COLUMNS = "id, title, status, priority, due_date, due_time, assignee_id";
 
@@ -22,6 +39,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const tDocs = await getTranslations({ locale, namespace: "documents" });
   const tNav = await getTranslations({ locale, namespace: "nav" });
   const tEmployees = await getTranslations({ locale, namespace: "employees" });
+  const tAnalytics = await getTranslations({ locale, namespace: "analytics" });
 
   const manages = member.role === "owner" || member.role === "manager";
   const managesPeople = member.role === "owner" || member.role === "hr";
@@ -30,7 +48,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 
   // Everything below is scoped by RLS to what this person may see.
   const supabase = await createClient();
-  const [mine, review, overdue, approved, docs] = await Promise.all([
+  const [mine, review, overdue, approved, docs, analyticsRes] = await Promise.all([
     supabase.from("tasks").select(TASK_COLUMNS).eq("assignee_id", member.employee_id).neq("status", "approved").order("due_date").limit(6),
     manages
       ? supabase.from("tasks").select(TASK_COLUMNS).eq("status", "submitted").neq("assignee_id", member.employee_id).order("submitted_at").limit(6)
@@ -44,7 +62,10 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
     managesPeople
       ? supabase.from("employee_documents").select("id, employee_id, doc_type, expiry_date").not("expiry_date", "is", null).lte("expiry_date", soon).order("expiry_date").limit(8)
       : Promise.resolve({ data: [] }),
+    supabase.rpc("get_analytics_summary"),
   ]);
+
+  const summary = (analyticsRes.data as unknown as AnalyticsSummary) || null;
 
   const taskRows = [...(mine.data ?? []), ...(review.data ?? []), ...(overdue.data ?? []), ...(approved.data ?? [])];
   const names = await loadNames(locale, [...taskRows.map((r) => r.assignee_id), ...(docs.data ?? []).map((d) => d.employee_id)]);
@@ -63,7 +84,87 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 
   return (
     <main className="flex flex-col gap-8">
-      <h1 className="text-page">{tApp("greeting", { name })}</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h1 className="text-page">{tApp("greeting", { name })}</h1>
+        <Link
+          href="/analytics"
+          className="inline-flex h-9 items-center gap-1.5 self-start sm:self-auto rounded-control border border-line bg-surface px-3 text-caption font-semibold text-ink hover:border-indigo hover:text-indigo focus-visible:outline-2 focus-visible:outline-indigo"
+        >
+          <BarChart3 className="size-4 text-indigo" aria-hidden />
+          <span>{tAnalytics("title")}</span>
+        </Link>
+      </div>
+
+      {/* Quick KPIs Bar */}
+      {summary && (
+        <section aria-labelledby="kpis-heading" className="flex flex-col gap-3">
+          <div className="flex items-baseline justify-between gap-2">
+            <h2 id="kpis-heading" className="text-section flex items-center gap-2">
+              <BarChart3 className="size-4 text-indigo" aria-hidden />
+              {tAnalytics("quickKpis")}
+            </h2>
+            <Link href="/analytics" className="text-label text-indigo hover:underline">
+              {tAnalytics("viewFullAnalytics")} →
+            </Link>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {summary.workforce ? (
+              <KpiCard
+                title={member.role === "manager" ? "فريق العمل" : tAnalytics("totalEmployees")}
+                value={summary.workforce.total_employees}
+                subtitle={
+                  summary.workforce.saudization_rate !== null
+                    ? `توطين: ${summary.workforce.saudization_rate}%`
+                    : "موظف في الفريق"
+                }
+                icon={Users}
+              />
+            ) : (
+              <KpiCard
+                title={tAnalytics("hoursLogged")}
+                value={summary.tasks.hours_spent}
+                subtitle="ساعة عمل مسجلة"
+                icon={Clock}
+              />
+            )}
+
+            <KpiCard
+              title={tAnalytics("completionRate")}
+              value={`${summary.tasks.completion_rate}%`}
+              subtitle={`${summary.tasks.approved} من ${summary.tasks.total} منجزة`}
+              icon={ListChecks}
+              tone={summary.tasks.completion_rate >= 75 ? "stamp" : "saffron"}
+            />
+
+            <KpiCard
+              title={tAnalytics("todayPresent")}
+              value={`${summary.attendance.today_rate}%`}
+              subtitle={`${summary.attendance.today_present} حاضر اليوم`}
+              icon={Clock}
+              tone={summary.attendance.today_rate >= 80 ? "stamp" : "saffron"}
+            />
+
+            {summary.financial?.latest_run ? (
+              <KpiCard
+                title={tAnalytics("netPayout")}
+                value={formatAmount(summary.financial.latest_run.total_net)}
+                subtitle={tAnalytics("currency")}
+                icon={DollarSign}
+                tone="indigo"
+              />
+            ) : (
+              <KpiCard
+                title={tAnalytics("avgRating")}
+                value={`${summary.tasks.avg_rating} / 5.0`}
+                subtitle="تقييم الجودة"
+                icon={Star}
+                tone="stamp"
+              />
+            )}
+          </div>
+        </section>
+      )}
 
       <Section title={tTasks("myTitle")} href="/tasks" more={t("viewAll")}>
         {(mine.data ?? []).length === 0 ? (
@@ -125,6 +226,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         </h2>
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {[
+            { href: "/analytics", label: tNav("analytics"), icon: BarChart3, show: true },
             { href: "/attendance", label: tNav("attendance"), icon: Clock, show: true },
             { href: "/leave", label: tNav("leave"), icon: CalendarDays, show: true },
             { href: "/payroll", label: tNav("payroll"), icon: Banknote, show: member.role === "owner" || member.role === "hr" || member.role === "employee" },

@@ -55,3 +55,4 @@ describe("payrollError", () => {
     expect(payrollError({ message: "cannot_delete_locked_run" }, "test")).toBe("cannotDeleteLockedRun");
   });
 });
+

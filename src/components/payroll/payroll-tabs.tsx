@@ -41,3 +41,4 @@ export function PayrollTabs({ role }: { role: Role }) {
     </div>
   );
 }
+

@@ -22,3 +22,4 @@ export async function GET(_request: Request, ctx: RouteContext<"/[locale]/payrol
   const built = await buildPayslipPdf(locale, member, id.data);
   return built ? pdfResponse(built.pdf, built.filename) : new Response(null, { status: 404 });
 }
+

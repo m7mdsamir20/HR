@@ -74,3 +74,4 @@ export default async function AdvanceRequestsPage({ params }: PageProps<"/[local
     </main>
   );
 }
+
