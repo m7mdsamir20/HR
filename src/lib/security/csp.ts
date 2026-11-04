@@ -29,7 +29,7 @@ export function buildCsp(nonce: string) {
  */
 export const PDF_CSP = "frame-ancestors 'none'; base-uri 'none'; form-action 'none'";
 
-const PDF_PATH = /^(\/en)?\/(tasks|employees|leave)\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/pdf$/;
+const PDF_PATH = /^(\/en)?\/(tasks|employees|leave|payroll\/slips)\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/pdf$/;
 const SHEET_PDF_PATH = /^(\/en)?\/attendance\/sheet\/pdf$/;
 
 export function isPdfPath(pathname: string): boolean {

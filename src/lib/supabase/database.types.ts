@@ -23,7 +23,31 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "advance_installments": {
+            "payroll_runs": {
+  Row: {
+    "approved_at": string | null,"approved_by": string | null,"company_id": string,"created_at": string,"created_by": string | null,"employee_count": number,"id": string,"month": number,"notes": string | null,"status": string,"total_advance_deductions": number,"total_attendance_deductions": number,"total_basic": number,"total_deductions": number,"total_gosi_employee": number,"total_gosi_employer": number,"total_gross": number,"total_housing": number,"total_leave_deductions": number,"total_net": number,"total_other_allowances": number,"total_other_deductions": number,"year": number
+  }
+  ComputedFields: never
+  Insert: {
+    "approved_at"?: string | null,"approved_by"?: string | null,"company_id": string,"created_at"?: string,"created_by"?: string | null,"employee_count"?: number,"id"?: string,"month": number,"notes"?: string | null,"status"?: string,"total_advance_deductions"?: number,"total_attendance_deductions"?: number,"total_basic"?: number,"total_deductions"?: number,"total_gosi_employee"?: number,"total_gosi_employer"?: number,"total_gross"?: number,"total_housing"?: number,"total_leave_deductions"?: number,"total_net"?: number,"total_other_allowances"?: number,"total_other_deductions"?: number,"year": number
+  }
+  Update: {
+    "approved_at"?: string | null,"approved_by"?: string | null,"company_id"?: string,"created_at"?: string,"created_by"?: string | null,"employee_count"?: number,"id"?: string,"month"?: number,"notes"?: string | null,"status"?: string,"total_advance_deductions"?: number,"total_attendance_deductions"?: number,"total_basic"?: number,"total_deductions"?: number,"total_gosi_employee"?: number,"total_gosi_employer"?: number,"total_gross"?: number,"total_housing"?: number,"total_leave_deductions"?: number,"total_net"?: number,"total_other_allowances"?: number,"total_other_deductions"?: number,"year"?: number
+  }
+  Relationships: []
+},"payroll_slips": {
+  Row: {
+    "advance_deduction": number,"attendance_deduction": number,"bank_name": string | null,"basic_salary": number,"communication_allowance": number,"company_id": string,"created_at": string,"employee_id": string,"gosi_employee": number,"gosi_employer": number,"gross_salary": number,"housing_allowance": number,"iban": string | null,"id": string,"leave_deduction": number,"net_salary": number,"notes": string | null,"other_allowances": number,"other_deductions": number,"payroll_run_id": string,"total_deductions": number,"transport_allowance": number
+  }
+  ComputedFields: never
+  Insert: {
+    "advance_deduction"?: number,"attendance_deduction"?: number,"bank_name"?: string | null,"basic_salary"?: number,"communication_allowance"?: number,"company_id": string,"created_at"?: string,"employee_id": string,"gosi_employee"?: number,"gosi_employer"?: number,"gross_salary"?: number,"housing_allowance"?: number,"iban"?: string | null,"id"?: string,"leave_deduction"?: number,"net_salary"?: number,"notes"?: string | null,"other_allowances"?: number,"other_deductions"?: number,"payroll_run_id": string,"total_deductions"?: number,"transport_allowance"?: number
+  }
+  Update: {
+    "advance_deduction"?: number,"attendance_deduction"?: number,"bank_name"?: string | null,"basic_salary"?: number,"communication_allowance"?: number,"company_id"?: string,"created_at"?: string,"employee_id"?: string,"gosi_employee"?: number,"gosi_employer"?: number,"gross_salary"?: number,"housing_allowance"?: number,"iban"?: string | null,"id"?: string,"leave_deduction"?: number,"net_salary"?: number,"notes"?: string | null,"other_allowances"?: number,"other_deductions"?: number,"payroll_run_id"?: string,"total_deductions"?: number,"transport_allowance"?: number
+  }
+  Relationships: []
+},"advance_installments": {
                   Row: {
                     "advance_id": string,"amount": number,"company_id": string,"created_at": string,"created_by": string | null,"employee_id": string,"id": string,"method": string,"notes": string | null,"payment_date": string
                   }
@@ -571,6 +595,18 @@ isOneToOne: false
                            },
 "employee_gosi_preview":
 { Args: { "p_employee_id": string }; Returns: Json
+                           },
+"payroll_run_create":
+{ Args: { "p_month": number,"p_notes"?: string,"p_year": number }; Returns: string
+                           },
+"payroll_slip_adjust":
+{ Args: { "p_notes"?: string,"p_other_allowances": number,"p_other_deductions": number,"p_slip_id": string }; Returns: undefined
+                           },
+"payroll_run_approve":
+{ Args: { "p_run_id": string }; Returns: undefined
+                           },
+"payroll_run_delete":
+{ Args: { "p_run_id": string }; Returns: undefined
                            },
 "can_manage_employee":
 { Args: { "p_employee_id": string }; Returns: boolean

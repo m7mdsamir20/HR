@@ -212,7 +212,13 @@
     "amountExceedsRemaining": "المبلغ المدفوع يتجاوز الرصيد المتبقي للسلفة.",
     "notApproved": "السلفة ليست في حالة معتمدة للسداد.",
     "cannotDecideOwn": "لا يمكنك اتخاذ قرار على طلب السلفة الخاص بك.",
-    "noteRequired": "الملاحظة إلزامية عند رفض الطلب."
+    "noteRequired": "الملاحظة إلزامية عند رفض الطلب.",
+    "invalidPeriod": "الفترة المحددة غير صحيحة.",
+    "runAlreadyExists": "يوجد مسير رواتب مسجل بالفعل لهذا الشهر.",
+    "runLocked": "المسير معتمد ولا يمكن تعديل بنوده.",
+    "ownerOnly": "اعتماد مسير الرواتب متاح لمدير الشركة (المالك) فقط.",
+    "notDraft": "المسير ليس في حالة مسودة.",
+    "cannotDeleteLockedRun": "لا يمكن حذف مسير رواتب معتمد ومقفل."
   },
   "employees": {
     "title": "الموظفون",
@@ -669,7 +675,8 @@
     "leaveCancelled": "أُلغي طلبك: {type}.",
     "advanceRequested": "{actor} طلب سلفة بمبلغ {amount} ر.س. وينتظر موافقتك.",
     "advanceApproved": "تمت الموافقة على طلب السلفة بمبلغ {amount} ر.س.",
-    "advanceRejected": "تم رفض طلب السلفة بمبلغ {amount} ر.س."
+    "advanceRejected": "تم رفض طلب السلفة بمبلغ {amount} ر.س.",
+    "payrollReady": "تم اعتماد وإصدار مسير رواتب شهر {month}/{year}. صافي راتبك: {net} ر.س."
   },
   "home": {
     "awaitingReview": "بانتظار مراجعتك",
@@ -1151,6 +1158,60 @@
       "rejected": "مرفوضة",
       "cancelled": "ملغاة",
       "completed": "مكتملة السداد"
+    }
+  },
+  "payroll": {
+    "title": "الرواتب ومسيرات الأجور",
+    "description": "إدارة مسيرات الرواتب الشهرية، قسائم رواتب الموظفين، وملفات حماية الأجور (WPS).",
+    "mySlips": "قسائم رواتبي",
+    "allRuns": "مسيرات الرواتب",
+    "newRun": "إنشاء مسير شهري جديد",
+    "creatingRun": "جاري إنشاء المسير واحتساب الاستقطاعات...",
+    "createRunSubmit": "إنشاء المسير",
+    "year": "السنة",
+    "month": "الشهر",
+    "period": "فترة المسير",
+    "employeeCount": "الموظفون",
+    "totalGross": "إجمالي الاستحقاقات",
+    "totalDeductions": "إجمالي الاستقطاعات",
+    "totalNet": "صافي الصرف",
+    "notes": "ملاحظات المسير",
+    "notesPlaceholder": "أي ملاحظات إضافية على المسير...",
+    "adjustSlipTitle": "تعديل القسيمة (مكافأة / استقطاع)",
+    "adjustSubmit": "حفظ التعديل",
+    "otherAllowances": "مكافآت وبدلات إضافية",
+    "otherDeductions": "استقطاعات إضافية",
+    "adjustNotes": "سبب التعديل",
+    "approveRun": "اعتماد وقفل المسير",
+    "deleteRun": "حذف المسودة",
+    "wpsSif": "تحميل ملف حماية الأجور (WPS)",
+    "downloadPdf": "طباعة القسيمة PDF",
+    "earnings": "الاستحقاقات",
+    "deductions": "الاستقطاعات",
+    "basicSalary": "الراتب الأساسي",
+    "housingAllowance": "بدل السكن",
+    "transportAllowance": "بدل النقل",
+    "communicationAllowance": "بدل الاتصال",
+    "otherAllowancesField": "بدلات ومكافآت أخرى",
+    "gosiEmployee": "التأمينات (حصة الموظف)",
+    "gosiEmployer": "التأمينات (حصة الشركة)",
+    "attendanceDeduction": "خصم الحضور والتأخير",
+    "leaveDeduction": "خصم الإجازات غير المدفوعة",
+    "advanceDeduction": "قسط السلفة الشهرية",
+    "netSalary": "صافي الراتب",
+    "bankName": "البنك",
+    "iban": "رقم الآيبان (IBAN)",
+    "emptyMine": "لا توجد قسائم رواتب صادرة لك بعد.",
+    "emptyRuns": "لا توجد مسيرات رواتب منشأة بعد.",
+    "viewRun": "عرض المسير",
+    "viewSlip": "عرض القسيمة",
+    "backToRuns": "العودة للمسيرات",
+    "backToSlips": "العودة لقسائمي",
+    "status": {
+      "draft": "مسودة",
+      "approved": "معتمد",
+      "paid": "مصروف",
+      "cancelled": "ملغي"
     }
   }
 }

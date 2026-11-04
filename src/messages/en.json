@@ -212,7 +212,13 @@
     "amountExceedsRemaining": "The payment amount exceeds the remaining advance balance.",
     "notApproved": "The advance is not in an approved state for repayment.",
     "cannotDecideOwn": "You cannot decide on your own advance request.",
-    "noteRequired": "A note is required when rejecting a request."
+    "noteRequired": "A note is required when rejecting a request.",
+    "invalidPeriod": "The specified period or month is invalid.",
+    "runAlreadyExists": "A payroll run already exists for this month.",
+    "runLocked": "The payroll run is locked and cannot be adjusted.",
+    "ownerOnly": "Only the company owner can approve the payroll run.",
+    "notDraft": "The payroll run is not in draft status.",
+    "cannotDeleteLockedRun": "Cannot delete an approved/locked payroll run."
   },
   "employees": {
     "title": "Employees",
@@ -669,7 +675,8 @@
     "leaveCancelled": "Your request for {type} was cancelled.",
     "advanceRequested": "{actor} requested an advance of {amount} SAR and is waiting for your decision.",
     "advanceApproved": "Your advance request of {amount} SAR was approved.",
-    "advanceRejected": "Your advance request of {amount} SAR was rejected."
+    "advanceRejected": "Your advance request of {amount} SAR was rejected.",
+    "payrollReady": "Payroll for {month}/{year} has been approved. Your net salary is {net} SAR."
   },
   "home": {
     "awaitingReview": "Waiting for your review",
@@ -1151,6 +1158,60 @@
       "rejected": "Rejected",
       "cancelled": "Cancelled",
       "completed": "Fully Repaid"
+    }
+  },
+  "payroll": {
+    "title": "Payroll & Compensation",
+    "description": "Manage monthly payroll runs, employee payslips, and Wage Protection System (WPS) files.",
+    "mySlips": "My Payslips",
+    "allRuns": "Payroll Runs",
+    "newRun": "New Monthly Payroll Run",
+    "creatingRun": "Creating payroll run and calculating deductions...",
+    "createRunSubmit": "Create Run",
+    "year": "Year",
+    "month": "Month",
+    "period": "Period",
+    "employeeCount": "Employees",
+    "totalGross": "Total Gross",
+    "totalDeductions": "Total Deductions",
+    "totalNet": "Total Net",
+    "notes": "Run Notes",
+    "notesPlaceholder": "Any notes regarding this payroll run...",
+    "adjustSlipTitle": "Adjust Slip (Bonus / Deduction)",
+    "adjustSubmit": "Save Adjustment",
+    "otherAllowances": "Bonus / Other Allowances",
+    "otherDeductions": "Other Deductions",
+    "adjustNotes": "Adjustment Reason",
+    "approveRun": "Approve & Lock Payroll",
+    "deleteRun": "Delete Draft",
+    "wpsSif": "Download WPS SIF File",
+    "downloadPdf": "Download Payslip PDF",
+    "earnings": "Earnings",
+    "deductions": "Deductions",
+    "basicSalary": "Basic Salary",
+    "housingAllowance": "Housing Allowance",
+    "transportAllowance": "Transport Allowance",
+    "communicationAllowance": "Communication Allowance",
+    "otherAllowancesField": "Other Allowances / Bonus",
+    "gosiEmployee": "GOSI (Employee Share)",
+    "gosiEmployer": "GOSI (Employer Share)",
+    "attendanceDeduction": "Attendance Deductions",
+    "leaveDeduction": "Unpaid Leave Deductions",
+    "advanceDeduction": "Advance Installment",
+    "netSalary": "Net Salary",
+    "bankName": "Bank",
+    "iban": "IBAN",
+    "emptyMine": "No payslips issued for you yet.",
+    "emptyRuns": "No payroll runs created yet.",
+    "viewRun": "View Run",
+    "viewSlip": "View Payslip",
+    "backToRuns": "Back to runs",
+    "backToSlips": "Back to my payslips",
+    "status": {
+      "draft": "Draft",
+      "approved": "Approved",
+      "paid": "Paid",
+      "cancelled": "Cancelled"
     }
   }
 }

@@ -13,6 +13,8 @@ describe("isPdfPath", () => {
     expect(isPdfPath("/attendance/sheet")).toBe(false);
     expect(isPdfPath(`/tasks/${id}/pdf`)).toBe(true);
     expect(isPdfPath(`/en/employees/${id}/pdf`)).toBe(true);
+    expect(isPdfPath(`/payroll/slips/${id}/pdf`)).toBe(true);
+    expect(isPdfPath(`/en/payroll/slips/${id}/pdf`)).toBe(true);
     expect(isPdfPath(`/tasks/${id}`)).toBe(false);
     expect(isPdfPath(`/tasks/${id}/pdf/extra`)).toBe(false);
     expect(isPdfPath(`/admin/companies/${id}/pdf`)).toBe(false);
