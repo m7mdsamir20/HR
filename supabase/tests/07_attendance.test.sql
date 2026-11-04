@@ -4,7 +4,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(55);
+select plan(57);
 
 create function pg_temp.mk_user(p_id uuid, p_nid text) returns void language sql as $$
   insert into auth.users (id, email, aud, role, instance_id, created_at)
@@ -19,6 +19,17 @@ create function pg_temp.frac(p_emp text, p_date date, p_kind text) returns numer
   select day_fraction from attendance_deductions where employee_id = p_emp::uuid and work_date = p_date and kind = p_kind;
 $$;
 grant execute on function pg_temp.frac(text, date, text) to authenticated;
+
+-- How many rule rows an update touched, under the caller's own privileges (RLS applies).
+create function pg_temp.set_tier2(p numeric) returns integer language plpgsql as $$
+declare n integer;
+begin
+  update attendance_rules set late_tier2_fraction = p;
+  get diagnostics n = row_count;
+  return n;
+end;
+$$;
+grant execute on function pg_temp.set_tier2(numeric) to authenticated;
 
 select pg_temp.mk_user('00000000-0000-0000-0000-0000000000a1', '1000000701'); -- owner
 select pg_temp.mk_user('00000000-0000-0000-0000-0000000000a2', '1000000702'); -- hr
@@ -68,9 +79,14 @@ select throws_ok($$insert into shifts (company_id, name_ar, start_time, end_time
   '23514', null, 'a shift must end after it starts');
 select throws_ok($$insert into branches (company_id, name_ar, latitude, longitude) values ('0000000b-0000-0000-0000-000000000000', 'تسلل', 24, 46)$$,
   '42501', null, 'HR cannot add a branch to another company');
-select lives_ok($$update attendance_rules set late_tier2_fraction = 0.3$$, 'HR edits the deduction rules');
+select is(pg_temp.set_tier2(0.3), 0,
+  'HR cannot change the deduction rules: they decide how much pay is suggested');
+select is((select count(*) from attendance_rules), 1::bigint, 'but HR can read them');
 reset role;
-select is((select late_tier2_fraction from attendance_rules where company_id = '0000000a-0000-0000-0000-000000000000'), 0.3, 'the rule change was saved');
+select pg_temp.act_as('00000000-0000-0000-0000-0000000000a1');
+select is(pg_temp.set_tier2(0.3), 1, 'the owner changes the deduction rules');
+reset role;
+select is((select late_tier2_fraction from attendance_rules where company_id = '0000000a-0000-0000-0000-000000000000'), 0.3, 'and the change was saved');
 update attendance_rules set late_tier2_fraction = 0.25;
 
 -- ---------------------------------------------------------------------------
