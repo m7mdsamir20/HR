@@ -1,4 +1,4 @@
-import { CalendarClock, CalendarDays, Clock, MapPin, Network, Settings } from "lucide-react";
+import { CalendarClock, CalendarDays, Clock, HandCoins, MapPin, Network, Settings } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { StatusPill } from "@/components/status-pill";
 import { TaskCard, type TaskRow } from "@/components/tasks/task-card";
@@ -127,6 +127,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           {[
             { href: "/attendance", label: tNav("attendance"), icon: Clock, show: true },
             { href: "/leave", label: tNav("leave"), icon: CalendarDays, show: true },
+            { href: "/advances", label: tNav("advances"), icon: HandCoins, show: member.role === "owner" || member.role === "hr" || member.role === "employee" },
             { href: "/departments", label: tNav("departments"), icon: Network, show: managesPeople },
             { href: "/branches", label: tNav("branches"), icon: MapPin, show: managesPeople },
             { href: "/shifts", label: tNav("shifts"), icon: CalendarClock, show: managesPeople },

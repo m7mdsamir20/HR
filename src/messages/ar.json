@@ -189,7 +189,9 @@
     "attendance": "الحضور",
     "branches": "الفروع",
     "shifts": "الورديات",
-    "leave": "الإجازات"
+    "leave": "الإجازات",
+    "payroll": "الرواتب",
+    "advances": "السلف المالية"
   },
   "errors": {
     "invalid": "راجع الحقول المحددة باللون الأحمر.",
@@ -200,7 +202,17 @@
     "rateLimited": "عمليات كثيرة في وقت قصير. انتظر قليلاً ثم حاول مرة أخرى.",
     "nationalIdTaken": "رقم الهوية مسجل مسبقاً في النظام. تواصل مع الدعم.",
     "notFound": "لم يعد هذا العنصر موجوداً.",
-    "unexpected": "حدث خطأ غير متوقع. حاول مرة أخرى، وإذا تكرر تواصل مع الدعم."
+    "unexpected": "حدث خطأ غير متوقع. حاول مرة أخرى، وإذا تكرر تواصل مع الدعم.",
+    "invalidAmount": "المبلغ يجب أن يكون بين 100 و 100,000 ر.س.",
+    "invalidInstallments": "عدد أشهر الأقساط يجب أن يكون بين 1 و 24 شهراً.",
+    "invalidReason": "سبب السلفة يجب أن يكون بين 3 و 500 حرف.",
+    "noCompensationRecord": "لا يوجد هيكل راتب مسجل للموظف لاحتساب حد السلفة.",
+    "installmentExceedsSalaryLimit": "قيمة القسط الشهري تتجاوز 50% من الراتب الأساسي.",
+    "existingActiveAdvance": "يوجد طلب سلفة قائم أو سلفة نشطة جاري سدادها بالفعل.",
+    "amountExceedsRemaining": "المبلغ المدفوع يتجاوز الرصيد المتبقي للسلفة.",
+    "notApproved": "السلفة ليست في حالة معتمدة للسداد.",
+    "cannotDecideOwn": "لا يمكنك اتخاذ قرار على طلب السلفة الخاص بك.",
+    "noteRequired": "الملاحظة إلزامية عند رفض الطلب."
   },
   "employees": {
     "title": "الموظفون",
@@ -654,7 +666,10 @@
     "leaveRequested": "{actor} طلب {type} لمدة {days} يوم وينتظر قرارك.",
     "leaveApproved": "تمت الموافقة على طلبك: {type}.",
     "leaveRejected": "تم رفض طلبك: {type}.",
-    "leaveCancelled": "أُلغي طلبك: {type}."
+    "leaveCancelled": "أُلغي طلبك: {type}.",
+    "advanceRequested": "{actor} طلب سلفة بمبلغ {amount} ر.س. وينتظر موافقتك.",
+    "advanceApproved": "تمت الموافقة على طلب السلفة بمبلغ {amount} ر.س.",
+    "advanceRejected": "تم رفض طلب السلفة بمبلغ {amount} ر.س."
   },
   "home": {
     "awaitingReview": "بانتظار مراجعتك",
@@ -1097,6 +1112,45 @@
       "hajjUsed": "لديك إجازة حج مطلوبة أو مستخدمة بالفعل.",
       "hajjService": "إجازة الحج تتطلب سنتين من الخدمة.",
       "alreadyDecided": "سبق اتخاذ قرار في هذا الطلب."
+    }
+  },
+  "advances": {
+    "title": "السلف المالية",
+    "description": "إدارة طلبات السلف المالية للموظفين، مسار الاعتماد، والجدولة والأقساط.",
+    "requestTitle": "طلب سلفة جديد",
+    "myAdvances": "سلفي",
+    "pendingRequests": "طلبات بانتظار الاعتماد",
+    "allAdvances": "جميع السلف",
+    "amount": "مبلغ السلفة (ر.س.)",
+    "installmentsCount": "عدد الأشهر (الأقساط)",
+    "monthlyInstallment": "القسط الشهري التقديري",
+    "reason": "سبب السلفة",
+    "reasonPlaceholder": "اكتب سبب طلب السلفة...",
+    "submitRequest": "إرسال الطلب",
+    "submitting": "جاري الإرسال...",
+    "cancelRequest": "إلغاء الطلب",
+    "approveRequest": "اعتماد السلفة",
+    "rejectRequest": "رفض الطلب",
+    "repayTitle": "تسجيل سداد دفعة",
+    "repayAmount": "المبلغ المسدد (ر.س.)",
+    "repayNote": "ملاحظة السداد",
+    "repaySubmit": "تسجيل السداد",
+    "emptyMine": "لم تقدم أي طلبات سلف حتى الآن.",
+    "emptyPending": "لا توجد طلبات سلف بانتظار الاعتماد حالياً.",
+    "emptyAll": "لا توجد سلف مسجلة.",
+    "limitHint": "وفق نظام العمل السعودي، لا يمكن أن يتجاوز القسط الشهري 50% من الراتب الأساسي.",
+    "remaining": "المتبقي",
+    "paid": "المسدد",
+    "employee": "الموظف",
+    "createdAt": "تاريخ الطلب",
+    "decisionNote": "ملاحظة القرار",
+    "decisionNotePlaceholder": "اكتب سبب الرفض أو ملاحظات الاعتماد...",
+    "status": {
+      "pending": "بانتظار الاعتماد",
+      "approved": "معتمدة ونشطة",
+      "rejected": "مرفوضة",
+      "cancelled": "ملغاة",
+      "completed": "مكتملة السداد"
     }
   }
 }

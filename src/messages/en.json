@@ -189,7 +189,9 @@
     "attendance": "Attendance",
     "branches": "Branches",
     "shifts": "Shifts",
-    "leave": "Leave"
+    "leave": "Leave",
+    "payroll": "Payroll",
+    "advances": "Advances"
   },
   "errors": {
     "invalid": "Check the fields marked in red.",
@@ -200,7 +202,17 @@
     "rateLimited": "Too many actions in a short time. Wait a moment and try again.",
     "nationalIdTaken": "This ID number is already registered. Contact support.",
     "notFound": "This item no longer exists.",
-    "unexpected": "Something went wrong. Try again, and contact support if it keeps happening."
+    "unexpected": "Something went wrong. Try again, and contact support if it keeps happening.",
+    "invalidAmount": "The amount must be between 100 and 100,000 SAR.",
+    "invalidInstallments": "Installment count must be between 1 and 24 months.",
+    "invalidReason": "The reason must be between 3 and 500 characters.",
+    "noCompensationRecord": "No salary structure is recorded for this employee.",
+    "installmentExceedsSalaryLimit": "Monthly installment exceeds 50% of basic salary.",
+    "existingActiveAdvance": "You already have a pending or active advance in repayment.",
+    "amountExceedsRemaining": "The payment amount exceeds the remaining advance balance.",
+    "notApproved": "The advance is not in an approved state for repayment.",
+    "cannotDecideOwn": "You cannot decide on your own advance request.",
+    "noteRequired": "A note is required when rejecting a request."
   },
   "employees": {
     "title": "Employees",
@@ -654,7 +666,10 @@
     "leaveRequested": "{actor} requested {type} for {days} days and is waiting for your decision.",
     "leaveApproved": "Your request for {type} was approved.",
     "leaveRejected": "Your request for {type} was rejected.",
-    "leaveCancelled": "Your request for {type} was cancelled."
+    "leaveCancelled": "Your request for {type} was cancelled.",
+    "advanceRequested": "{actor} requested an advance of {amount} SAR and is waiting for your decision.",
+    "advanceApproved": "Your advance request of {amount} SAR was approved.",
+    "advanceRejected": "Your advance request of {amount} SAR was rejected."
   },
   "home": {
     "awaitingReview": "Waiting for your review",
@@ -1097,6 +1112,45 @@
       "hajjUsed": "You already have a Hajj leave requested or used.",
       "hajjService": "Hajj leave needs two years of service.",
       "alreadyDecided": "This request has already been decided."
+    }
+  },
+  "advances": {
+    "title": "Employee Advances",
+    "description": "Manage employee advance requests, approvals, installments, and repayments.",
+    "requestTitle": "New Advance Request",
+    "myAdvances": "My Advances",
+    "pendingRequests": "Pending Approvals",
+    "allAdvances": "All Advances",
+    "amount": "Advance Amount (SAR)",
+    "installmentsCount": "Installments (Months)",
+    "monthlyInstallment": "Estimated Monthly Installment",
+    "reason": "Reason",
+    "reasonPlaceholder": "Explain the reason for the advance request...",
+    "submitRequest": "Submit Request",
+    "submitting": "Submitting...",
+    "cancelRequest": "Cancel Request",
+    "approveRequest": "Approve Advance",
+    "rejectRequest": "Reject Request",
+    "repayTitle": "Record Repayment",
+    "repayAmount": "Repayment Amount (SAR)",
+    "repayNote": "Payment Note",
+    "repaySubmit": "Record Payment",
+    "emptyMine": "You have not submitted any advance requests yet.",
+    "emptyPending": "No advance requests waiting for approval.",
+    "emptyAll": "No advances recorded.",
+    "limitHint": "Under Saudi Labor Law, monthly installments cannot exceed 50% of the basic salary.",
+    "remaining": "Remaining",
+    "paid": "Paid",
+    "employee": "Employee",
+    "createdAt": "Requested At",
+    "decisionNote": "Decision Note",
+    "decisionNotePlaceholder": "Enter rejection reason or approval notes...",
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved & Active",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled",
+      "completed": "Fully Repaid"
     }
   }
 }

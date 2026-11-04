@@ -1,12 +1,12 @@
 "use client";
 
-import { Bell, CalendarClock, CalendarDays, Clock, House, ListChecks, MapPin, Network, Settings, UserRound, Users } from "lucide-react";
+import { Bell, CalendarClock, CalendarDays, Clock, HandCoins, House, ListChecks, MapPin, Network, Settings, UserRound, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import type { Role } from "@/lib/auth/roles";
 import { cn } from "@/lib/utils";
 
-type Key = "home" | "tasks" | "myTasks" | "employees" | "team" | "departments" | "attendance" | "leave" | "branches" | "shifts" | "notifications" | "settings" | "profile";
+type Key = "home" | "tasks" | "myTasks" | "employees" | "team" | "departments" | "attendance" | "leave" | "advances" | "branches" | "shifts" | "notifications" | "settings" | "profile";
 type Item = { href: string; key: Key; icon: typeof House; badge?: boolean; tab: boolean };
 
 // `tab: false` items live in the sidebar only; on phones they're reached from the home page.
@@ -21,6 +21,9 @@ function itemsFor(role: Role): Item[] {
   // Attendance is the employee's daily action, so it gets a tab for them; others reach it from the sidebar or home.
   items.push({ href: "/attendance", key: "attendance", icon: Clock, tab: role === "employee" });
   items.push({ href: "/leave", key: "leave", icon: CalendarDays, tab: false });
+  if (role === "owner" || role === "hr" || role === "employee") {
+    items.push({ href: "/advances", key: "advances", icon: HandCoins, tab: false });
+  }
   if (role === "owner" || role === "hr") {
     items.push({ href: "/departments", key: "departments", icon: Network, tab: false });
     items.push({ href: "/branches", key: "branches", icon: MapPin, tab: false });
@@ -86,7 +89,7 @@ export function AppNav({ role, variant, unread = 0 }: { role: Role; variant: "si
             aria-current={current ? "page" : undefined}
             className={cn(
               "flex min-h-11 items-center gap-2.5 rounded-control px-3 text-label text-ink-soft hover:bg-paper hover:text-ink",
-              "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo",
+              "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-indigo",
               current && "bg-indigo/10 font-semibold text-indigo hover:bg-indigo/10 hover:text-indigo",
             )}
           >

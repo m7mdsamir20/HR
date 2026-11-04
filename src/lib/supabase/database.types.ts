@@ -23,7 +23,47 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "attendance_deductions": {
+            "advance_installments": {
+                  Row: {
+                    "advance_id": string,"amount": number,"company_id": string,"created_at": string,"created_by": string | null,"employee_id": string,"id": string,"method": string,"notes": string | null,"payment_date": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "advance_id": string,"amount": number,"company_id": string,"created_at"?: string,"created_by"?: string | null,"employee_id": string,"id"?: string,"method": string,"notes"?: string | null,"payment_date": string
+                  }
+                  Update: {
+                    "advance_id"?: string,"amount"?: number,"company_id"?: string,"created_at"?: string,"created_by"?: string | null,"employee_id"?: string,"id"?: string,"method"?: string,"notes"?: string | null,"payment_date"?: string
+                  }
+                  Relationships: [
+                    {
+                      foreignKeyName: "advance_installments_advance_id_fkey"
+                      columns: ["advance_id"]
+                      isOneToOne: false
+                      referencedRelation: "advance_requests"
+                      referencedColumns: ["id"]
+                    }
+                  ]
+                },"advance_requests": {
+                  Row: {
+                    "amount": number,"company_id": string,"created_at": string,"decided_at": string | null,"decided_by": string | null,"decision_note": string | null,"employee_id": string,"id": string,"installments_count": number,"monthly_installment": number,"paid_amount": number,"reason": string,"remaining_amount": number,"status": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "amount": number,"company_id": string,"created_at"?: string,"decided_at"?: string | null,"decided_by"?: string | null,"decision_note"?: string | null,"employee_id": string,"id"?: string,"installments_count": number,"monthly_installment": number,"paid_amount"?: number,"reason": string,"status"?: string
+                  }
+                  Update: {
+                    "amount"?: number,"company_id"?: string,"created_at"?: string,"decided_at"?: string | null,"decided_by"?: string | null,"decision_note"?: string | null,"employee_id"?: string,"id"?: string,"installments_count"?: number,"monthly_installment"?: number,"paid_amount"?: number,"reason"?: string,"status"?: string
+                  }
+                  Relationships: [
+                    {
+                      foreignKeyName: "advance_requests_company_id_employee_id_fkey"
+                      columns: ["company_id","employee_id"]
+                      isOneToOne: false
+                      referencedRelation: "employees"
+                      referencedColumns: ["company_id","id"]
+                    }
+                  ]
+                },"attendance_deductions": {
                   Row: {
                     "company_id": string,"created_at": string,"day_fraction": number,"decided_at": string | null,"decided_by": string | null,"employee_id": string,"id": string,"kind": string,"minutes": number,"note": string | null,"status": string,"work_date": string
                   }
@@ -516,6 +556,21 @@ isOneToOne: false
                            },
 "attendance_deduction_decide":
 { Args: { "p_decision": string,"p_id": string,"p_note"?: string }; Returns: undefined
+                           },
+"advance_manual_repayment":
+{ Args: { "p_advance_id": string,"p_amount": number,"p_note"?: string }; Returns: string
+                           },
+"advance_request_cancel":
+{ Args: { "p_id": string }; Returns: undefined
+                           },
+"advance_request_create":
+{ Args: { "p_amount": number,"p_installments": number,"p_reason": string }; Returns: string
+                           },
+"advance_request_decide":
+{ Args: { "p_decision": string,"p_id": string,"p_note"?: string }; Returns: undefined
+                           },
+"employee_gosi_preview":
+{ Args: { "p_employee_id": string }; Returns: Json
                            },
 "can_manage_employee":
 { Args: { "p_employee_id": string }; Returns: boolean
