@@ -4,7 +4,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(70);
+select plan(73);
 
 create function pg_temp.mk_user(p_id uuid, p_nid text) returns void language sql as $$
   insert into auth.users (id, email, aud, role, instance_id, created_at)
@@ -163,6 +163,16 @@ reset role;
 select is((select days_full || '/' || days_three_quarter || '/' || days_unpaid from leave_requests where id = (select id from ids where name = 'sick')), '5/5/0',
   'the 26th to 35th sick days: five on full pay, five on three quarters');
 select is((private.leave_balance_of('000000a5-0000-0000-0000-000000000000') ->> 'sick_remaining')::integer, 85, 'of the 120 sick days a year, 85 are left');
+
+-- The 120-day cap is counted in the year the leave falls in
+select is(private.sick_days_in_year('000000a5-0000-0000-0000-000000000000', extract(year from current_date)::integer, null), 35, 'sick days are counted per calendar year');
+select is(private.sick_days_in_year('000000a5-0000-0000-0000-000000000000', extract(year from current_date)::integer + 1, null), 0, 'and next year starts from zero');
+insert into ids select 'sick2', gen_random_uuid();
+insert into leave_requests (id, company_id, employee_id, type, start_date, end_date, days, status)
+  select id, '0000000a-0000-0000-0000-000000000000', '000000a5-0000-0000-0000-000000000000', 'sick', date_trunc('year', current_date)::date + 60, date_trunc('year', current_date)::date + 149, 90, 'pending_hr' from ids where name = 'sick2';
+select pg_temp.act_as('00000000-0000-0000-0000-0000000000a1');
+select throws_ok($$select public.leave_request_decide((select id from ids where name = 'sick2'), 'approve')$$, 'P0001', 'sick_limit', 'approval re-checks the yearly sick cap (35 + 90 is over 120)');
+reset role;
 
 -- ---------------------------------------------------------------------------
 -- Attendance: approved leave is excused
