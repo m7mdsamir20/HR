@@ -35,8 +35,9 @@ select is_empty($$
   from pg_class c join pg_namespace n on n.oid = c.relnamespace
   where n.nspname in ('public', 'private') and c.relkind in ('r', 'p')
     and has_table_privilege('authenticated', c.oid, 'insert,update,delete,truncate')
-    and format('%I.%I', n.nspname, c.relname) not in ('public.companies', 'public.departments', 'public.employee_documents')
-$$, 'authenticated can write directly only to companies (update), departments and employee_documents');
+    and format('%I.%I', n.nspname, c.relname) not in ('public.companies', 'public.departments', 'public.employee_documents',
+      'public.branches', 'public.shifts', 'public.company_calendar', 'public.attendance_rules')
+$$, 'authenticated can write directly only to companies, departments, documents, branches, shifts, calendar and attendance rules');
 
 select is_empty($$
   select format('%I.%I', n.nspname, c.relname)
