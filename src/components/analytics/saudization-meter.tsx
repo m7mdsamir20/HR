@@ -82,3 +82,4 @@ export function SaudizationMeter({ workforce, t }: SaudizationMeterProps) {
     </div>
   );
 }
+

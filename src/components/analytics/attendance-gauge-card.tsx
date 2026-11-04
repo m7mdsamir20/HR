@@ -67,3 +67,4 @@ export function AttendanceGaugeCard({ attendance, t }: AttendanceGaugeCardProps)
     </div>
   );
 }
+

@@ -390,3 +390,4 @@ end;
 $$;
 
 grant execute on function public.get_analytics_summary() to authenticated;
+

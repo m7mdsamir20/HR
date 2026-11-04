@@ -28,3 +28,4 @@ describe("attendanceTone", () => {
     expect(attendanceTone(50)).toBe("brick");
   });
 });
+

@@ -99,3 +99,4 @@ export function TaskEfficiencyCard({ tasks, t }: TaskEfficiencyCardProps) {
     </div>
   );
 }
+
