@@ -23,7 +23,91 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "audit_logs": {
+            "attendance_deductions": {
+                  Row: {
+                    "company_id": string,"created_at": string,"day_fraction": number,"decided_at": string | null,"decided_by": string | null,"employee_id": string,"id": string,"kind": string,"minutes": number,"note": string | null,"status": string,"work_date": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "company_id": string,"created_at"?: string,"day_fraction": number,"decided_at"?: string | null,"decided_by"?: string | null,"employee_id": string,"id"?: string,"kind": string,"minutes"?: number,"note"?: string | null,"status"?: string,"work_date": string
+                  }
+                  Update: {
+                    "company_id"?: string,"created_at"?: string,"day_fraction"?: number,"decided_at"?: string | null,"decided_by"?: string | null,"employee_id"?: string,"id"?: string,"kind"?: string,"minutes"?: number,"note"?: string | null,"status"?: string,"work_date"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "attendance_deductions_company_id_employee_id_fkey"
+      columns: ["company_id","employee_id"]
+isOneToOne: false
+      referencedRelation: "employees"
+      referencedColumns: ["company_id","id"]
+    },{
+      foreignKeyName: "attendance_deductions_company_id_fkey"
+      columns: ["company_id"]
+isOneToOne: false
+      referencedRelation: "companies"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"attendance_records": {
+                  Row: {
+                    "branch_id": string | null,"check_in_accuracy_m": number | null,"check_in_at": string | null,"check_in_distance_m": number | null,"check_in_lat": number | null,"check_in_lng": number | null,"check_in_outside": boolean,"check_out_accuracy_m": number | null,"check_out_at": string | null,"check_out_distance_m": number | null,"check_out_lat": number | null,"check_out_lng": number | null,"check_out_outside": boolean,"company_id": string,"corrected_by": string | null,"correction_note": string | null,"created_at": string,"early_minutes": number,"employee_id": string,"id": string,"late_minutes": number,"shift_id": string,"source": string,"status": string,"work_date": string,"worked_minutes": number | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "branch_id"?: string | null,"check_in_accuracy_m"?: number | null,"check_in_at"?: string | null,"check_in_distance_m"?: number | null,"check_in_lat"?: number | null,"check_in_lng"?: number | null,"check_in_outside"?: boolean,"check_out_accuracy_m"?: number | null,"check_out_at"?: string | null,"check_out_distance_m"?: number | null,"check_out_lat"?: number | null,"check_out_lng"?: number | null,"check_out_outside"?: boolean,"company_id": string,"corrected_by"?: string | null,"correction_note"?: string | null,"created_at"?: string,"early_minutes"?: number,"employee_id": string,"id"?: string,"late_minutes"?: number,"shift_id": string,"source"?: string,"status"?: string,"work_date": string,"worked_minutes"?: number | null
+                  }
+                  Update: {
+                    "branch_id"?: string | null,"check_in_accuracy_m"?: number | null,"check_in_at"?: string | null,"check_in_distance_m"?: number | null,"check_in_lat"?: number | null,"check_in_lng"?: number | null,"check_in_outside"?: boolean,"check_out_accuracy_m"?: number | null,"check_out_at"?: string | null,"check_out_distance_m"?: number | null,"check_out_lat"?: number | null,"check_out_lng"?: number | null,"check_out_outside"?: boolean,"company_id"?: string,"corrected_by"?: string | null,"correction_note"?: string | null,"created_at"?: string,"early_minutes"?: number,"employee_id"?: string,"id"?: string,"late_minutes"?: number,"shift_id"?: string,"source"?: string,"status"?: string,"work_date"?: string,"worked_minutes"?: number | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "attendance_records_company_id_branch_id_fkey"
+      columns: ["company_id","branch_id"]
+isOneToOne: false
+      referencedRelation: "branches"
+      referencedColumns: ["company_id","id"]
+    },{
+      foreignKeyName: "attendance_records_company_id_employee_id_fkey"
+      columns: ["company_id","employee_id"]
+isOneToOne: false
+      referencedRelation: "employees"
+      referencedColumns: ["company_id","id"]
+    },{
+      foreignKeyName: "attendance_records_company_id_fkey"
+      columns: ["company_id"]
+isOneToOne: false
+      referencedRelation: "companies"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "attendance_records_company_id_shift_id_fkey"
+      columns: ["company_id","shift_id"]
+isOneToOne: false
+      referencedRelation: "shifts"
+      referencedColumns: ["company_id","id"]
+    }
+                  ]
+                },"attendance_rules": {
+                  Row: {
+                    "absence_fraction": number,"company_id": string,"early_grace_minutes": number,"late_tier1_fraction": number,"late_tier1_minutes": number,"late_tier2_fraction": number,"late_tier2_minutes": number,"late_tier3_fraction": number,"late_tier3_minutes": number,"late_tier4_fraction": number,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "absence_fraction"?: number,"company_id": string,"early_grace_minutes"?: number,"late_tier1_fraction"?: number,"late_tier1_minutes"?: number,"late_tier2_fraction"?: number,"late_tier2_minutes"?: number,"late_tier3_fraction"?: number,"late_tier3_minutes"?: number,"late_tier4_fraction"?: number,"updated_at"?: string
+                  }
+                  Update: {
+                    "absence_fraction"?: number,"company_id"?: string,"early_grace_minutes"?: number,"late_tier1_fraction"?: number,"late_tier1_minutes"?: number,"late_tier2_fraction"?: number,"late_tier2_minutes"?: number,"late_tier3_fraction"?: number,"late_tier3_minutes"?: number,"late_tier4_fraction"?: number,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "attendance_rules_company_id_fkey"
+      columns: ["company_id"]
+isOneToOne: true
+      referencedRelation: "companies"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"audit_logs": {
                   Row: {
                     "action": string,"actor_id": string | null,"company_id": string | null,"created_at": string,"id": number,"meta": NonNullable<Json>,"target_id": string | null,"target_type": string
                   }
@@ -43,6 +127,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"branches": {
+                  Row: {
+                    "company_id": string,"created_at": string,"id": string,"latitude": number,"longitude": number,"name_ar": string,"name_en": string | null,"radius_m": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "company_id": string,"created_at"?: string,"id"?: string,"latitude": number,"longitude": number,"name_ar": string,"name_en"?: string | null,"radius_m"?: number
+                  }
+                  Update: {
+                    "company_id"?: string,"created_at"?: string,"id"?: string,"latitude"?: number,"longitude"?: number,"name_ar"?: string,"name_en"?: string | null,"radius_m"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "branches_company_id_fkey"
+      columns: ["company_id"]
+isOneToOne: false
+      referencedRelation: "companies"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"companies": {
                   Row: {
                     "commercial_reg": string | null,"created_at": string,"id": string,"logo_path": string | null,"max_employees": number,"name_ar": string,"name_en": string | null,"settings": NonNullable<Json>,"status": Database["public"]['Enums']["company_status"],"subscription_ends_at": string,"updated_at": string
@@ -56,6 +160,26 @@ isOneToOne: false
                   }
                   Relationships: [
                     
+                  ]
+                },"company_calendar": {
+                  Row: {
+                    "company_id": string,"created_at": string,"end_date": string,"id": string,"kind": string,"name_ar": string,"name_en": string | null,"start_date": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "company_id": string,"created_at"?: string,"end_date": string,"id"?: string,"kind": string,"name_ar": string,"name_en"?: string | null,"start_date": string
+                  }
+                  Update: {
+                    "company_id"?: string,"created_at"?: string,"end_date"?: string,"id"?: string,"kind"?: string,"name_ar"?: string,"name_en"?: string | null,"start_date"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "company_calendar_company_id_fkey"
+      columns: ["company_id"]
+isOneToOne: false
+      referencedRelation: "companies"
+      referencedColumns: ["id"]
+    }
                   ]
                 },"departments": {
                   Row: {
@@ -119,17 +243,23 @@ isOneToOne: false
                   ]
                 },"employees": {
                   Row: {
-                    "birth_date": string | null,"company_id": string,"contract_end": string | null,"contract_start": string | null,"contract_type": string | null,"created_at": string,"created_by": string | null,"deleted_at": string | null,"department_id": string | null,"disabled_at": string | null,"email": string | null,"employee_number": string | null,"full_name_ar": string,"full_name_en": string | null,"gender": string | null,"hire_date": string | null,"id": string,"id_type": Database["public"]['Enums']["id_type"],"job_title": string | null,"locale": string,"manager_id": string | null,"marital_status": string | null,"national_id": string,"nationality": string | null,"occupation": string | null,"phone": string | null,"probation_days": number | null,"role": Database["public"]['Enums']["employee_role"],"status": Database["public"]['Enums']["employee_status"],"updated_at": string,"user_id": string | null
+                    "birth_date": string | null,"branch_id": string | null,"company_id": string,"contract_end": string | null,"contract_start": string | null,"contract_type": string | null,"created_at": string,"created_by": string | null,"deleted_at": string | null,"department_id": string | null,"disabled_at": string | null,"email": string | null,"employee_number": string | null,"full_name_ar": string,"full_name_en": string | null,"gender": string | null,"hire_date": string | null,"id": string,"id_type": Database["public"]['Enums']["id_type"],"job_title": string | null,"locale": string,"manager_id": string | null,"marital_status": string | null,"national_id": string,"nationality": string | null,"occupation": string | null,"phone": string | null,"probation_days": number | null,"role": Database["public"]['Enums']["employee_role"],"shift_id": string | null,"shift_since": string | null,"status": Database["public"]['Enums']["employee_status"],"updated_at": string,"user_id": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "birth_date"?: string | null,"company_id": string,"contract_end"?: string | null,"contract_start"?: string | null,"contract_type"?: string | null,"created_at"?: string,"created_by"?: string | null,"deleted_at"?: string | null,"department_id"?: string | null,"disabled_at"?: string | null,"email"?: string | null,"employee_number"?: string | null,"full_name_ar": string,"full_name_en"?: string | null,"gender"?: string | null,"hire_date"?: string | null,"id"?: string,"id_type": Database["public"]['Enums']["id_type"],"job_title"?: string | null,"locale"?: string,"manager_id"?: string | null,"marital_status"?: string | null,"national_id": string,"nationality"?: string | null,"occupation"?: string | null,"phone"?: string | null,"probation_days"?: number | null,"role"?: Database["public"]['Enums']["employee_role"],"status"?: Database["public"]['Enums']["employee_status"],"updated_at"?: string,"user_id"?: string | null
+                    "birth_date"?: string | null,"branch_id"?: string | null,"company_id": string,"contract_end"?: string | null,"contract_start"?: string | null,"contract_type"?: string | null,"created_at"?: string,"created_by"?: string | null,"deleted_at"?: string | null,"department_id"?: string | null,"disabled_at"?: string | null,"email"?: string | null,"employee_number"?: string | null,"full_name_ar": string,"full_name_en"?: string | null,"gender"?: string | null,"hire_date"?: string | null,"id"?: string,"id_type": Database["public"]['Enums']["id_type"],"job_title"?: string | null,"locale"?: string,"manager_id"?: string | null,"marital_status"?: string | null,"national_id": string,"nationality"?: string | null,"occupation"?: string | null,"phone"?: string | null,"probation_days"?: number | null,"role"?: Database["public"]['Enums']["employee_role"],"shift_id"?: string | null,"shift_since"?: string | null,"status"?: Database["public"]['Enums']["employee_status"],"updated_at"?: string,"user_id"?: string | null
                   }
                   Update: {
-                    "birth_date"?: string | null,"company_id"?: string,"contract_end"?: string | null,"contract_start"?: string | null,"contract_type"?: string | null,"created_at"?: string,"created_by"?: string | null,"deleted_at"?: string | null,"department_id"?: string | null,"disabled_at"?: string | null,"email"?: string | null,"employee_number"?: string | null,"full_name_ar"?: string,"full_name_en"?: string | null,"gender"?: string | null,"hire_date"?: string | null,"id"?: string,"id_type"?: Database["public"]['Enums']["id_type"],"job_title"?: string | null,"locale"?: string,"manager_id"?: string | null,"marital_status"?: string | null,"national_id"?: string,"nationality"?: string | null,"occupation"?: string | null,"phone"?: string | null,"probation_days"?: number | null,"role"?: Database["public"]['Enums']["employee_role"],"status"?: Database["public"]['Enums']["employee_status"],"updated_at"?: string,"user_id"?: string | null
+                    "birth_date"?: string | null,"branch_id"?: string | null,"company_id"?: string,"contract_end"?: string | null,"contract_start"?: string | null,"contract_type"?: string | null,"created_at"?: string,"created_by"?: string | null,"deleted_at"?: string | null,"department_id"?: string | null,"disabled_at"?: string | null,"email"?: string | null,"employee_number"?: string | null,"full_name_ar"?: string,"full_name_en"?: string | null,"gender"?: string | null,"hire_date"?: string | null,"id"?: string,"id_type"?: Database["public"]['Enums']["id_type"],"job_title"?: string | null,"locale"?: string,"manager_id"?: string | null,"marital_status"?: string | null,"national_id"?: string,"nationality"?: string | null,"occupation"?: string | null,"phone"?: string | null,"probation_days"?: number | null,"role"?: Database["public"]['Enums']["employee_role"],"shift_id"?: string | null,"shift_since"?: string | null,"status"?: Database["public"]['Enums']["employee_status"],"updated_at"?: string,"user_id"?: string | null
                   }
                   Relationships: [
                     {
+      foreignKeyName: "employees_branch_fk"
+      columns: ["company_id","branch_id"]
+isOneToOne: false
+      referencedRelation: "branches"
+      referencedColumns: ["company_id","id"]
+    },{
       foreignKeyName: "employees_company_id_fkey"
       columns: ["company_id"]
 isOneToOne: false
@@ -153,6 +283,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "employees"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "employees_shift_fk"
+      columns: ["company_id","shift_id"]
+isOneToOne: false
+      referencedRelation: "shifts"
+      referencedColumns: ["company_id","id"]
     }
                   ]
                 },"notifications": {
@@ -221,6 +357,26 @@ isOneToOne: false
       referencedColumns: ["company_id","id"]
     }
                   ]
+                },"shifts": {
+                  Row: {
+                    "company_id": string,"created_at": string,"end_time": string,"grace_minutes": number,"id": string,"name_ar": string,"name_en": string | null,"ramadan_hours": number,"start_time": string,"work_days": (number)[]
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "company_id": string,"created_at"?: string,"end_time": string,"grace_minutes"?: number,"id"?: string,"name_ar": string,"name_en"?: string | null,"ramadan_hours"?: number,"start_time": string,"work_days"?: (number)[]
+                  }
+                  Update: {
+                    "company_id"?: string,"created_at"?: string,"end_time"?: string,"grace_minutes"?: number,"id"?: string,"name_ar"?: string,"name_en"?: string | null,"ramadan_hours"?: number,"start_time"?: string,"work_days"?: (number)[]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "shifts_company_id_fkey"
+      columns: ["company_id"]
+isOneToOne: false
+      referencedRelation: "companies"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"task_reports": {
                   Row: {
                     "company_id": string,"created_at": string,"hours_spent": number,"id": string,"links": (string)[],"obstacles": string | null,"rating": number | null,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"round": number,"status": Database["public"]['Enums']["report_status"],"submitted_by": string,"summary": string,"task_id": string
@@ -287,6 +443,21 @@ isOneToOne: false
           Functions: {
             "admin_create_company":
 { Args: { "p_commercial_reg": string,"p_max_employees": number,"p_name_ar": string,"p_name_en": string,"p_owner_name_ar": string,"p_owner_name_en": string,"p_owner_national_id": string,"p_owner_phone": string,"p_owner_user_id": string,"p_subscription_ends_at": string }; Returns: string
+                           },
+"attendance_assign":
+{ Args: { "p_branch_id": string,"p_employee_ids": (string)[],"p_shift_id": string }; Returns: number
+                           },
+"attendance_check_in":
+{ Args: { "p_accuracy"?: number,"p_lat"?: number,"p_lng"?: number }; Returns: Json
+                           },
+"attendance_check_out":
+{ Args: { "p_accuracy"?: number,"p_lat"?: number,"p_lng"?: number }; Returns: Json
+                           },
+"attendance_correct":
+{ Args: { "p_check_in": string,"p_check_out": string,"p_date": string,"p_employee_id": string,"p_note": string }; Returns: string
+                           },
+"attendance_deduction_decide":
+{ Args: { "p_decision": string,"p_id": string,"p_note"?: string }; Returns: undefined
                            },
 "can_manage_employee":
 { Args: { "p_employee_id": string }; Returns: boolean

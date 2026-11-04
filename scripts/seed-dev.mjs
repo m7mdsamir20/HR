@@ -180,6 +180,41 @@ async function main() {
     ]),
   );
 
+  // Attendance: a branch, two shifts, assignments, and some past days for the demo employee. The
+  // past days go through the HR user's correction RPC so the suggested deductions are computed
+  // by the same code as in production.
+  const { data: branch, error: branchError } = await admin
+    .from("branches")
+    .insert({ company_id: company.id, name_ar: "الفرع الرئيسي", name_en: "Main branch", latitude: 24.7136, longitude: 46.6753, radius_m: 150 })
+    .select("id")
+    .single();
+  if (branchError) throw branchError;
+  const { data: shifts, error: shiftsError } = await admin
+    .from("shifts")
+    .insert([
+      { company_id: company.id, name_ar: "الدوام الإداري", name_en: "Office hours", start_time: "08:00", end_time: "16:00", grace_minutes: 15, work_days: [0, 1, 2, 3, 4] },
+      { company_id: company.id, name_ar: "وردية مفتوحة (للتجربة)", name_en: "Open shift (for testing)", start_time: "00:00", end_time: "23:59", grace_minutes: 120, work_days: [0, 1, 2, 3, 4, 5, 6] },
+    ])
+    .select("id, name_en");
+  if (shiftsError) throw shiftsError;
+  const office = shifts.find((x) => x.name_en === "Office hours").id;
+  const open = shifts.find((x) => x.name_en.startsWith("Open")).id;
+  for (const [nid, shift] of [["2000000005", office], ["1000000003", office], ["1000000004", open]]) {
+    check(await admin.from("employees").update({ branch_id: branch.id, shift_id: shift }).eq("id", ids.get(nid)));
+  }
+  const hr = createClient(url, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "", { auth: { persistSession: false } });
+  check(await hr.auth.signInWithPassword({ email: "1000000003@users.invalid", password: PASSWORD }));
+  const days = [
+    [1, "08:05", "16:02", "حضور مسجل"],
+    [2, "08:40", "16:00", "تأخر بسبب الازدحام"],
+    [3, null, null, "غياب بدون إذن"],
+    [6, "08:00", "15:20", "خرج مبكراً لموعد طبي"],
+    [7, "09:10", "16:00", "تأخر في الوصول"],
+  ];
+  for (const [ago, checkIn, checkOut, note] of days) {
+    check(await hr.rpc("attendance_correct", { p_employee_id: ahmed, p_date: day(-ago), p_check_in: checkIn, p_check_out: checkOut, p_note: note }));
+  }
+
   console.log(`Seeded system admin ${ADMIN.nationalId} and ${USERS.length} company users (password in scripts/seed-dev.mjs).`);
 }
 

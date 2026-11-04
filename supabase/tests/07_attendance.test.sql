@@ -4,7 +4,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(57);
+select plan(63);
 
 create function pg_temp.mk_user(p_id uuid, p_nid text) returns void language sql as $$
   insert into auth.users (id, email, aud, role, instance_id, created_at)
@@ -204,10 +204,30 @@ select is((select scheduled_minutes from private.shift_bounds('55000002-0000-000
 select is(private.is_work_day('55000002-0000-0000-0000-000000000000', current_date - 20), false, 'a holiday is not a working day');
 
 update employees set hire_date = current_date where id = '000000a5-0000-0000-0000-000000000000';
-select is(private.run_attendance_day(current_date - 10), 3, 'the job marks absent those scheduled to work with no record (not the one hired later)');
+-- Everyone was assigned today by the RPC above; pretend a month ago, except employee 1 (just assigned).
+update employees set shift_since = current_date - 30;
+update employees set shift_since = current_date where id = '000000a4-0000-0000-0000-000000000000';
+select is(private.run_attendance_day(current_date - 10), 2, 'the job marks absent those already on a shift with no record (not the one hired later, nor the one assigned today)');
+update employees set shift_since = current_date - 30 where id = '000000a4-0000-0000-0000-000000000000';
+select is(private.run_attendance_day(current_date - 10), 1, 'once the assignment predates the day, that employee is covered too');
 select is(private.run_attendance_day(current_date - 10), 0, 'running it again changes nothing');
 select is(pg_temp.frac('000000a4-0000-0000-0000-000000000000', current_date - 10, 'absence'), 1::numeric, 'an absent day carries a full-day suggestion');
 select is(private.run_attendance_day(current_date - 20), 0, 'on a holiday nobody is marked absent');
+
+-- ---------------------------------------------------------------------------
+-- The monthly sheet export
+-- ---------------------------------------------------------------------------
+select pg_temp.act_as('00000000-0000-0000-0000-0000000000a2');
+select lives_ok($$select public.record_export('attendance_sheet', '0000000a-0000-0000-0000-000000000000')$$, 'HR exports the company''s attendance sheet');
+select throws_ok($$select public.record_export('attendance_sheet', '0000000b-0000-0000-0000-000000000000')$$, '42501', null, 'but not another company''s');
+reset role;
+select pg_temp.act_as('00000000-0000-0000-0000-0000000000a3');
+select throws_ok($$select public.record_export('attendance_sheet', '0000000a-0000-0000-0000-000000000000')$$, '42501', null, 'a manager cannot export the sheet');
+reset role;
+
+-- The calculation and the daily job are internal: nobody signed in can call them directly
+select is((select has_function_privilege('authenticated', 'private.recompute_attendance(uuid)', 'execute')), false, 'signed-in users cannot call the recompute step');
+select is((select has_function_privilege('authenticated', 'private.run_attendance_day(date)', 'execute')), false, 'nor run the daily job');
 
 select * from finish();
 rollback;
