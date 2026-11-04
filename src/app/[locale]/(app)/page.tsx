@@ -1,4 +1,4 @@
-import { Network, Settings } from "lucide-react";
+import { CalendarClock, Clock, MapPin, Network, Settings } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { StatusPill } from "@/components/status-pill";
 import { TaskCard, type TaskRow } from "@/components/tasks/task-card";
@@ -115,33 +115,36 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
               </ul>
             )}
           </Section>
-
-          {/* Phones show only the main tabs; these sections are one tap from here. */}
-          <section aria-labelledby="quick" className="flex flex-col gap-3">
-            <h2 id="quick" className="text-section">
-              {t("quickLinks")}
-            </h2>
-            <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {[
-                { href: "/departments", label: tNav("departments"), icon: Network, show: true },
-                { href: "/settings", label: tNav("settings"), icon: Settings, show: member.role === "owner" },
-              ]
-                .filter((l) => l.show)
-                .map(({ href, label, icon: Icon }) => (
-                  <li key={href}>
-                    <Link
-                      href={href}
-                      className="flex min-h-14 items-center gap-3 rounded-card border border-line bg-surface px-4 hover:border-indigo focus-visible:outline-2 focus-visible:outline-indigo"
-                    >
-                      <Icon className="size-5 text-ink-soft" aria-hidden />
-                      <span className="font-semibold">{label}</span>
-                    </Link>
-                  </li>
-                ))}
-            </ul>
-          </section>
         </>
       )}
+
+      {/* Phones show only the main tabs; these sections are one tap from here. */}
+      <section aria-labelledby="quick" className="flex flex-col gap-3">
+        <h2 id="quick" className="text-section">
+          {t("quickLinks")}
+        </h2>
+        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { href: "/attendance", label: tNav("attendance"), icon: Clock, show: true },
+            { href: "/departments", label: tNav("departments"), icon: Network, show: managesPeople },
+            { href: "/branches", label: tNav("branches"), icon: MapPin, show: managesPeople },
+            { href: "/shifts", label: tNav("shifts"), icon: CalendarClock, show: managesPeople },
+            { href: "/settings", label: tNav("settings"), icon: Settings, show: member.role === "owner" },
+          ]
+            .filter((l) => l.show)
+            .map(({ href, label, icon: Icon }) => (
+              <li key={href}>
+                <Link
+                  href={href}
+                  className="flex min-h-14 items-center gap-3 rounded-card border border-line bg-surface px-4 hover:border-indigo focus-visible:outline-2 focus-visible:outline-indigo"
+                >
+                  <Icon className="size-5 text-ink-soft" aria-hidden />
+                  <span className="font-semibold">{label}</span>
+                </Link>
+              </li>
+            ))}
+        </ul>
+      </section>
     </main>
   );
 }

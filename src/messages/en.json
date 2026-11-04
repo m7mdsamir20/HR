@@ -185,7 +185,10 @@
     "tasks": "Tasks",
     "myTasks": "My tasks",
     "notifications": "Notifications",
-    "unread": "{count} unread"
+    "unread": "{count} unread",
+    "attendance": "Attendance",
+    "branches": "Branches",
+    "shifts": "Shifts"
   },
   "errors": {
     "invalid": "Check the fields marked in red.",
@@ -681,6 +684,260 @@
     "noReports": "No completion report has been submitted yet.",
     "otherFiles": "Other files",
     "rateLimited": "Too many files in a short time. Wait a moment.",
-    "view": "View and print PDF"
+    "view": "View and print PDF",
+    "attendanceSheetTitle": "Monthly attendance sheet",
+    "sheetPresent": "Present",
+    "sheetAbsent": "Absent",
+    "sheetLate": "Late",
+    "sheetDeduction": "Deduct (days)",
+    "legendPresent": "Present",
+    "legendLate": "Present, late",
+    "legendAbsent": "Absent",
+    "legendOff": "Holiday or not a working day",
+    "sheetDeductionNote": "Deduction days count approved deductions only. Suggestions still awaiting a decision are not included."
+  },
+  "attendance": {
+    "title": "Attendance",
+    "history": "This month",
+    "tabs": {
+      "label": "Attendance sections",
+      "mine": "My attendance",
+      "sheet": "Attendance sheet",
+      "deductions": "Suggested deductions"
+    },
+    "month": {
+      "previous": "Previous month",
+      "next": "Next month"
+    },
+    "panel": {
+      "today": "Today",
+      "ramadan": "Ramadan hours: {hours} hours a day",
+      "late": "{minutes} min late",
+      "onTime": "On time",
+      "outside": "Outside the branch",
+      "arrival": "Arrival",
+      "departure": "Departure",
+      "checkIn": "Check in",
+      "checkOut": "Check out",
+      "locating": "Finding your location…",
+      "locationNote": "Your location is used only at the moment you check in, to confirm you are at the branch.",
+      "doneForToday": "You checked in and out today.",
+      "noShift": "You have no shift or branch yet. Ask HR to assign them.",
+      "dayOff": "Today is outside your working days.",
+      "holiday": "Today is a public holiday: {name}.",
+      "shiftOver": "Today's shift has ended, so you can no longer check in. If you were here, ask HR to record your day.",
+      "noLocationNotice": "Your time was recorded without a location, and HR will see it for review. Allow location access in your browser next time.",
+      "outsideNotice": "Your time was recorded, but you are outside the branch area. HR will see it for review.",
+      "checkedInDone": "You are checked in.",
+      "checkedOutDone": "You are checked out.",
+      "noLocation": "No location"
+    },
+    "errors": {
+      "invalid": "Check the details you entered.",
+      "noShift": "You have no shift or branch yet.",
+      "notWorkDay": "Today is not one of your working days.",
+      "shiftOver": "Today's shift has ended.",
+      "alreadyCheckedIn": "You already checked in today.",
+      "alreadyCheckedOut": "You already checked out today.",
+      "notCheckedIn": "Check in first.",
+      "alreadyDecided": "This deduction has already been decided.",
+      "inUse": "It can't be deleted while employees or attendance records use it.",
+      "duplicate": "That name is already used."
+    },
+    "flags": {
+      "absent": "Absent",
+      "late": "{minutes} min late",
+      "early": "Left {minutes} min early",
+      "outside": "Outside the branch",
+      "noLocation": "No location",
+      "missingCheckout": "No check-out recorded",
+      "manual": "Edited by hand",
+      "onTime": "On time"
+    },
+    "days": {
+      "empty": "No records this month.",
+      "date": "Day",
+      "arrival": "Arrival",
+      "departure": "Departure",
+      "worked": "Duration",
+      "notes": "Notes"
+    },
+    "sheet": {
+      "back": "Back to the sheet",
+      "intro": "A summary for each employee this month. Select a name to see their days.",
+      "pdf": "Attendance sheet PDF",
+      "empty": "No employees are assigned to a shift yet.",
+      "employee": "Employee",
+      "present": "Days present",
+      "absent": "Days absent",
+      "late": "Late",
+      "early": "Left early",
+      "flagged": "To review"
+    },
+    "correct": {
+      "title": "Record or fix a day",
+      "intro": "For days the employee forgot to check in or that were recorded wrongly. The change goes in the audit log.",
+      "date": "Date",
+      "checkIn": "Arrival time",
+      "checkOut": "Departure time",
+      "absent": "Absent on this day",
+      "note": "Reason for the change",
+      "noteHint": "For example: forgot to check in; the supervisor confirmed attendance.",
+      "submit": "Save the day",
+      "saved": "The day was saved.",
+      "edit": "Edit",
+      "invalid": "Check this field."
+    },
+    "deductions": {
+      "intro": "These are suggestions the platform works out from lateness, early departure and absence. Approve a deduction, or waive it with a reason. The actual amounts go into payroll later.",
+      "filter": "Deduction status",
+      "filterAll": "All",
+      "empty": "No suggested deductions with this status this month.",
+      "status": {
+        "pending": "Awaiting a decision",
+        "approved": "Approved",
+        "waived": "Waived"
+      },
+      "kind": {
+        "late": "Late arrival",
+        "early_departure": "Early departure",
+        "absence": "Absence"
+      },
+      "minutes": "{minutes} min",
+      "warning": "Warning only, no deduction",
+      "amount": "Deduct {share} of a day's pay",
+      "note": "Reason for the decision",
+      "notePlaceholder": "Reason for waiving (required to waive)",
+      "approve": "Approve",
+      "waive": "Waive",
+      "noteRequired": "Write the reason for waiving."
+    },
+    "branches": {
+      "title": "Branches",
+      "intro": "Set each branch's location and the radius where check-in is expected.",
+      "add": "Add a branch",
+      "addSubmit": "Add branch",
+      "empty": "No branches yet. Add the first one so you can assign employees to it.",
+      "nameAr": "Branch name in Arabic",
+      "nameEn": "Branch name in English",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "radius": "Radius (meters)",
+      "radiusHint": "20 to 5000 meters. 100 to 200 is typical.",
+      "radiusValue": "{meters} m radius",
+      "employees": "{count, plural, one {# employee} other {# employees}}",
+      "useHere": "Use my current location",
+      "locating": "Locating…",
+      "locateFailed": "Couldn't get your location. Allow location access in the browser, or type the coordinates.",
+      "openMap": "Open in Maps",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteConfirm": "Delete the branch “{name}”? It can't be deleted while employees or attendance records use it.",
+      "errors": {
+        "invalid": "Check the highlighted fields."
+      },
+      "fields": {
+        "nameAr": "Enter the branch name (at least 2 characters).",
+        "nameEn": "The English name is 2 to 80 characters.",
+        "latitude": "Latitude is between -90 and 90.",
+        "longitude": "Longitude is between -180 and 180.",
+        "radius": "The radius is 20 to 5000 meters."
+      }
+    },
+    "shifts": {
+      "title": "Shifts and working time",
+      "intro": "Working hours, grace period and working days, who is assigned, holidays and the deduction rules.",
+      "add": "Add a shift",
+      "addSubmit": "Add shift",
+      "empty": "No shifts yet. Add the first one.",
+      "nameAr": "Shift name in Arabic",
+      "nameEn": "Shift name in English",
+      "startTime": "Start of work",
+      "endTime": "End of work",
+      "grace": "Grace period (minutes)",
+      "graceHint": "Lateness is counted after the grace period ends.",
+      "graceValue": "{minutes} min grace",
+      "ramadanHours": "Ramadan hours",
+      "ramadanHint": "Working hours a day during Ramadan.",
+      "workDays": "Working days",
+      "employees": "{count, plural, one {# employee} other {# employees}}",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteConfirm": "Delete the shift “{name}”? It can't be deleted while employees or attendance records use it.",
+      "errors": {
+        "invalid": "Check the highlighted fields."
+      },
+      "fields": {
+        "nameAr": "Enter the shift name (at least 2 characters).",
+        "nameEn": "The English name is 2 to 80 characters.",
+        "startTime": "Enter the start time.",
+        "endTime": "The end must be after the start, on the same day.",
+        "graceMinutes": "Grace is 0 to 120 minutes.",
+        "ramadanHours": "1 to 12 hours.",
+        "workDays": "Choose at least one working day."
+      }
+    },
+    "calendar": {
+      "title": "Holidays and Ramadan",
+      "intro": "No absence is counted on a holiday. In Ramadan the shift shortens to the Ramadan hours set on it.",
+      "kind": "Type",
+      "kinds": {
+        "holiday": "Holiday",
+        "ramadan": "Ramadan"
+      },
+      "nameAr": "Name in Arabic",
+      "nameEn": "Name in English",
+      "startDate": "From",
+      "endDate": "To",
+      "add": "Add",
+      "empty": "No holidays recorded.",
+      "remove": "Delete {name}",
+      "errors": {
+        "invalid": "Check the highlighted fields. The range is at most 45 days."
+      },
+      "fields": {
+        "nameAr": "Enter the name (at least 2 characters).",
+        "startDate": "Choose the start date.",
+        "endDate": "The end date is after the start, at most 45 days."
+      }
+    },
+    "rules": {
+      "title": "Deduction rules",
+      "intro": "Tiers apply to lateness after the grace period; percentages are of one day's pay.",
+      "introReadOnly": "Only the company owner changes these rules.",
+      "invalid": "Not a valid value.",
+      "late": "Lateness tiers",
+      "lateHint": "Tier 1 runs to the first limit, tier 2 to the second, tier 3 to the third, and anything later is tier 4.",
+      "tier1Minutes": "Tier 1 up to (minutes)",
+      "tier2Minutes": "Tier 2 up to (minutes)",
+      "tier3Minutes": "Tier 3 up to (minutes)",
+      "tier1Percent": "Tier 1 deduction (% of a day's pay)",
+      "tier2Percent": "Tier 2 deduction (%)",
+      "tier3Percent": "Tier 3 deduction (%)",
+      "tier4Percent": "Deduction beyond tier 3 (%)",
+      "warningHint": "0 means a warning with no deduction.",
+      "otherTitle": "Early departure and absence",
+      "earlyGrace": "Early departure grace (minutes)",
+      "earlyGraceHint": "The deduction is proportional to the time left in the shift.",
+      "absencePercent": "Absence deduction (% of a day's pay)",
+      "save": "Save the rules",
+      "saved": "The rules were saved."
+    },
+    "assign": {
+      "title": "Assign employees",
+      "intro": "Tick the employees, then choose the branch and shift. Choose “None” to remove an assignment.",
+      "branch": "Branch",
+      "shift": "Shift",
+      "department": "Filter by department",
+      "allDepartments": "All departments",
+      "none": "None",
+      "selectAll": "Select those shown",
+      "clear": "Clear selection",
+      "noPeople": "No employees.",
+      "unassigned": "No shift",
+      "submit": "Apply to {count, plural, one {# employee} other {# employees}}",
+      "saved": "Assigned",
+      "invalid": "Choose at least one employee."
+    }
   }
 }

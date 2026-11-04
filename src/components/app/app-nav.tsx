@@ -1,12 +1,12 @@
 "use client";
 
-import { Bell, House, ListChecks, Network, Settings, UserRound, Users } from "lucide-react";
+import { Bell, CalendarClock, Clock, House, ListChecks, MapPin, Network, Settings, UserRound, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import type { Role } from "@/lib/auth/roles";
 import { cn } from "@/lib/utils";
 
-type Key = "home" | "tasks" | "myTasks" | "employees" | "team" | "departments" | "notifications" | "settings" | "profile";
+type Key = "home" | "tasks" | "myTasks" | "employees" | "team" | "departments" | "attendance" | "branches" | "shifts" | "notifications" | "settings" | "profile";
 type Item = { href: string; key: Key; icon: typeof House; badge?: boolean; tab: boolean };
 
 // `tab: false` items live in the sidebar only; on phones they're reached from the home page.
@@ -18,7 +18,13 @@ function itemsFor(role: Role): Item[] {
   ];
   if (role === "owner" || role === "hr") items.push({ href: "/employees", key: "employees", icon: Users, tab: true });
   if (role === "manager") items.push({ href: "/employees", key: "team", icon: Users, tab: true });
-  if (role === "owner" || role === "hr") items.push({ href: "/departments", key: "departments", icon: Network, tab: false });
+  // Attendance is the employee's daily action, so it gets a tab for them; others reach it from the sidebar or home.
+  items.push({ href: "/attendance", key: "attendance", icon: Clock, tab: role === "employee" });
+  if (role === "owner" || role === "hr") {
+    items.push({ href: "/departments", key: "departments", icon: Network, tab: false });
+    items.push({ href: "/branches", key: "branches", icon: MapPin, tab: false });
+    items.push({ href: "/shifts", key: "shifts", icon: CalendarClock, tab: false });
+  }
   items.push({ href: "/notifications", key: "notifications", icon: Bell, badge: true, tab: true });
   if (role === "owner") items.push({ href: "/settings", key: "settings", icon: Settings, tab: false });
   items.push({ href: "/profile", key: "profile", icon: UserRound, tab: true });
