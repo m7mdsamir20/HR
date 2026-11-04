@@ -30,7 +30,8 @@ export function buildCsp(nonce: string) {
 export const PDF_CSP = "frame-ancestors 'none'; base-uri 'none'; form-action 'none'";
 
 const PDF_PATH = /^(\/en)?\/(tasks|employees)\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/pdf$/;
+const SHEET_PDF_PATH = /^(\/en)?\/attendance\/sheet\/pdf$/;
 
 export function isPdfPath(pathname: string): boolean {
-  return PDF_PATH.test(pathname);
+  return PDF_PATH.test(pathname) || SHEET_PDF_PATH.test(pathname);
 }

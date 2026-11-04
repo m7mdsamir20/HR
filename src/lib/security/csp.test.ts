@@ -4,7 +4,11 @@ import { isPdfPath, PDF_CSP } from "./csp";
 const id = "47431093-68ad-4021-a259-6deb78249487";
 
 describe("isPdfPath", () => {
-  it("matches only the two PDF routes", () => {
+  it("matches only the PDF routes", () => {
+    expect(isPdfPath("/attendance/sheet/pdf")).toBe(true);
+    expect(isPdfPath("/en/attendance/sheet/pdf")).toBe(true);
+    expect(isPdfPath("/attendance/sheet/pdf/extra")).toBe(false);
+    expect(isPdfPath("/attendance/sheet")).toBe(false);
     expect(isPdfPath(`/tasks/${id}/pdf`)).toBe(true);
     expect(isPdfPath(`/en/employees/${id}/pdf`)).toBe(true);
     expect(isPdfPath(`/tasks/${id}`)).toBe(false);
