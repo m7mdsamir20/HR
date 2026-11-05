@@ -2,7 +2,6 @@
 
 import {
   Banknote,
-  BarChart3,
   CalendarDays,
   Clock,
   HandCoins,
@@ -24,7 +23,6 @@ type Key =
   | "employees"
   | "team"
   | "attendance"
-  | "analytics"
   | "leave"
   | "payroll"
   | "advances"
@@ -35,8 +33,8 @@ type Key =
 
 type Item = { href: string; key: Key; icon: typeof House; tab: boolean };
 
-// Header now holds notifications, language switcher, profile dropdown and logout.
-// Tab bar on phones holds the 5 primary daily actions.
+// Header holds notifications, language switcher, profile dropdown and logout.
+// Tab bar on phones holds the primary daily actions.
 function itemsFor(role: Role): Item[] {
   const isLeader = role === "owner" || role === "admin";
   const manages = isLeader || role === "manager";
@@ -52,7 +50,7 @@ function itemsFor(role: Role): Item[] {
     items.push({ href: "/employees", key: "team", icon: Users, tab: true });
   }
 
-  // Tasks is now under Employees & Departments
+  // Tasks is under Employees & Departments
   items.push({ href: "/tasks", key: manages ? "tasks" : "myTasks", icon: ListChecks, tab: true });
 
   // Attendance: owner goes directly to the attendance sheet
@@ -62,7 +60,6 @@ function itemsFor(role: Role): Item[] {
     icon: Clock,
     tab: true,
   });
-  items.push({ href: "/analytics", key: "analytics", icon: BarChart3, tab: true });
 
   // Sidebar-only management modules
   items.push({ href: "/leave", key: "leave", icon: CalendarDays, tab: false });
