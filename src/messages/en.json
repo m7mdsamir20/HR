@@ -520,7 +520,7 @@
     "add": "Add Department",
     "modalTitle": "Add New Department",
     "modalIntro": "Enter the department name in Arabic and English to organize company structure.",
-    "addSubmit": "Save Department",
+    "addSubmit": "Save",
     "nameAr": "Department name (Arabic)",
     "nameEn": "Department name (English)",
     "rename": "Edit",
