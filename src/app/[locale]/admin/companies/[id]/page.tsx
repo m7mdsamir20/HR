@@ -4,7 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { CompanyStatusButton } from "@/components/admin/company-status-button";
 import { SubscriptionForm } from "@/components/admin/subscription-form";
-import { StatusPill } from "@/components/status-pill";
+import { StatusPill, type Tone } from "@/components/status-pill";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { requirePlatformAdmin } from "@/lib/auth/account";
@@ -12,9 +12,70 @@ import { companyState, companyStateTone } from "@/lib/company-state";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 
-const AUDIT_ACTIONS = ["company_insert", "company_update", "employee_insert", "employee_update"] as const;
+const AUDIT_ACTIONS = [
+  "company_insert",
+  "company_update",
+  "company_delete",
+  "employee_insert",
+  "employee_update",
+  "employee_delete",
+  "employee_password_reset",
+  "employee_password_change",
+  "department_insert",
+  "department_update",
+  "department_delete",
+  "document_insert",
+  "document_update",
+  "document_delete",
+  "compensation_insert",
+  "compensation_update",
+  "compensation_delete",
+  "task_insert",
+  "task_update",
+  "task_delete",
+  "task_approve",
+  "branch_insert",
+  "branch_update",
+  "branch_delete",
+  "shift_insert",
+  "shift_update",
+  "shift_delete",
+  "calendar_insert",
+  "calendar_update",
+  "calendar_delete",
+  "attendance_rules_insert",
+  "attendance_rules_update",
+  "attendance_assign",
+  "attendance_correct",
+  "leave_request",
+  "leave_approve",
+  "leave_reject",
+  "leave_cancel",
+  "leave_adjust",
+  "deduction_approve",
+  "deduction_waive",
+  "deduction_reject",
+  "payroll_run_create",
+  "payroll_run_lock",
+  "advance_request",
+  "advance_approve",
+  "advance_reject",
+  "export_employee_card",
+  "export_attendance_report",
+  "export_leave_report",
+  "export_payroll_wps",
+] as const;
+
 type AuditAction = (typeof AUDIT_ACTIONS)[number];
 const isKnownAction = (a: string): a is AuditAction => (AUDIT_ACTIONS as readonly string[]).includes(a);
+
+function auditActionTone(key: string): Tone {
+  if (key.includes("approve") || key.includes("activate")) return "stamp";
+  if (key.includes("reject") || key.includes("delete") || key.includes("cancel") || key.includes("waive")) return "brick";
+  if (key.includes("update") || key.includes("correct") || key.includes("adjust") || key.includes("reset")) return "saffron";
+  if (key.includes("insert") || key.includes("create") || key.includes("request") || key.includes("assign")) return "indigo";
+  return "neutral";
+}
 
 export default async function CompanyPage({ params }: PageProps<"/[locale]/admin/companies/[id]">) {
   const { locale: rawLocale, id: rawId } = await params;
@@ -121,11 +182,14 @@ export default async function CompanyPage({ params }: PageProps<"/[locale]/admin
         {activity && activity.length > 0 ? (
           <ol className="flex flex-col divide-y divide-line rounded-card border border-line bg-surface">
             {activity.map((a) => {
-              const key = a.action.replace(".", "_");
+              const key = a.action.replace(/\./g, "_");
+              const label = isKnownAction(key) ? t(`company.actions.${key}`) : a.action.replace(/[._]/g, " ");
               return (
-                <li key={a.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
-                  <span>{isKnownAction(key) ? t(`company.actions.${key}`) : a.action}</span>
-                  <span className="text-secondary tabular-nums">{formatDateTime(locale, a.created_at)}</span>
+                <li key={a.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                  <div className="flex items-center gap-2.5">
+                    <StatusPill tone={auditActionTone(key)}>{label}</StatusPill>
+                  </div>
+                  <span className="text-secondary tabular-nums text-sm">{formatDateTime(locale, a.created_at)}</span>
                 </li>
               );
             })}
