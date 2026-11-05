@@ -35,7 +35,15 @@ export function CompanyProfileForm({
   defaults,
   canEdit = true,
 }: {
-  defaults: { nameAr: string; nameEn: string; commercialReg: string };
+  defaults: {
+    nameAr: string;
+    nameEn: string;
+    commercialReg: string;
+    taxNumber?: string;
+    phone?: string;
+    email?: string;
+    address?: string;
+  };
   canEdit?: boolean;
 }) {
   const t = useTranslations("settings");
@@ -75,6 +83,50 @@ export function CompanyProfileForm({
           optionalLabel={tCommon("optional")}
           inputMode="numeric"
           dir="ltr"
+          disabled={!canEdit}
+        />
+        <FormField
+          name="taxNumber"
+          label={t("company.taxNumber")}
+          defaultValue={defaults.taxNumber ?? ""}
+          error={bad("taxNumber")}
+          optionalLabel={tCommon("optional")}
+          inputMode="numeric"
+          placeholder="300000000000003"
+          dir="ltr"
+          disabled={!canEdit}
+        />
+        <FormField
+          name="phone"
+          label={t("company.phone")}
+          defaultValue={defaults.phone ?? ""}
+          error={bad("phone")}
+          optionalLabel={tCommon("optional")}
+          type="tel"
+          inputMode="tel"
+          placeholder="0110000000"
+          dir="ltr"
+          disabled={!canEdit}
+        />
+        <FormField
+          name="email"
+          label={t("company.email")}
+          defaultValue={defaults.email ?? ""}
+          error={bad("email")}
+          optionalLabel={tCommon("optional")}
+          type="email"
+          inputMode="email"
+          placeholder="info@company.sa"
+          dir="ltr"
+          disabled={!canEdit}
+        />
+        <FormField
+          name="address"
+          label={t("company.address")}
+          defaultValue={defaults.address ?? ""}
+          error={bad("address")}
+          optionalLabel={tCommon("optional")}
+          placeholder="الرياض، حي الملز..."
           disabled={!canEdit}
         />
       </FormSection>

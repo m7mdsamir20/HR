@@ -68,28 +68,38 @@ html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 body{margin:0;color:${COLORS.ink};font-size:9.5pt;line-height:1.55}
 body.ar{font-family:'Plex','InterEmbedded',sans-serif}
 body.en{font-family:'InterEmbedded','Plex',sans-serif}
-.doc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding-bottom:10px;border-bottom:3px solid ${COLORS.indigo};margin-bottom:16px}
-.brand{display:flex;gap:12px;align-items:center;min-width:0}
-.brand img{width:52px;height:52px;object-fit:contain;border:1px solid ${COLORS.line};border-radius:8px;padding:3px;background:#fff}
-.brand .name{font-size:13pt;font-weight:600}
-.brand .legal{color:${COLORS.soft};font-size:8.5pt}
-.doc-meta{text-align:end;flex-shrink:0}
-.doc-meta .title{font-size:14pt;font-weight:600;color:${COLORS.indigo}}
-.doc-meta .line{color:${COLORS.soft};font-size:8.5pt}
-h2{display:flex;align-items:center;gap:8px;font-size:11pt;font-weight:600;margin:16px 0 8px;break-after:avoid}
-h2::before{content:"";width:4px;height:14px;background:${COLORS.indigo};border-radius:2px}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid ${COLORS.line};border-radius:8px;overflow:hidden}
-.grid3 .cell{padding:7px 10px;border-bottom:1px solid ${COLORS.line};border-inline-end:1px solid ${COLORS.line}}
-.grid3 .cell .k{color:${COLORS.soft};font-size:8pt}
-.grid3 .cell .v{font-weight:600}
+.doc-head{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-bottom:12px;border-bottom:2.5px solid ${COLORS.indigo};margin-bottom:16px}
+.brand-info{flex:1.1;text-align:start;min-width:0}
+.brand-info .company-name{font-size:12.5pt;font-weight:700;color:${COLORS.ink};margin-bottom:2px}
+.brand-info .company-meta{color:${COLORS.soft};font-size:7.8pt;line-height:1.35}
+.doc-meta-center{flex:1.1;text-align:center}
+.doc-meta-center .doc-title{font-size:13.5pt;font-weight:700;color:${COLORS.indigo};margin-bottom:3px}
+.doc-meta-center .doc-sub{color:${COLORS.soft};font-size:8pt;line-height:1.4}
+.brand-logo{flex:1.1;display:flex;justify-content:flex-end;align-items:center}
+.brand-logo img{max-width:80px;max-height:80px;object-fit:contain;border:1px solid ${COLORS.line};border-radius:8px;padding:4px;background:#fff}
+.emp-hero{display:flex;justify-content:space-between;align-items:center;background:${COLORS.paper};border:1px solid ${COLORS.line};border-radius:8px;padding:10px 14px;margin-bottom:12px;break-inside:avoid}
+.emp-hero-main{display:flex;flex-direction:column;gap:3px}
+.emp-hero .emp-name{font-size:14pt;font-weight:700;color:${COLORS.ink}}
+.emp-hero .emp-subtitle{display:flex;align-items:center;gap:6px;font-size:8.8pt;color:${COLORS.soft}}
+.emp-hero .emp-job{font-weight:600;color:${COLORS.indigo}}
+.emp-hero .emp-dot{color:${COLORS.line}}
+.emp-hero-badges{display:flex;align-items:center;gap:8px}
+.emp-code{font-family:'InterEmbedded',monospace;font-size:8.8pt;font-weight:700;background:#fff;border:1px solid ${COLORS.line};border-radius:6px;padding:2px 8px;color:${COLORS.ink}}
+h2{display:flex;align-items:center;gap:8px;font-size:10.5pt;font-weight:700;margin:14px 0 6px;color:${COLORS.indigo};break-after:avoid}
+h2::before{content:"";width:4px;height:13px;background:${COLORS.indigo};border-radius:2px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid ${COLORS.line};border-radius:8px;overflow:hidden;background:#fff}
+.grid3 .cell{padding:6px 10px;border-bottom:1px solid ${COLORS.line};border-inline-end:1px solid ${COLORS.line}}
+.grid3 .cell .k{color:${COLORS.soft};font-size:7.5pt;margin-bottom:1px}
+.grid3 .cell .v{font-weight:600;font-size:8.8pt;color:${COLORS.ink}}
 .grid3 .cell.wide{grid-column:span 3}
 .card{border:1px solid ${COLORS.line};border-radius:8px;padding:10px 12px;break-inside:avoid;margin-bottom:10px}
 .card .round{display:flex;justify-content:space-between;color:${COLORS.soft};font-size:8.5pt;margin-bottom:4px}
 .card p{margin:3px 0;white-space:pre-line}
-table{width:100%;border-collapse:collapse;border:1px solid ${COLORS.line};border-radius:8px;overflow:hidden}
-th{background:${COLORS.paper};color:${COLORS.soft};font-weight:600;font-size:8.5pt;text-align:start;padding:6px 8px;border-bottom:1px solid ${COLORS.line}}
-td{padding:6px 8px;border-bottom:1px solid ${COLORS.line};vertical-align:top}
+table{width:100%;border-collapse:collapse;border:1px solid ${COLORS.line};border-radius:8px;overflow:hidden;background:#fff;font-size:8.8pt}
+th{background:${COLORS.paper};color:${COLORS.soft};font-weight:600;font-size:8pt;text-align:start;padding:6px 9px;border-bottom:1px solid ${COLORS.line}}
+td{padding:6px 9px;border-bottom:1px solid ${COLORS.line};vertical-align:middle}
 tr{break-inside:avoid}
+tr.total-row td{background:#f0f4fc;font-weight:700;color:${COLORS.indigo}}
 .pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:1px 9px;font-size:8.5pt;font-weight:600;white-space:nowrap}
 .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
 .pill.stamp{background:#1f7a5518;color:${COLORS.stamp}}
@@ -110,18 +120,28 @@ tr{break-inside:avoid}
 a{color:${COLORS.indigo};text-decoration:none;word-break:break-all}
 `;
 
-export type Brand = { name: string; legal: string | null; logoDataUri: string | null };
+export type Brand = {
+  name: string;
+  legal?: string | null;
+  commercialReg?: string | null;
+  taxNumber?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  address?: string | null;
+  logoDataUri: string | null;
+};
 
 /** The page shell: fonts, styles, header. `body` is the document's own sections. */
 export function documentHtml(opts: {
   locale: Locale;
   brand: Brand;
   title: string;
-  numberLabel: string;
-  number: string;
+  numberLabel?: string;
+  number?: string;
   issuedLabel: string;
   issued: string;
   body: string;
+  hideNumber?: boolean;
 }): string {
   const { locale, brand } = opts;
   return `<!doctype html>
@@ -129,14 +149,21 @@ export function documentHtml(opts: {
 <head><meta charset="utf-8"><title>${esc(opts.title)}</title><style>${fontCss()}${CSS}</style></head>
 <body class="${locale}">
   <header class="doc-head">
-    <div class="brand">
-      ${brand.logoDataUri ? `<img src="${esc(brand.logoDataUri)}" alt="">` : ""}
-      <div><div class="name">${txt(brand.name)}</div>${brand.legal ? `<div class="legal">${txt(brand.legal)}</div>` : ""}</div>
+    <div class="brand-info">
+      <div class="company-name">${txt(brand.name)}</div>
+      ${brand.commercialReg ? `<div class="company-meta">${txt(brand.commercialReg)}</div>` : brand.legal ? `<div class="company-meta">${txt(brand.legal)}</div>` : ""}
+      ${brand.taxNumber ? `<div class="company-meta">${txt(brand.taxNumber)}</div>` : ""}
+      ${brand.phone ? `<div class="company-meta">${txt(brand.phone)}</div>` : ""}
+      ${brand.email ? `<div class="company-meta">${txt(brand.email)}</div>` : ""}
+      ${brand.address ? `<div class="company-meta">${txt(brand.address)}</div>` : ""}
     </div>
-    <div class="doc-meta">
-      <div class="title">${esc(opts.title)}</div>
-      <div class="line">${esc(opts.numberLabel)}: ${ltr(opts.number)}</div>
-      <div class="line">${esc(opts.issuedLabel)}: ${opts.issued}</div>
+    <div class="doc-meta-center">
+      <div class="doc-title">${esc(opts.title)}</div>
+      ${!opts.hideNumber && opts.number && opts.numberLabel ? `<div class="doc-sub">${esc(opts.numberLabel)}: ${ltr(opts.number)}</div>` : ""}
+      <div class="doc-sub">${esc(opts.issuedLabel)}: ${opts.issued}</div>
+    </div>
+    <div class="brand-logo">
+      ${brand.logoDataUri ? `<img src="${esc(brand.logoDataUri)}" alt="">` : ""}
     </div>
   </header>
   ${opts.body}

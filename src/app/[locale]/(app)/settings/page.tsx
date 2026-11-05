@@ -15,7 +15,7 @@ export default async function SettingsPage({ params }: PageProps<"/[locale]/sett
   const supabase = await createClient();
   const { data: company } = await supabase
     .from("companies")
-    .select("name_ar, name_en, commercial_reg, logo_path")
+    .select("name_ar, name_en, commercial_reg, tax_number, phone, email, address, logo_path")
     .eq("id", member.company.id)
     .single();
   const logoUrl = await signedUrl(company?.logo_path ?? null, 600);
@@ -36,6 +36,10 @@ export default async function SettingsPage({ params }: PageProps<"/[locale]/sett
               nameAr: company.name_ar,
               nameEn: company.name_en ?? "",
               commercialReg: company.commercial_reg ?? "",
+              taxNumber: company.tax_number ?? "",
+              phone: company.phone ?? "",
+              email: company.email ?? "",
+              address: company.address ?? "",
             }}
             canEdit={isOwner}
           />

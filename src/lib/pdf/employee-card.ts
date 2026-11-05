@@ -20,7 +20,7 @@ export async function buildEmployeeCardPdf(locale: Locale, member: Member, emplo
     supabase
       .from("employees")
       .select(
-        "id, national_id, full_name_ar, full_name_en, phone, email, employee_number, job_title, occupation, role, status, nationality, gender, birth_date, marital_status, hire_date, contract_type, contract_start, contract_end, probation_days, department:departments(name_ar, name_en), manager:manager_id(full_name_ar, full_name_en)",
+        "id, national_id, id_type, full_name_ar, full_name_en, phone, email, employee_number, job_title, occupation, role, status, nationality, gender, birth_date, marital_status, hire_date, contract_type, contract_start, contract_end, probation_days, department:departments(name_ar, name_en), manager:manager_id(full_name_ar, full_name_en)",
       )
       .eq("id", employeeId)
       .neq("status", "deleted")
@@ -32,7 +32,6 @@ export async function buildEmployeeCardPdf(locale: Locale, member: Member, emplo
 
   const te = await getTranslations({ locale, namespace: "employees" });
   const td = await getTranslations({ locale, namespace: "documents" });
-  const tr = await getTranslations({ locale, namespace: "roles" });
   const tp = await getTranslations({ locale, namespace: "pdf" });
   const manager = one(e.manager);
   const date = (d: string | null) => (d ? dt(formatDate(locale, d)) : "—");
@@ -51,16 +50,32 @@ export async function buildEmployeeCardPdf(locale: Locale, member: Member, emplo
     : [];
   const total = payRows.reduce((sum, [, v]) => sum + Number(v), 0);
 
+  const deptName = e.department ? localName(locale, e.department.name_ar, e.department.name_en) : null;
+  const managerName = manager ? localName(locale, manager.full_name_ar, manager.full_name_en) : null;
+  const idTypeName = e.id_type === "citizen" ? te("form.idTypeCitizen") : te("form.idTypeResident");
+
   const body = `
-    <div class="card" style="margin-bottom:6px">
-      <strong style="font-size:13pt">${txt(localName(locale, e.full_name_ar, e.full_name_en))}</strong>
-      ${pill(status === "active" ? "stamp" : "brick", te(`status.${status}`))}
-      <div class="muted">${esc(tr(e.role))}${e.job_title ? ` · ${esc(e.job_title)}` : ""}</div>
+    <!-- Hero / Main Identification Banner (NO "موظف", clean Job Title & Department) -->
+    <div class="emp-hero">
+      <div class="emp-hero-main">
+        <div class="emp-name">${txt(localName(locale, e.full_name_ar, e.full_name_en))}</div>
+        <div class="emp-subtitle">
+          ${e.job_title ? `<span class="emp-job">${esc(e.job_title)}</span>` : ""}
+          ${e.occupation && e.occupation !== e.job_title ? `<span>(${esc(e.occupation)})</span>` : ""}
+          ${deptName ? `<span class="emp-dot">·</span><span>${txt(deptName)}</span>` : ""}
+        </div>
+      </div>
+      <div class="emp-hero-badges">
+        <span class="emp-code">${ltr(number)}</span>
+        ${pill(status === "active" ? "stamp" : "brick", te(`status.${status}`))}
+      </div>
     </div>
 
+    <!-- 1. Personal & Identity Information -->
     <h2>${esc(te("form.sections.identity"))}</h2>
     ${grid([
       { label: te("columns.nationalId"), value: ltr(e.national_id) },
+      { label: te("form.idType"), value: esc(idTypeName) },
       { label: te("form.nationality"), value: txt(nationalityName(locale, e.nationality)) },
       { label: te("form.gender"), value: e.gender ? esc(te(`options.gender.${e.gender as "male"}`)) : "—" },
       { label: te("form.birthDate"), value: date(e.birth_date) },
@@ -69,29 +84,33 @@ export async function buildEmployeeCardPdf(locale: Locale, member: Member, emplo
       { label: te("form.email"), value: e.email ? ltr(e.email) : "—" },
     ])}
 
+    <!-- 2. Work & Employment Information -->
     <h2>${esc(te("form.sections.work"))}</h2>
     ${grid([
-      { label: te("form.employeeNumber"), value: e.employee_number ? ltr(e.employee_number) : "—" },
-      { label: te("columns.department"), value: e.department ? txt(localName(locale, e.department.name_ar, e.department.name_en)) : "—" },
-      { label: te("columns.manager"), value: manager ? txt(localName(locale, manager.full_name_ar, manager.full_name_en)) : "—" },
+      { label: te("columns.code"), value: ltr(number) },
+      { label: te("form.jobTitle"), value: e.job_title ? esc(e.job_title) : "—" },
       { label: te("form.occupation"), value: txt(e.occupation) },
+      { label: te("columns.department"), value: deptName ? txt(deptName) : "—" },
+      { label: te("form.directManager"), value: managerName ? txt(managerName) : "—" },
       { label: te("form.hireDate"), value: date(e.hire_date) },
     ])}
 
+    <!-- 3. Contract Details -->
     <h2>${esc(te("form.sections.contract"))}</h2>
     ${grid([
       { label: te("form.contractType"), value: e.contract_type ? esc(te(`options.contractType.${e.contract_type as "fixed"}`)) : "—" },
       { label: te("form.contractStart"), value: date(e.contract_start) },
       { label: te("form.contractEnd"), value: date(e.contract_end) },
-      { label: te("form.probationDays"), value: e.probation_days !== null ? ltr(e.probation_days) : "—" },
+      { label: te("form.probationDays"), value: e.probation_days !== null ? `${ltr(e.probation_days)} ${locale === "ar" ? "يوم" : "days"}` : "—" },
     ])}
 
+    <!-- 4. Pay & Compensation (if authorized) -->
     ${
       pay
         ? `<h2>${esc(te("form.sections.pay"))}</h2>
            <table><tbody>
              ${payRows.map(([k, v]) => `<tr><td>${esc(te(`form.${k}`))}</td><td style="text-align:end">${amount(Number(v))}</td></tr>`).join("")}
-             <tr><td><strong>${esc(te("form.totalSalary"))}</strong></td><td style="text-align:end"><strong>${amount(total)}</strong></td></tr>
+             <tr class="total-row"><td><strong>${esc(te("form.totalSalary"))}</strong></td><td style="text-align:end"><strong>${amount(total)}</strong></td></tr>
            </tbody></table>
            <div style="height:8px"></div>
            ${grid([
@@ -102,6 +121,7 @@ export async function buildEmployeeCardPdf(locale: Locale, member: Member, emplo
         : ""
     }
 
+    <!-- 5. Official Documents -->
     <h2>${esc(td("title"))}</h2>
     ${
       documents.length
@@ -126,12 +146,16 @@ export async function buildEmployeeCardPdf(locale: Locale, member: Member, emplo
     locale,
     brand,
     title: tp("employeeCardTitle"),
-    numberLabel: tp("number"),
-    number,
     issuedLabel: tp("issued"),
     issued: esc(issuedNow(locale)),
+    hideNumber: true,
     body,
   });
-  const pdf = await renderPdf(html, { locale, footerLabel: `${tp("employeeCardTitle")} · ${number}`, pageLabel: tp("page"), ofLabel: tp("of") });
+  const pdf = await renderPdf(html, {
+    locale,
+    footerLabel: tp("employeeCardTitle"),
+    pageLabel: tp("page"),
+    ofLabel: tp("of"),
+  });
   return { pdf, filename: `${number.toLowerCase()}.pdf` };
 }

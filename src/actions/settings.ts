@@ -90,6 +90,13 @@ const companySchema = z.object({
     (v) => (typeof v === "string" ? normalizeNationalId(v) || undefined : v),
     z.string().regex(/^\d{10}$/).optional(),
   ),
+  taxNumber: z.preprocess(
+    (v) => (typeof v === "string" ? normalizeNationalId(v) || undefined : v),
+    z.string().max(30).optional(),
+  ),
+  phone: z.preprocess(blankToUndefined, z.string().max(30).optional()),
+  email: z.preprocess(blankToUndefined, z.string().email().max(200).optional()),
+  address: z.preprocess(blankToUndefined, z.string().max(250).optional()),
 });
 
 export async function updateCompanyProfile(_prev: SettingsState, formData: FormData): Promise<SettingsState> {
@@ -98,6 +105,10 @@ export async function updateCompanyProfile(_prev: SettingsState, formData: FormD
     nameAr: formData.get("nameAr"),
     nameEn: formData.get("nameEn"),
     commercialReg: formData.get("commercialReg"),
+    taxNumber: formData.get("taxNumber"),
+    phone: formData.get("phone"),
+    email: formData.get("email"),
+    address: formData.get("address"),
   });
   if (!parsed.success) return { ok: false, error: "invalid", fields: fieldsOf(parsed.error) };
 
@@ -106,6 +117,10 @@ export async function updateCompanyProfile(_prev: SettingsState, formData: FormD
     p_name_ar: parsed.data.nameAr,
     p_name_en: parsed.data.nameEn ?? "",
     p_commercial_reg: parsed.data.commercialReg ?? "",
+    p_tax_number: parsed.data.taxNumber ?? "",
+    p_phone: parsed.data.phone ?? "",
+    p_email: parsed.data.email ?? "",
+    p_address: parsed.data.address ?? "",
   });
   if (error) return { ok: false, error: toActionError(error, "updateCompanyProfile") };
   refresh();

@@ -460,7 +460,11 @@
       "title": "Company details",
       "nameAr": "Company name (Arabic)",
       "nameEn": "Company name (English)",
-      "commercialReg": "Commercial registration"
+      "commercialReg": "Commercial registration",
+      "taxNumber": "VAT / Tax number",
+      "phone": "Phone / Mobile",
+      "email": "Company email",
+      "address": "Address / National address"
     },
     "logo": {
       "title": "Company logo",

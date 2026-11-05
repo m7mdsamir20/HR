@@ -207,14 +207,14 @@ isOneToOne: false
                   ]
                 },"companies": {
                   Row: {
-                    "commercial_reg": string | null,"created_at": string,"id": string,"logo_path": string | null,"max_employees": number,"name_ar": string,"name_en": string | null,"settings": NonNullable<Json>,"status": Database["public"]['Enums']["company_status"],"subscription_ends_at": string,"updated_at": string
+                    "address": string | null,"commercial_reg": string | null,"created_at": string,"email": string | null,"id": string,"logo_path": string | null,"max_employees": number,"name_ar": string,"name_en": string | null,"phone": string | null,"settings": NonNullable<Json>,"status": Database["public"]['Enums']["company_status"],"subscription_ends_at": string,"tax_number": string | null,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "commercial_reg"?: string | null,"created_at"?: string,"id"?: string,"logo_path"?: string | null,"max_employees": number,"name_ar": string,"name_en"?: string | null,"settings"?: NonNullable<Json>,"status"?: Database["public"]['Enums']["company_status"],"subscription_ends_at": string,"updated_at"?: string
+                    "address"?: string | null,"commercial_reg"?: string | null,"created_at"?: string,"email"?: string | null,"id"?: string,"logo_path"?: string | null,"max_employees": number,"name_ar": string,"name_en"?: string | null,"phone"?: string | null,"settings"?: NonNullable<Json>,"status"?: Database["public"]['Enums']["company_status"],"subscription_ends_at": string,"tax_number"?: string | null,"updated_at"?: string
                   }
                   Update: {
-                    "commercial_reg"?: string | null,"created_at"?: string,"id"?: string,"logo_path"?: string | null,"max_employees"?: number,"name_ar"?: string,"name_en"?: string | null,"settings"?: NonNullable<Json>,"status"?: Database["public"]['Enums']["company_status"],"subscription_ends_at"?: string,"updated_at"?: string
+                    "address"?: string | null,"commercial_reg"?: string | null,"created_at"?: string,"email"?: string | null,"id"?: string,"logo_path"?: string | null,"max_employees"?: number,"name_ar"?: string,"name_en"?: string | null,"phone"?: string | null,"settings"?: NonNullable<Json>,"status"?: Database["public"]['Enums']["company_status"],"subscription_ends_at"?: string,"tax_number"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
                     
@@ -662,6 +662,8 @@ isOneToOne: false
                            },
 "company_update_profile":
 { Args: { "p_commercial_reg": string,"p_name_ar": string,"p_name_en": string }; Returns: undefined
+                           } |
+{ Args: { "p_address"?: string,"p_commercial_reg": string,"p_email"?: string,"p_name_ar": string,"p_name_en": string,"p_phone"?: string,"p_tax_number"?: string }; Returns: undefined
                            },
 "consume_rate_limit":
 { Args: { "p_kind": string }; Returns: undefined

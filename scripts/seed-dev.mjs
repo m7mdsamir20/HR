@@ -16,7 +16,16 @@ if (process.env.VERCEL_ENV === "production" || !/^http:\/\/(127\.0\.0\.1|localho
 // Test accounts for local development only. Same password for all of them.
 const PASSWORD = "Dev-pass-2026";
 const ADMIN = { nationalId: "1000000001", name: "مدير النظام" };
-const COMPANY = { name_ar: "شركة الإنشاءات التجريبية", name_en: "Demo Construction Co.", max_employees: 25 };
+const COMPANY = {
+  name_ar: "شركة الإنشاءات التجريبية",
+  name_en: "Demo Construction Co.",
+  commercial_reg: "1010892341",
+  tax_number: "300098234100003",
+  phone: "0114567890",
+  email: "info@demo-construction.sa",
+  address: "الرياض، حي الملز، طريق صلاح الدين الأيوبي",
+  max_employees: 25,
+};
 const DEPARTMENTS = [
   { key: "ops", name_ar: "التشغيل والصيانة", name_en: "Operations" },
   { key: "admin", name_ar: "الشؤون الإدارية", name_en: "Administration" },
