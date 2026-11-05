@@ -217,7 +217,16 @@ export function EmployeeForm({ mode, action, departments, managers, nationalitie
       <FormSection title={t("form.sections.work")} description={t("form.sections.workHint")}>
         <SelectField name="departmentId" label={t("form.department")} defaultValue={v("departmentId")} error={err("departmentId")} options={[{ value: "", label: t("form.noDepartment") }, ...departments]} />
         <SelectField name="managerId" label={t("form.directManager")} defaultValue={v("managerId")} error={err("managerId")} options={[{ value: "", label: t("form.noDirectManager") }, ...managers]} />
-        <FormField name="employeeNumber" label={t("form.employeeNumber")} defaultValue={v("employeeNumber")} error={err("employeeNumber")} optionalLabel={tCommon("optional")} dir="ltr" />
+        {mode === "edit" && v("employeeNumber") && (
+          <FormField
+            name="employeeNumber"
+            label={t("form.employeeNumber")}
+            defaultValue={v("employeeNumber")}
+            readOnly
+            className="opacity-75 cursor-not-allowed bg-paper"
+            dir="ltr"
+          />
+        )}
         <FormField name="jobTitle" label={t("form.jobTitle")} defaultValue={v("jobTitle")} error={err("jobTitle")} optionalLabel={tCommon("optional")} />
         <FormField name="occupation" label={t("form.occupation")} hint={t("form.occupationHint")} defaultValue={v("occupation")} error={err("occupation")} optionalLabel={tCommon("optional")} />
         <FormField name="hireDate" label={t("form.hireDate")} type="date" defaultValue={v("hireDate")} error={err("hireDate")} dir="ltr" />

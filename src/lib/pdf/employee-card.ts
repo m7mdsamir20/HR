@@ -36,7 +36,7 @@ export async function buildEmployeeCardPdf(locale: Locale, member: Member, emplo
   const tp = await getTranslations({ locale, namespace: "pdf" });
   const manager = one(e.manager);
   const date = (d: string | null) => (d ? dt(formatDate(locale, d)) : "—");
-  const number = `EMP-${(e.employee_number ?? e.id.slice(0, 8)).toUpperCase()}`;
+  const number = e.employee_number ? e.employee_number.toUpperCase() : `EMP-${e.id.slice(0, 8).toUpperCase()}`;
   const status = e.status as "active" | "disabled";
 
   const amount = (v: number) => `${ltr(formatAmount(v))} ${esc(te("form.currency"))}`;

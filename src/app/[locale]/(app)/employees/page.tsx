@@ -1,8 +1,8 @@
 import { Plus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { EmployeeSearchInput } from "@/components/employees/employee-search-input";
 import { StatusPill } from "@/components/status-pill";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -32,18 +32,17 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
   let query = supabase
     .from("employees")
     .select(
-      "id, full_name_ar, full_name_en, national_id, role, status, department:departments(name_ar, name_en), manager:manager_id(full_name_ar, full_name_en)",
+      "id, full_name_ar, full_name_en, national_id, employee_number, role, status, department:departments(name_ar, name_en), manager:manager_id(full_name_ar, full_name_en)",
     )
     .neq("status", "deleted")
-    .neq("id", member.employee_id)
     .order("full_name_ar")
     .limit(500);
   if (filter !== "all") query = query.eq("status", filter);
   if (q) {
     const digits = normalizeNationalId(q);
     query = /^\d+$/.test(digits)
-      ? query.like("national_id", `${digits}%`)
-      : query.or(`full_name_ar.ilike.*${q}*,full_name_en.ilike.*${q}*`);
+      ? query.or(`national_id.like.${digits}*,employee_number.ilike.*${q}*`)
+      : query.or(`full_name_ar.ilike.*${q}*,full_name_en.ilike.*${q}*,employee_number.ilike.*${q}*`);
   }
   const { data, error } = await query;
   if (error) throw new Error("employees query failed");
@@ -52,6 +51,7 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
     const manager = one(e.manager);
     return {
       id: e.id,
+      code: e.employee_number || "—",
       name: localName(locale, e.full_name_ar, e.full_name_en),
       nationalId: e.national_id,
       role: tRoles(e.role),
@@ -77,15 +77,11 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
         )}
       </div>
 
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <form role="search" className="flex w-full max-w-xl gap-2">
-          {filter !== "active" && <input type="hidden" name="status" value={filter} />}
-          <Input name="q" type="search" defaultValue={q} placeholder={t("search")} aria-label={t("search")} />
-          <Button type="submit" variant="outline">
-            {t("searchSubmit")}
-          </Button>
-        </form>
-        <nav aria-label={t("filter.label")} className="flex gap-1 rounded-control border border-line bg-surface p-1">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="flex-1 min-w-0">
+          <EmployeeSearchInput placeholder={t("search")} />
+        </div>
+        <nav aria-label={t("filter.label")} className="shrink-0 flex gap-1 rounded-control border border-line bg-surface p-1">
           {FILTERS.map((f) => (
             <Link
               key={f}
@@ -122,7 +118,14 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
                   className="flex flex-col gap-1.5 rounded-card border border-line bg-surface p-4 focus-visible:outline-2 focus-visible:outline-indigo"
                 >
                   <span className="flex items-start justify-between gap-3">
-                    <span className="font-semibold">{r.name}</span>
+                    <span className="flex items-center gap-2">
+                      <span className="font-semibold">{r.name}</span>
+                      {r.code !== "—" && (
+                        <span className="font-mono text-2xs font-semibold px-1.5 py-0.5 rounded-[4px] bg-paper text-ink border border-line">
+                          {r.code}
+                        </span>
+                      )}
+                    </span>
                     {r.status === "disabled" && <StatusPill tone="brick">{t("status.disabled")}</StatusPill>}
                   </span>
                   <span className="text-secondary">
@@ -140,7 +143,7 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
             <Table>
               <TableHeader>
                 <TableRow>
-                  {(["name", "nationalId", "role", "department", "manager", "status"] as const).map((c) => (
+                  {(["code", "name", "nationalId", "role", "department", "manager", "status"] as const).map((c) => (
                     <TableHead key={c} className="text-start">
                       {t(`columns.${c}`)}
                     </TableHead>
@@ -150,6 +153,11 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
               <TableBody>
                 {rows.map((r) => (
                   <TableRow key={r.id}>
+                    <TableCell className="font-mono text-xs font-semibold text-ink">
+                      <span className="inline-block px-2 py-0.5 rounded-[6px] bg-paper border border-line">
+                        {r.code}
+                      </span>
+                    </TableCell>
                     <TableCell>
                       <Link href={`/employees/${r.id}`} className="font-semibold text-indigo hover:underline">
                         {r.name}

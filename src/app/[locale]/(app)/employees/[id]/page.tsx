@@ -61,6 +61,11 @@ export default async function EmployeePage({ params }: PageProps<"/[locale]/empl
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-page">{name}</h1>
           <StatusPill tone={status === "active" ? "stamp" : "brick"}>{t(`status.${status}`)}</StatusPill>
+          {e.employee_number && (
+            <span className="font-mono text-xs font-semibold px-2.5 py-1 rounded-[6px] bg-paper text-ink border border-line">
+              {e.employee_number}
+            </span>
+          )}
           {canManage && (
             <Button asChild className="ms-auto">
               <a href={`${locale === "en" ? "/en" : ""}/employees/${e.id}/pdf`} target="_blank" rel="noopener">

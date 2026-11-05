@@ -285,11 +285,12 @@
     "noResults": "No matching results.",
     "count": "{count} employees",
     "columns": {
+      "code": "Employee Code",
       "name": "Name",
       "nationalId": "ID number",
       "role": "Role",
       "department": "Department",
-      "manager": "Supervisor",
+      "manager": "Direct Manager",
       "status": "Status"
     },
     "status": {

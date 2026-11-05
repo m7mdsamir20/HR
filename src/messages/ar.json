@@ -285,11 +285,12 @@
     "noResults": "لا توجد نتائج مطابقة.",
     "count": "{count} موظف",
     "columns": {
+      "code": "كود الموظف",
       "name": "الاسم",
       "nationalId": "رقم الهوية",
       "role": "الدور",
       "department": "القسم",
-      "manager": "المشرف",
+      "manager": "المدير المباشر",
       "status": "الحالة"
     },
     "status": {
