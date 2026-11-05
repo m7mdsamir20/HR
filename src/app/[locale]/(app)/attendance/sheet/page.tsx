@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { AttendanceDetail } from "@/components/attendance/attendance-detail";
 import { AttendanceTabs } from "@/components/attendance/attendance-tabs";
+import { ManualAttendanceDialog } from "@/components/attendance/manual-attendance-dialog";
 import { MonthNav } from "@/components/attendance/month-nav";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -23,7 +24,7 @@ export default async function AttendanceSheetPage({ params, searchParams }: Page
   const month = monthParam(query.month);
   const today = todayInRiyadh();
   const { from, to } = monthRange(month);
-  const canCorrect = member.role === "owner" || member.role === "hr";
+  const canCorrect = member.role === "owner" || member.role === "admin" || member.role === "hr";
 
   const supabase = await createClient();
   // Row level security scopes both: owner / HR see the company, a manager sees the direct team.
@@ -33,7 +34,6 @@ export default async function AttendanceSheetPage({ params, searchParams }: Page
       .select("id, full_name_ar, full_name_en, employee_number, shift_id")
       .eq("status", "active")
       .neq("role", "owner")
-      .not("shift_id", "is", null)
       .order("full_name_ar"),
     supabase.from("attendance_records").select(RECORD_COLUMNS).gte("work_date", from).lte("work_date", to).order("work_date", { ascending: false }),
     supabase.from("leave_requests").select("id, employee_id, type, start_date, end_date").eq("status", "approved").lte("start_date", to).gte("end_date", from),
@@ -65,7 +65,16 @@ export default async function AttendanceSheetPage({ params, searchParams }: Page
             </Button>
             <h2 className="text-section">{nameOf(selected)}</h2>
           </div>
-          <MonthNav pathname="/attendance/sheet" month={month} query={{ employee: selected.id }} latest={today.slice(0, 7)} />
+          <div className="flex flex-wrap items-center gap-3">
+            {canCorrect && (
+              <ManualAttendanceDialog
+                employees={employees ?? []}
+                today={today}
+                defaultEmployeeId={selected.id}
+              />
+            )}
+            <MonthNav pathname="/attendance/sheet" month={month} query={{ employee: selected.id }} latest={today.slice(0, 7)} />
+          </div>
         </div>
         <AttendanceDetail employeeId={selected.id} days={days} canCorrect={canCorrect} today={today} />
       </main>
@@ -101,12 +110,15 @@ export default async function AttendanceSheetPage({ params, searchParams }: Page
         <p className="text-secondary">{t("sheet.intro")}</p>
         <div className="flex flex-wrap items-center gap-3">
           {canCorrect && (
-            <Button asChild variant="secondary">
-              <a href={`/${locale === "en" ? "en/" : ""}attendance/sheet/pdf?month=${month}`} target="_blank" rel="noopener noreferrer">
-                <FileText aria-hidden />
-                {t("sheet.pdf")}
-              </a>
-            </Button>
+            <>
+              <ManualAttendanceDialog employees={employees ?? []} today={today} />
+              <Button asChild variant="secondary">
+                <a href={`/${locale === "en" ? "en/" : ""}attendance/sheet/pdf?month=${month}`} target="_blank" rel="noopener noreferrer">
+                  <FileText aria-hidden />
+                  {t("sheet.pdf")}
+                </a>
+              </Button>
+            </>
           )}
           <MonthNav pathname="/attendance/sheet" month={month} latest={today.slice(0, 7)} />
         </div>

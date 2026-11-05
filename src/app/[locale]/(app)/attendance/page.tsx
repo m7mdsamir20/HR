@@ -3,6 +3,7 @@ import { AttendanceTabs } from "@/components/attendance/attendance-tabs";
 import { CheckInPanel, type PanelState } from "@/components/attendance/check-in-panel";
 import { DayRows } from "@/components/attendance/day-rows";
 import { MonthNav } from "@/components/attendance/month-nav";
+import { redirect } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { requireMember } from "@/lib/auth/account";
 import { hhmm, monthRange } from "@/lib/attendance";
@@ -23,6 +24,9 @@ function addHours(time: string, hours: number): string {
 export default async function AttendancePage({ params, searchParams }: PageProps<"/[locale]/attendance">) {
   const locale = (await params).locale as Locale;
   const member = await requireMember(locale);
+  if (member.role === "owner") {
+    redirect({ href: "/attendance/sheet", locale });
+  }
   const t = await getTranslations({ locale, namespace: "attendance" });
   const month = monthParam((await searchParams).month);
   const today = todayInRiyadh();

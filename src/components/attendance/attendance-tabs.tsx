@@ -5,14 +5,14 @@ import { Link, usePathname } from "@/i18n/navigation";
 import type { Role } from "@/lib/auth/roles";
 import { cn } from "@/lib/utils";
 
-/** The attendance module's own sections: my day for everyone, the sheet for whoever reviews, deductions for owner / HR. */
+/** The attendance module's own sections: my day for employees/managers, the sheet for whoever reviews, deductions for owner / admin / HR. */
 export function AttendanceTabs({ role }: { role: Role }) {
   const t = useTranslations("attendance.tabs");
   const pathname = usePathname();
   const tabs = [
-    { href: "/attendance", key: "mine" as const, show: true },
+    { href: "/attendance", key: "mine" as const, show: role !== "owner" },
     { href: "/attendance/sheet", key: "sheet" as const, show: role !== "employee" },
-    { href: "/attendance/deductions", key: "deductions" as const, show: role === "owner" || role === "hr" },
+    { href: "/attendance/deductions", key: "deductions" as const, show: role === "owner" || role === "admin" || role === "hr" },
   ].filter((x) => x.show);
   if (tabs.length < 2) return null;
 

@@ -945,6 +945,23 @@
       "flagged": "To review",
       "leave": "Leave"
     },
+    "manualEntry": {
+      "button": "Record attendance for employee",
+      "title": "Manual Attendance Entry",
+      "intro": "Record check-in and check-out times or mark an absence manually for an employee.",
+      "employee": "Employee",
+      "selectEmployee": "Select employee...",
+      "date": "Date",
+      "checkIn": "Arrival time",
+      "checkOut": "Departure time",
+      "absent": "Mark as absent (did not attend)",
+      "note": "Note / reason",
+      "noteDefault": "Manual entry by management",
+      "cancel": "Cancel",
+      "submit": "Save attendance",
+      "submitting": "Saving...",
+      "success": "Attendance recorded successfully."
+    },
     "correct": {
       "title": "Record or fix a day",
       "intro": "For days the employee forgot to check in or that were recorded wrongly. The change goes in the audit log.",
