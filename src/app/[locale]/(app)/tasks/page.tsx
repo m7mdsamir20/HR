@@ -1,19 +1,21 @@
-import { Plus } from "lucide-react";
+import { Calendar, Plus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { StatusPill } from "@/components/status-pill";
 import { TaskCard, type TaskRow } from "@/components/tasks/task-card";
+import { TaskDateFilter } from "@/components/tasks/task-date-filter";
+import { TaskSearchInput } from "@/components/tasks/task-search-input";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { requireMember } from "@/lib/auth/account";
+import { addDays, daysBetween, formatDayFull, todayInRiyadh } from "@/lib/format";
 import { loadNames } from "@/lib/task-data";
-import { dueGroup, type DueGroup, type Priority, type TaskStatus } from "@/lib/tasks";
+import { isOverdue, type Priority, type TaskStatus } from "@/lib/tasks";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
 const FILTERS = ["all", "open", "review", "mine"] as const;
 type Filter = (typeof FILTERS)[number];
-const GROUP_ORDER: DueGroup[] = ["overdue", "today", "tomorrow", "later", "done"];
 const cleanSearch = (q: string) => q.replace(/[,()*%\\:"'.]/g, " ").trim().slice(0, 60);
 
 export default async function TasksPage({ params, searchParams }: PageProps<"/[locale]/tasks">) {
@@ -25,6 +27,10 @@ export default async function TasksPage({ params, searchParams }: PageProps<"/[l
   const filters = manages ? FILTERS : (["all", "open"] as const);
   const filter: Filter = (filters as readonly string[]).includes(String(sp.status)) ? (sp.status as Filter) : "all";
   const q = cleanSearch(typeof sp.q === "string" ? sp.q : "");
+  const dateParam = typeof sp.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(sp.date) ? sp.date : "";
+
+  const today = todayInRiyadh();
+  const tomorrow = addDays(today, 1);
 
   // RLS decides the rows: an employee's own tasks; an owner everything; a manager their team's.
   const supabase = await createClient();
@@ -37,6 +43,8 @@ export default async function TasksPage({ params, searchParams }: PageProps<"/[l
   if (filter === "review") query = query.eq("status", "submitted");
   if (filter === "mine") query = query.eq("assignee_id", member.employee_id);
   if (q) query = query.ilike("title", `%${q}%`);
+  if (dateParam) query = query.eq("due_date", dateParam);
+
   const { data, error } = await query;
   if (error) throw new Error("tasks query failed");
 
@@ -51,9 +59,30 @@ export default async function TasksPage({ params, searchParams }: PageProps<"/[l
     assignee: names.get(r.assignee_id) ?? null,
   }));
 
-  const groups = GROUP_ORDER.map((g) => ({ group: g, items: rows.filter((r) => dueGroup(r.status, r.dueDate) === g) })).filter((g) => g.items.length > 0);
+  // Group tasks by their actual due date
+  const dateMap = new Map<string, TaskRow[]>();
+  const noDueDateTasks: TaskRow[] = [];
+
+  for (const r of rows) {
+    if (r.dueDate) {
+      const list = dateMap.get(r.dueDate) ?? [];
+      list.push(r);
+      dateMap.set(r.dueDate, list);
+    } else {
+      noDueDateTasks.push(r);
+    }
+  }
+
+  const sortedDates = Array.from(dateMap.keys()).sort();
   const title = manages ? t("title") : t("myTitle");
-  const filterHref = (f: Filter) => ({ pathname: "/tasks", query: { ...(q ? { q } : {}), ...(f !== "all" ? { status: f } : {}) } });
+  const filterHref = (f: Filter) => ({
+    pathname: "/tasks",
+    query: {
+      ...(q ? { q } : {}),
+      ...(dateParam ? { date: dateParam } : {}),
+      ...(f !== "all" ? { status: f } : {}),
+    },
+  });
 
   return (
     <main className="flex flex-col gap-6">
@@ -69,15 +98,12 @@ export default async function TasksPage({ params, searchParams }: PageProps<"/[l
         )}
       </div>
 
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <form role="search" className="flex w-full max-w-xl gap-2">
-          {filter !== "all" && <input type="hidden" name="status" value={filter} />}
-          <Input name="q" type="search" defaultValue={q} placeholder={t("search")} aria-label={t("search")} />
-          <Button type="submit" variant="outline">
-            {t("searchSubmit")}
-          </Button>
-        </form>
-        <nav aria-label={t("filter.label")} className="flex gap-1 overflow-x-auto rounded-control border border-line bg-surface p-1">
+      {/* Top Search bar extending to the filter nav */}
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+        <div className="flex-1 min-w-0">
+          <TaskSearchInput placeholder={t("search")} />
+        </div>
+        <nav aria-label={t("filter.label")} className="shrink-0 flex gap-1 overflow-x-auto rounded-control border border-line bg-surface p-1">
           {filters.map((f) => (
             <Link
               key={f}
@@ -94,31 +120,92 @@ export default async function TasksPage({ params, searchParams }: PageProps<"/[l
         </nav>
       </div>
 
+      {/* Date Filter Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
+        <TaskDateFilter
+          todayStr={today}
+          tomorrowStr={tomorrow}
+          labels={{
+            all: t("dateFilter.all"),
+            today: t("dateFilter.today"),
+            tomorrow: t("dateFilter.tomorrow"),
+            pickDate: t("dateFilter.pickDate"),
+            clear: t("dateFilter.clear"),
+          }}
+        />
+
+        {dateParam && (
+          <div className="flex items-center gap-2 text-label text-indigo bg-indigo/10 px-3 py-1.5 rounded-[6px]">
+            <Calendar className="size-4" aria-hidden />
+            <span>{t("dateFilter.showingDate", { date: formatDayFull(locale, dateParam) })}</span>
+          </div>
+        )}
+      </div>
+
       {rows.length === 0 ? (
         <div className="flex flex-col items-start gap-4 rounded-card border border-dashed border-line bg-surface p-6">
-          <p>{q || filter !== "all" ? t("noResults") : manages ? t("empty") : t("emptyMine")}</p>
-          {manages && !q && filter === "all" && (
+          <p>{q || dateParam || filter !== "all" ? t("noResults") : manages ? t("empty") : t("emptyMine")}</p>
+          {manages && !q && !dateParam && filter === "all" && (
             <Button asChild variant="outline">
               <Link href="/tasks/new">{t("add")}</Link>
             </Button>
           )}
         </div>
       ) : (
-        <div className="flex flex-col gap-6">
-          {groups.map(({ group, items }) => (
-            <section key={group} aria-labelledby={`g-${group}`} className="flex flex-col gap-3">
-              <h2 id={`g-${group}`} className={cn("text-label", group === "overdue" ? "text-brick" : "text-ink-soft")}>
-                {t(`groups.${group}`)} <span className="tabular-nums">({items.length})</span>
-              </h2>
+        <div className="flex flex-col gap-8">
+          {sortedDates.map((dateStr) => {
+            const items = dateMap.get(dateStr)!;
+            const isDateToday = dateStr === today;
+            const daysDiff = daysBetween(today, dateStr);
+            const isDateTomorrow = daysDiff === 1;
+            const hasOverdue = items.some((it) => isOverdue(it.status, it.dueDate, today));
+
+            return (
+              <section key={dateStr} aria-labelledby={`date-${dateStr}`} className="flex flex-col gap-3">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <div className="flex size-7 items-center justify-center rounded-[6px] bg-paper text-ink-soft">
+                    <Calendar className="size-4" aria-hidden />
+                  </div>
+                  <h2 id={`date-${dateStr}`} className="text-card font-semibold text-ink">
+                    {formatDayFull(locale, dateStr)}
+                  </h2>
+                  {isDateToday && <StatusPill tone="stamp">{t("dateFilter.today")}</StatusPill>}
+                  {isDateTomorrow && <StatusPill tone="indigo">{t("dateFilter.tomorrow")}</StatusPill>}
+                  {hasOverdue && !isDateToday && <StatusPill tone="brick">{t("overdue")}</StatusPill>}
+                  <span className="text-caption text-secondary">
+                    ({t("tasksCount", { count: items.length })})
+                  </span>
+                </div>
+                <ul className="grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
+                  {items.map((task) => (
+                    <li key={task.id}>
+                      <TaskCard task={task} locale={locale} showAssignee={manages} />
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            );
+          })}
+
+          {noDueDateTasks.length > 0 && (
+            <section aria-labelledby="date-none" className="flex flex-col gap-3">
+              <div className="flex items-center gap-2">
+                <h2 id="date-none" className="text-card font-semibold text-secondary">
+                  {t("noDueDate")}
+                </h2>
+                <span className="text-caption text-secondary">
+                  ({t("tasksCount", { count: noDueDateTasks.length })})
+                </span>
+              </div>
               <ul className="grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
-                {items.map((task) => (
+                {noDueDateTasks.map((task) => (
                   <li key={task.id}>
                     <TaskCard task={task} locale={locale} showAssignee={manages} />
                   </li>
                 ))}
               </ul>
             </section>
-          ))}
+          )}
         </div>
       )}
     </main>

@@ -28,6 +28,13 @@ export function daysBetween(from: string, to: string): number {
   return Math.round((Date.parse(to) - Date.parse(from)) / 86_400_000);
 }
 
+/** Pure day offset for YYYY-MM-DD strings. */
+export function addDays(isoDate: string, days: number): string {
+  const d = new Date(isoDate);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
 /** "08:15" in Riyadh for a timestamp (24-hour, Latin digits). */
 export function formatTime(locale: Locale, isoTimestamp: string): string {
   return new Intl.DateTimeFormat(intlLocale(locale), { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "Asia/Riyadh" }).format(
@@ -38,6 +45,17 @@ export function formatTime(locale: Locale, isoTimestamp: string): string {
 /** "الأحد 3 نوفمبر" for a date-only ISO string. */
 export function formatDayShort(locale: Locale, isoDate: string): string {
   return new Intl.DateTimeFormat(intlLocale(locale), { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(isoDate));
+}
+
+/** "الخميس، 5 نوفمبر 2026" / "Thursday, 5 November 2026" for a date-only ISO string. */
+export function formatDayFull(locale: Locale, isoDate: string): string {
+  return new Intl.DateTimeFormat(intlLocale(locale), {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(isoDate));
 }
 
 /** "نوفمبر 2026" for a YYYY-MM month. */

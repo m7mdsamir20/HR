@@ -592,6 +592,17 @@
       "all": "All",
       "mine": "Assigned to me"
     },
+    "dateFilter": {
+      "all": "All dates",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "pickDate": "Pick date",
+      "clear": "Clear filter",
+      "filterByDate": "Filter by date",
+      "showingDate": "Tasks for: {date}"
+    },
+    "noDueDate": "No due date specified",
+    "tasksCount": "{count, plural, one {# task} other {# tasks}}",
     "groups": {
       "overdue": "Overdue",
       "today": "Today",

@@ -593,6 +593,17 @@
       "all": "الكل",
       "mine": "مهامي أنا"
     },
+    "dateFilter": {
+      "all": "جميع التواريخ",
+      "today": "اليوم",
+      "tomorrow": "غداً",
+      "pickDate": "تحديد تاريخ",
+      "clear": "إلغاء التصفية",
+      "filterByDate": "تصفية حسب التاريخ",
+      "showingDate": "مهام تاريخ: {date}"
+    },
+    "noDueDate": "بدون موعد إنجاز محدد",
+    "tasksCount": "{count, plural, one {# مهمة} two {# مهمتان} few {# مهام} other {# مهمة}}",
     "groups": {
       "overdue": "متأخرة",
       "today": "اليوم",
