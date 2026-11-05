@@ -105,7 +105,6 @@ export function EmployeeForm({ mode, action, departments, managers, nationalitie
           <FormField
             name="nationalId"
             label={idType === "citizen" ? t("form.citizenNationalId") : t("form.residentNationalId")}
-            hint={idType === "citizen" ? t("form.citizenNationalIdHint") : t("form.residentNationalIdHint")}
             defaultValue={v("nationalId")}
             error={err("nationalId")}
             required
