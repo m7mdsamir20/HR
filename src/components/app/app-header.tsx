@@ -21,29 +21,24 @@ export function AppHeader({ name, role, companyName, logo, unread }: AppHeaderPr
 
   return (
     <header className="sticky top-0 z-30 flex h-14 w-full items-center justify-between gap-3 border-b border-line bg-surface/95 px-4 backdrop-blur-xs md:px-8">
-      {/* Start side: On mobile shows Company Brand; on desktop shows a subtle welcome or company tag */}
-      <div className="flex min-w-0 items-center gap-2.5">
-        <div className="flex items-center gap-2.5 md:hidden">
-          {logo && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={logo}
-              alt=""
-              className="size-8 shrink-0 rounded-control border border-line bg-surface object-contain"
-            />
-          )}
-          <span className="truncate text-card font-semibold text-ink">{companyName}</span>
-        </div>
-
-        <div className="hidden min-w-0 items-center gap-2 md:flex">
-          <span className="text-caption text-secondary font-medium truncate">
-            {companyName}
-          </span>
-        </div>
+      {/* Start side: On mobile shows Company Brand since sidebar is hidden; on desktop kept clean */}
+      <div className="flex min-w-0 items-center gap-2.5 md:hidden">
+        {logo && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={logo}
+            alt=""
+            className="size-8 shrink-0 rounded-control border border-line bg-surface object-contain"
+          />
+        )}
+        <span className="truncate text-card font-semibold text-ink">{companyName}</span>
       </div>
 
+      {/* Spacer for desktop to keep actions at the end */}
+      <div className="hidden md:block" aria-hidden />
+
       {/* End side: Notifications, Language Switcher (EN/AR), and User Profile Dropdown */}
-      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+      <div className="flex shrink-0 items-center gap-2 sm:gap-3 ms-auto md:ms-0">
         {/* Notifications Icon Button */}
         <Link
           href="/notifications"
