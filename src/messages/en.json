@@ -475,7 +475,10 @@
       "upload": "Upload logo",
       "uploading": "Uploading…",
       "remove": "Remove logo",
-      "saved": "Logo updated"
+      "delete": "Delete logo",
+      "change": "Change logo",
+      "saved": "Logo updated",
+      "deleted": "Logo removed"
     },
     "fields": {
       "nameAr": "Enter the Arabic name (at least 2 characters).",

@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { CompanyProfileForm, LogoForm } from "@/components/settings/settings-forms";
+import { CompanyProfileForm } from "@/components/settings/settings-forms";
 import { SettingsTabs } from "@/components/settings/settings-tabs";
 import type { Locale } from "@/i18n/routing";
 import { requireMember } from "@/lib/auth/account";
@@ -41,9 +41,9 @@ export default async function SettingsPage({ params }: PageProps<"/[locale]/sett
               email: company.email ?? "",
               address: company.address ?? "",
             }}
+            logoUrl={logoUrl}
             canEdit={isOwner}
           />
-          <LogoForm logoUrl={logoUrl} canEdit={isOwner} />
         </div>
       )}
     </main>

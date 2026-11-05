@@ -1,14 +1,13 @@
 "use client";
 
-import { CheckCircle2, ImageUp, X } from "lucide-react";
+import { Camera, CheckCircle2, Loader2, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useActionState } from "react";
+import { useActionState, useRef, useState, useTransition } from "react";
 import { removeLogo, updateCompanyProfile, uploadLogo, type SettingsState } from "@/actions/settings";
 import { FormField } from "@/components/form-field";
 import { FormSection } from "@/components/form-section";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 function useErrorText() {
   const t = useTranslations("settings");
@@ -31,8 +30,196 @@ function Saved({ show, label }: { show: boolean; label: string }) {
   );
 }
 
+export function CompanyLogoUploader({
+  logoUrl,
+  canEdit = true,
+}: {
+  logoUrl: string | null;
+  canEdit?: boolean;
+}) {
+  const t = useTranslations("settings");
+  const tCommon = useTranslations("common");
+  const locale = useLocale();
+  const errorText = useErrorText();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [prevPropUrl, setPrevPropUrl] = useState(logoUrl);
+  const [optimisticUrl, setOptimisticUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  if (prevPropUrl !== logoUrl) {
+    setPrevPropUrl(logoUrl);
+    setOptimisticUrl(null);
+  }
+
+  const currentLogo = optimisticUrl !== null ? optimisticUrl : logoUrl;
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 512 * 1024) {
+      setError(t("errors.fileSize"));
+      e.target.value = "";
+      return;
+    }
+
+    const allowedTypes = ["image/png", "image/jpeg", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      setError(t("errors.fileType"));
+      e.target.value = "";
+      return;
+    }
+
+    setError(null);
+    const preview = URL.createObjectURL(file);
+    setOptimisticUrl(preview);
+
+    startTransition(async () => {
+      try {
+        const fd = new FormData();
+        fd.append("logo", file);
+        fd.append("uiLocale", locale);
+        const res = await uploadLogo(undefined, fd);
+        if (!res?.ok) {
+          setOptimisticUrl(null);
+          setError(errorText(res) ?? tCommon("unexpected"));
+        } else {
+          setSuccessMsg(t("logo.saved"));
+          setTimeout(() => setSuccessMsg(null), 3500);
+        }
+      } catch {
+        setOptimisticUrl(null);
+        setError(tCommon("unexpected"));
+      } finally {
+        if (fileInputRef.current) fileInputRef.current.value = "";
+      }
+    });
+  };
+
+  const handleDelete = () => {
+    if (!canEdit || isPending) return;
+    setError(null);
+    startTransition(async () => {
+      try {
+        const fd = new FormData();
+        fd.append("uiLocale", locale);
+        const res = await removeLogo(undefined, fd);
+        if (!res?.ok) {
+          setError(errorText(res) ?? tCommon("unexpected"));
+        } else {
+          setOptimisticUrl(null);
+          setSuccessMsg(t("logo.deleted"));
+          setTimeout(() => setSuccessMsg(null), 3500);
+        }
+      } catch {
+        setError(tCommon("unexpected"));
+      }
+    });
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-label text-ink">{t("logo.title")}</span>
+      <div className="flex flex-wrap items-center gap-4">
+        <div
+          role={canEdit ? "button" : undefined}
+          tabIndex={canEdit ? 0 : undefined}
+          onClick={() => {
+            if (canEdit && !isPending) {
+              fileInputRef.current?.click();
+            }
+          }}
+          onKeyDown={(e) => {
+            if (canEdit && !isPending && (e.key === "Enter" || e.key === " ")) {
+              e.preventDefault();
+              fileInputRef.current?.click();
+            }
+          }}
+          className={cn(
+            "group relative grid size-28 shrink-0 place-items-center overflow-hidden rounded-card border-2 transition-all select-none",
+            currentLogo
+              ? "border-line bg-paper hover:border-indigo"
+              : "border-dashed border-line bg-paper/50 hover:border-indigo hover:bg-paper",
+            canEdit && "cursor-pointer focus-visible:outline-2 focus-visible:outline-indigo",
+            isPending && "pointer-events-none opacity-85",
+          )}
+          title={canEdit ? (currentLogo ? t("logo.change") : t("logo.choose")) : undefined}
+          aria-label={t("logo.title")}
+        >
+          {currentLogo ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={currentLogo} alt={t("logo.current")} className="size-full object-contain p-2" />
+          ) : (
+            <div className="flex flex-col items-center justify-center gap-1.5 p-2 text-center text-ink-soft transition-colors group-hover:text-indigo">
+              <Camera className="size-6" aria-hidden />
+              <span className="text-caption font-medium leading-tight">{t("logo.choose")}</span>
+            </div>
+          )}
+
+          {currentLogo && canEdit && !isPending && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-ink/50 opacity-0 backdrop-blur-[1px] transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+              <Camera className="size-6 text-white" aria-hidden />
+              <span className="text-caption font-medium text-white">{t("logo.change")}</span>
+            </div>
+          )}
+
+          {isPending && (
+            <div className="absolute inset-0 flex items-center justify-center bg-surface/85 backdrop-blur-[1px]">
+              <Loader2 className="size-6 animate-spin text-indigo" aria-hidden />
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-col items-start gap-2">
+          <p className="text-caption text-secondary">
+            {t("logo.hint")}
+          </p>
+
+          {currentLogo && canEdit && (
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={isPending}
+              className="inline-flex items-center gap-1.5 text-caption font-medium text-brick transition-colors hover:text-brick/80 hover:underline disabled:opacity-50"
+            >
+              <Trash2 className="size-3.5" aria-hidden />
+              {t("logo.delete")}
+            </button>
+          )}
+
+          {successMsg && (
+            <p role="status" className="inline-flex items-center gap-1 text-caption font-medium text-stamp">
+              <CheckCircle2 className="size-3.5" aria-hidden />
+              {successMsg}
+            </p>
+          )}
+
+          {error && (
+            <p role="alert" className="text-caption text-brick">
+              {error}
+            </p>
+          )}
+        </div>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/png,image/jpeg,image/webp"
+          className="hidden"
+          onChange={handleFileChange}
+          disabled={!canEdit || isPending}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function CompanyProfileForm({
   defaults,
+  logoUrl = null,
   canEdit = true,
 }: {
   defaults: {
@@ -44,6 +231,7 @@ export function CompanyProfileForm({
     email?: string;
     address?: string;
   };
+  logoUrl?: string | null;
   canEdit?: boolean;
 }) {
   const t = useTranslations("settings");
@@ -57,6 +245,9 @@ export function CompanyProfileForm({
     <form action={action} className="flex flex-col gap-4" noValidate>
       <input type="hidden" name="uiLocale" value={locale} />
       <FormSection title={t("company.title")}>
+        <div className="col-span-full border-b border-line pb-5">
+          <CompanyLogoUploader logoUrl={logoUrl} canEdit={canEdit} />
+        </div>
         <FormField
           name="nameAr"
           label={t("company.nameAr")}
@@ -158,73 +349,9 @@ export function LogoForm({
   logoUrl: string | null;
   canEdit?: boolean;
 }) {
-  const t = useTranslations("settings");
-  const locale = useLocale();
-  const errorText = useErrorText();
-  const [state, action, pending] = useActionState<SettingsState, FormData>(uploadLogo, undefined);
-  const [removeState, remove, removing] = useActionState<SettingsState, FormData>(removeLogo, undefined);
-  const error = errorText(state) ?? errorText(removeState);
-
   return (
-    <section aria-labelledby="logo-title" className="flex flex-col gap-5 rounded-card border border-line bg-surface p-4 md:p-6">
-      <div className="flex flex-col gap-1">
-        <h2 id="logo-title" className="text-card">
-          {t("logo.title")}
-        </h2>
-        <p className="text-secondary">{t("logo.intro")}</p>
-      </div>
-      <div className="grid gap-5 md:grid-cols-[auto_1fr] md:items-center">
-        <div className="grid size-28 place-items-center overflow-hidden rounded-card border border-line bg-paper">
-          {logoUrl ? (
-            // Signed, short-lived URL from private storage.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoUrl} alt={t("logo.current")} className="size-full object-contain" />
-          ) : (
-            <ImageUp className="size-7 text-ink-soft" aria-hidden />
-          )}
-        </div>
-        {canEdit ? (
-          <div className="flex flex-col gap-3">
-            <form action={action} className="flex flex-col gap-2">
-              <input type="hidden" name="uiLocale" value={locale} />
-              <Label htmlFor="logo">{t("logo.choose")}</Label>
-              <div className="flex flex-wrap gap-2">
-                <Input
-                  id="logo"
-                  name="logo"
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp"
-                  required
-                  aria-describedby="logo-hint"
-                  className="h-11 flex-1 py-2 sm:min-w-72"
-                />
-                <Button type="submit" disabled={pending}>
-                  {pending ? t("logo.uploading") : t("logo.upload")}
-                </Button>
-                {logoUrl && (
-                  <Button type="submit" formAction={remove} formNoValidate variant="ghost" disabled={removing} className="text-brick">
-                    <X aria-hidden />
-                    {t("logo.remove")}
-                  </Button>
-                )}
-              </div>
-              <p id="logo-hint" className="text-caption text-ink-soft">
-                {t("logo.hint")}
-              </p>
-            </form>
-            <Saved show={!!state?.ok} label={t("logo.saved")} />
-            {error && (
-              <p role="alert" className="text-label text-brick">
-                {error}
-              </p>
-            )}
-          </div>
-        ) : (
-          <p className="text-caption text-secondary">
-            ℹ️ {t("ownerOnlyNotice")}
-          </p>
-        )}
-      </div>
+    <section aria-label="logo-section" className="rounded-card border border-line bg-surface p-4 md:p-6">
+      <CompanyLogoUploader logoUrl={logoUrl} canEdit={canEdit} />
     </section>
   );
 }
