@@ -21,6 +21,7 @@ export interface EmployeeUserItem {
   role: Role;
   hasUserAccount: boolean;
   locale: string;
+  employeeNumber?: string | null;
 }
 
 interface UsersManagerProps {

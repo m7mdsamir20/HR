@@ -15,11 +15,15 @@ export default async function LeaveBalancesPage({ params }: PageProps<"/[locale]
   const supabase = await createClient();
   const { data: employees } = await supabase
     .from("employees")
-    .select("id, full_name_ar, full_name_en, role")
+    .select("id, full_name_ar, full_name_en, role, employee_number")
     .eq("status", "active")
-    .order("full_name_ar")
+    .order("employee_number", { ascending: true, nullsFirst: false })
     .limit(200);
-  const people = employees ?? [];
+  const people = (employees ?? []).sort((a, b) => {
+    if (!a.employee_number) return 1;
+    if (!b.employee_number) return -1;
+    return a.employee_number.localeCompare(b.employee_number, undefined, { numeric: true, sensitivity: "base" });
+  });
   // One lookup per employee: the balance is worked out by the database, not re-implemented here.
   const balances = await Promise.all(
     people.map(async (e) => {

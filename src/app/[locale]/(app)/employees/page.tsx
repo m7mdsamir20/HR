@@ -35,7 +35,8 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
       "id, full_name_ar, full_name_en, national_id, employee_number, role, status, department:departments(name_ar, name_en), manager:manager_id(full_name_ar, full_name_en)",
     )
     .neq("status", "deleted")
-    .order("full_name_ar")
+    .order("employee_number", { ascending: true, nullsFirst: false })
+    .order("created_at", { ascending: true })
     .limit(500);
   if (filter !== "all") query = query.eq("status", filter);
   if (q) {
@@ -59,6 +60,16 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
       manager: manager ? localName(locale, manager.full_name_ar, manager.full_name_en) : "—",
       status: e.status as "active" | "disabled",
     };
+  });
+
+  // Sort employees by code from smallest to largest (numeric / natural sort)
+  rows.sort((a, b) => {
+    const aHas = a.code && a.code !== "—";
+    const bHas = b.code && b.code !== "—";
+    if (!aHas && !bHas) return 0;
+    if (!aHas) return 1;
+    if (!bHas) return -1;
+    return a.code.localeCompare(b.code, undefined, { numeric: true, sensitivity: "base" });
   });
   const title = member.role === "manager" ? t("teamTitle") : t("title");
   const filterHref = (f: Filter) => ({ pathname: "/employees", query: { ...(q ? { q } : {}), ...(f !== "active" ? { status: f } : {}) } });
