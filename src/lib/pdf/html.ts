@@ -75,8 +75,8 @@ body.en{font-family:'InterEmbedded','Plex',sans-serif}
 .doc-meta-center{flex:1.1;text-align:center}
 .doc-meta-center .doc-title{font-size:13.5pt;font-weight:700;color:${COLORS.indigo};margin-bottom:3px}
 .doc-meta-center .doc-sub{color:${COLORS.soft};font-size:8pt;line-height:1.4}
-.brand-logo{flex:1.1;display:flex;justify-content:flex-end;align-items:center}
-.brand-logo img{max-width:80px;max-height:80px;object-fit:contain;border:1px solid ${COLORS.line};border-radius:8px;padding:4px;background:#fff}
+.brand-logo{flex:1.1;display:flex;justify-content:flex-end;align-items:center;min-width:0}
+.brand-logo img{max-width:180px;max-height:95px;width:auto;height:auto;object-fit:contain;border:none;border-radius:0;padding:0;background:transparent}
 .emp-hero{display:flex;justify-content:space-between;align-items:center;background:${COLORS.paper};border:1px solid ${COLORS.line};border-radius:8px;padding:10px 14px;margin-bottom:12px;break-inside:avoid}
 .emp-hero-main{display:flex;flex-direction:column;gap:3px}
 .emp-hero .emp-name{font-size:14pt;font-weight:700;color:${COLORS.ink}}
