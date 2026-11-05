@@ -3,7 +3,6 @@
 import {
   Banknote,
   BarChart3,
-  Bell,
   CalendarClock,
   CalendarDays,
   Clock,
@@ -13,7 +12,6 @@ import {
   MapPin,
   Network,
   Settings,
-  UserRound,
   Users,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -27,32 +25,38 @@ type Key =
   | "myTasks"
   | "employees"
   | "team"
-  | "analytics"
-  | "departments"
   | "attendance"
+  | "analytics"
   | "leave"
   | "payroll"
   | "advances"
+  | "departments"
   | "branches"
   | "shifts"
-  | "notifications"
-  | "settings"
-  | "profile";
+  | "settings";
 
-type Item = { href: string; key: Key; icon: typeof House; badge?: boolean; tab: boolean };
+type Item = { href: string; key: Key; icon: typeof House; tab: boolean };
 
-// `tab: false` items live in the sidebar only; on phones they're reached from the home page.
+// Header now holds notifications, language switcher, profile dropdown and logout.
+// Tab bar on phones holds the 5 primary daily actions.
 function itemsFor(role: Role): Item[] {
   const manages = role === "owner" || role === "manager";
   const items: Item[] = [
     { href: "/", key: "home", icon: House, tab: true },
     { href: "/tasks", key: manages ? "tasks" : "myTasks", icon: ListChecks, tab: true },
   ];
-  if (role === "owner" || role === "hr") items.push({ href: "/employees", key: "employees", icon: Users, tab: true });
-  if (role === "manager") items.push({ href: "/employees", key: "team", icon: Users, tab: true });
-  // Attendance is the employee's daily action, so it gets a tab for them; others reach it from the sidebar or home.
-  items.push({ href: "/attendance", key: "attendance", icon: Clock, tab: role === "employee" });
-  items.push({ href: "/analytics", key: "analytics", icon: BarChart3, tab: false });
+  if (role === "owner" || role === "hr") {
+    items.push({ href: "/employees", key: "employees", icon: Users, tab: true });
+  }
+  if (role === "manager") {
+    items.push({ href: "/employees", key: "team", icon: Users, tab: true });
+  }
+
+  // Attendance is daily for all users
+  items.push({ href: "/attendance", key: "attendance", icon: Clock, tab: true });
+  items.push({ href: "/analytics", key: "analytics", icon: BarChart3, tab: true });
+
+  // Sidebar-only management modules
   items.push({ href: "/leave", key: "leave", icon: CalendarDays, tab: false });
   if (role === "owner" || role === "hr" || role === "employee") {
     items.push({ href: "/payroll", key: "payroll", icon: Banknote, tab: false });
@@ -63,16 +67,17 @@ function itemsFor(role: Role): Item[] {
     items.push({ href: "/branches", key: "branches", icon: MapPin, tab: false });
     items.push({ href: "/shifts", key: "shifts", icon: CalendarClock, tab: false });
   }
-  items.push({ href: "/notifications", key: "notifications", icon: Bell, badge: true, tab: true });
-  if (role === "owner") items.push({ href: "/settings", key: "settings", icon: Settings, tab: false });
-  items.push({ href: "/profile", key: "profile", icon: UserRound, tab: true });
+  if (role === "owner") {
+    items.push({ href: "/settings", key: "settings", icon: Settings, tab: false });
+  }
+
   return items;
 }
 
 const isCurrent = (pathname: string, href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
-/** Sidebar links from md up; a bottom tab bar on phones (CLAUDE.md §6 layout). */
-export function AppNav({ role, variant, unread = 0 }: { role: Role; variant: "sidebar" | "tabs"; unread?: number }) {
+/** Sidebar links from md up; a bottom tab bar on phones. */
+export function AppNav({ role, variant }: { role: Role; variant: "sidebar" | "tabs"; unread?: number }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const all = itemsFor(role);
@@ -85,7 +90,7 @@ export function AppNav({ role, variant, unread = 0 }: { role: Role; variant: "si
         className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] md:hidden"
       >
         <ul className="grid" style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}>
-          {items.map(({ href, key, icon: Icon, badge }) => {
+          {items.map(({ href, key, icon: Icon }) => {
             const current = isCurrent(pathname, href);
             return (
               <li key={key}>
@@ -95,14 +100,11 @@ export function AppNav({ role, variant, unread = 0 }: { role: Role; variant: "si
                   className={cn(
                     "flex min-h-14 flex-col items-center justify-center gap-0.5 text-caption text-ink-soft",
                     "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-indigo",
-                    current && "font-semibold text-indigo",
+                    current && "font-semibold text-indigo"
                   )}
                 >
-                  <span className="relative">
-                    <Icon className="size-5" aria-hidden />
-                    {badge && unread > 0 && <Badge count={unread} label={t("unread", { count: unread })} />}
-                  </span>
-                  {t(key)}
+                  <Icon className="size-5" aria-hidden />
+                  <span className="truncate max-w-16">{t(key)}</span>
                 </Link>
               </li>
             );
@@ -114,7 +116,7 @@ export function AppNav({ role, variant, unread = 0 }: { role: Role; variant: "si
 
   return (
     <nav aria-label={t("label")} className="flex flex-col gap-1">
-      {items.map(({ href, key, icon: Icon, badge }) => {
+      {items.map(({ href, key, icon: Icon }) => {
         const current = isCurrent(pathname, href);
         return (
           <Link
@@ -124,28 +126,14 @@ export function AppNav({ role, variant, unread = 0 }: { role: Role; variant: "si
             className={cn(
               "flex min-h-11 items-center gap-2.5 rounded-control px-3 text-label text-ink-soft hover:bg-paper hover:text-ink",
               "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo",
-              current && "bg-indigo/10 font-semibold text-indigo hover:bg-indigo/10 hover:text-indigo",
+              current && "bg-indigo/10 font-semibold text-indigo hover:bg-indigo/10 hover:text-indigo"
             )}
           >
-            <span className="relative">
-              <Icon className="size-4.5 shrink-0" aria-hidden />
-              {badge && unread > 0 && <Badge count={unread} label={t("unread", { count: unread })} />}
-            </span>
+            <Icon className="size-4.5 shrink-0" aria-hidden />
             <span className="grow truncate">{t(key)}</span>
           </Link>
         );
       })}
     </nav>
-  );
-}
-
-function Badge({ count, label }: { count: number; label: string }) {
-  return (
-    <span
-      aria-label={label}
-      className="absolute -top-1 -end-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brick px-1 text-[10px] font-bold text-white tabular-nums"
-    >
-      {count > 99 ? "99+" : count}
-    </span>
   );
 }
