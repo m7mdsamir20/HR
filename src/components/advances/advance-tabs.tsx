@@ -8,10 +8,10 @@ import { cn } from "@/lib/utils";
 export function AdvanceTabs({ role }: { role: Role }) {
   const t = useTranslations("advances");
   const pathname = usePathname();
-  const canManage = role === "owner" || role === "hr";
+  const canManage = role === "owner" || role === "admin" || role === "hr";
 
   const tabs = [
-    { href: "/advances", label: t("myAdvances") },
+    ...(role !== "owner" ? [{ href: "/advances", label: t("myAdvances") }] : []),
     ...(canManage
       ? [
           { href: "/advances/requests", label: t("pendingRequests") },
@@ -42,4 +42,3 @@ export function AdvanceTabs({ role }: { role: Role }) {
     </div>
   );
 }
-

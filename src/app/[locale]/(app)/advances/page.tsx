@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { AdvanceCard } from "@/components/advances/advance-card";
 import { AdvanceRequestForm } from "@/components/advances/advance-request-form";
 import { AdvanceTabs } from "@/components/advances/advance-tabs";
+import { redirect } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import type { AdvanceStatus } from "@/lib/advances";
 import { requireMember } from "@/lib/auth/account";
@@ -10,8 +11,11 @@ import { createClient } from "@/lib/supabase/server";
 export default async function AdvancesPage({ params }: PageProps<"/[locale]">) {
   const locale = (await params).locale as Locale;
   const member = await requireMember(locale);
-  const t = await getTranslations({ locale, namespace: "advances" });
+  if (member.role === "owner") {
+    redirect({ href: "/advances/requests", locale });
+  }
 
+  const t = await getTranslations({ locale, namespace: "advances" });
   const supabase = await createClient();
   const { data: advances } = await supabase
     .from("advance_requests")
@@ -62,7 +66,7 @@ export default async function AdvancesPage({ params }: PageProps<"/[locale]">) {
                   createdAt: a.created_at,
                 }}
                 currentEmployeeId={member.employee_id}
-                canManage={member.role === "owner" || member.role === "hr"}
+                canManage={member.role === "owner" || member.role === "admin" || member.role === "hr"}
               />
             ))}
           </ul>
@@ -71,4 +75,3 @@ export default async function AdvancesPage({ params }: PageProps<"/[locale]">) {
     </main>
   );
 }
-

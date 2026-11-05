@@ -6,6 +6,13 @@ export const advanceRequestSchema = z.object({
   reason: z.string().trim().min(3, "reason_short").max(500, "reason_long"),
 });
 
+export const manualAdvanceSchema = z.object({
+  employeeId: z.string().uuid(),
+  amount: z.coerce.number().min(100, "min_amount").max(100000, "max_amount"),
+  installmentsCount: z.coerce.number().int().min(1, "min_installments").max(24, "max_installments"),
+  reason: z.string().trim().min(3, "reason_short").max(500, "reason_long"),
+});
+
 export const advanceDecisionSchema = z
   .object({
     id: z.string().uuid(),
@@ -33,7 +40,7 @@ export const advanceRepaymentSchema = z.object({
 });
 
 export type AdvanceRequestInput = z.infer<typeof advanceRequestSchema>;
+export type ManualAdvanceInput = z.infer<typeof manualAdvanceSchema>;
 export type AdvanceDecisionInput = z.infer<typeof advanceDecisionSchema>;
 export type AdvanceCancelInput = z.infer<typeof advanceCancelSchema>;
 export type AdvanceRepaymentInput = z.infer<typeof advanceRepaymentSchema>;
-

@@ -11,6 +11,7 @@ import {
   advanceDecisionSchema,
   advanceRepaymentSchema,
   advanceRequestSchema,
+  manualAdvanceSchema,
 } from "@/lib/validation/advances";
 
 const localeSchema = z.enum(routing.locales).catch(routing.defaultLocale);
@@ -34,6 +35,29 @@ export async function requestAdvance(_prev: AdvanceState, formData: FormData): P
     p_reason: parsed.data.reason,
   });
   if (error) return { ok: false, error: advancesError(error, "requestAdvance") };
+  refresh();
+  return { ok: true };
+}
+
+export async function createManualAdvance(_prev: AdvanceState, formData: FormData): Promise<AdvanceState> {
+  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin", "hr"]);
+  const parsed = manualAdvanceSchema.safeParse({
+    employeeId: formData.get("employeeId"),
+    amount: formData.get("amount"),
+    installmentsCount: formData.get("installmentsCount"),
+    reason: formData.get("reason"),
+  });
+  if (!parsed.success) return { ok: false, error: "invalid", fields: fieldsOf(parsed.error) };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("advance_manual_create", {
+    p_employee_id: parsed.data.employeeId,
+    p_amount: parsed.data.amount,
+    p_installments: parsed.data.installmentsCount,
+    p_reason: parsed.data.reason,
+    p_auto_approve: true,
+  });
+  if (error) return { ok: false, error: advancesError(error, "createManualAdvance") };
   refresh();
   return { ok: true };
 }
@@ -97,4 +121,3 @@ export async function repayAdvance(_prev: AdvanceState, formData: FormData): Pro
   refresh();
   return { ok: true };
 }
-

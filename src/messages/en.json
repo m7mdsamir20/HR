@@ -1302,6 +1302,22 @@
       "rejected": "Rejected",
       "cancelled": "Cancelled",
       "completed": "Fully Repaid"
+    },
+    "manualAdvance": {
+      "button": "Record manual advance",
+      "title": "Manual Advance Entry",
+      "intro": "Directly grant a financial advance to an employee and set repayment installments.",
+      "employee": "Employee",
+      "selectEmployee": "Select employee...",
+      "amount": "Advance amount (SAR)",
+      "installmentsCount": "Installments count (months)",
+      "monthly": "Estimated monthly installment",
+      "reason": "Reason / details",
+      "reasonDefault": "Direct cash advance by management",
+      "cancel": "Cancel",
+      "submit": "Approve and record advance",
+      "submitting": "Recording...",
+      "success": "Advance recorded and approved successfully."
     }
   },
   "payroll": {

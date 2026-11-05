@@ -68,7 +68,12 @@ function itemsFor(role: Role): Item[] {
   items.push({ href: "/leave", key: "leave", icon: CalendarDays, tab: false });
   if (isLeader || role === "hr" || role === "employee") {
     items.push({ href: "/payroll", key: "payroll", icon: Banknote, tab: false });
-    items.push({ href: "/advances", key: "advances", icon: HandCoins, tab: false });
+    items.push({
+      href: role === "owner" ? "/advances/requests" : "/advances",
+      key: "advances",
+      icon: HandCoins,
+      tab: false,
+    });
   }
   if (isLeader || role === "hr") {
     items.push({ href: "/settings", key: "settings", icon: Settings, tab: false });
