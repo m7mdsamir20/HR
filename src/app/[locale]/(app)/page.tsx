@@ -232,9 +232,9 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             { href: "/payroll", label: tNav("payroll"), icon: Banknote, show: member.role === "owner" || member.role === "hr" || member.role === "employee" },
             { href: "/advances", label: tNav("advances"), icon: HandCoins, show: member.role === "owner" || member.role === "hr" || member.role === "employee" },
             { href: "/departments", label: tNav("departments"), icon: Network, show: managesPeople },
-            { href: "/branches", label: tNav("branches"), icon: MapPin, show: managesPeople },
-            { href: "/shifts", label: tNav("shifts"), icon: CalendarClock, show: managesPeople },
-            { href: "/settings", label: tNav("settings"), icon: Settings, show: member.role === "owner" },
+            { href: "/settings/branches", label: tNav("branches"), icon: MapPin, show: managesPeople },
+            { href: "/settings/shifts", label: tNav("shifts"), icon: CalendarClock, show: managesPeople },
+            { href: "/settings", label: tNav("settings"), icon: Settings, show: managesPeople },
           ]
             .filter((l) => l.show)
             .map(({ href, label, icon: Icon }) => (

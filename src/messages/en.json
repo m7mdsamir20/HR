@@ -392,6 +392,12 @@
   "settings": {
     "title": "Settings",
     "saved": "Changes saved",
+    "tabs": {
+      "company": "Company Settings",
+      "branches": "Branches",
+      "shifts": "Shifts"
+    },
+    "ownerOnlyNotice": "Only the company owner can modify company details and logo.",
     "company": {
       "title": "Company details",
       "nameAr": "Company name (Arabic)",

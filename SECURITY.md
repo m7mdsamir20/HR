@@ -469,7 +469,7 @@
 |---|---|---|
 | `/employees` (القائمة، الإضافة، الصفحة) + actions الموظفين | مدير الشركة وHR (والمشرف قراءة فريقه بس) | `requireMember(roles)` + الـ RPCs + RLS |
 | `/departments` + actions الأقسام | مدير الشركة وHR | RLS (`departments_write`) |
-| `/settings` + الشعار | مدير الشركة | `company_update_profile` و`company_set_logo` (owner بس) + سياسة الـ storage |
+| `/settings` (إعدادات الشركة، الفروع، الورديات) + الشعار | مدير الشركة وHR (وتعديل بيانات الشركة والشعار لمدير الشركة فقط) | `requireMember(["owner", "hr"])` + `company_update_profile` و`company_set_logo` (owner بس) + سياسة الـ storage |
 | `/profile` + تغيير الرقم السري واللغة | أي موظف داخل | التحقق من الرقم الحالي + حد محاولات + `profile_*` |
 | رفع الوثائق: `prepareDocumentUpload` ← PUT للـ Storage ← `saveDocument` | مدير الشركة وHR في نطاقهم | `can_manage_employee` + سياسة الـ insert + فحص المحتوى + RLS |
 | تنزيل الوثيقة: `documentDownloadUrl` | صاحب الوثيقة ومين يديره | RLS + سياسة الـ select + رابط 5 دقايق |

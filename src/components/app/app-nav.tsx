@@ -3,13 +3,11 @@
 import {
   Banknote,
   BarChart3,
-  CalendarClock,
   CalendarDays,
   Clock,
   HandCoins,
   House,
   ListChecks,
-  MapPin,
   Network,
   Settings,
   Users,
@@ -64,10 +62,6 @@ function itemsFor(role: Role): Item[] {
   }
   if (role === "owner" || role === "hr") {
     items.push({ href: "/departments", key: "departments", icon: Network, tab: false });
-    items.push({ href: "/branches", key: "branches", icon: MapPin, tab: false });
-    items.push({ href: "/shifts", key: "shifts", icon: CalendarClock, tab: false });
-  }
-  if (role === "owner") {
     items.push({ href: "/settings", key: "settings", icon: Settings, tab: false });
   }
 

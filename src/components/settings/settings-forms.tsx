@@ -31,7 +31,13 @@ function Saved({ show, label }: { show: boolean; label: string }) {
   );
 }
 
-export function CompanyProfileForm({ defaults }: { defaults: { nameAr: string; nameEn: string; commercialReg: string } }) {
+export function CompanyProfileForm({
+  defaults,
+  canEdit = true,
+}: {
+  defaults: { nameAr: string; nameEn: string; commercialReg: string };
+  canEdit?: boolean;
+}) {
   const t = useTranslations("settings");
   const tCommon = useTranslations("common");
   const locale = useLocale();
@@ -43,8 +49,24 @@ export function CompanyProfileForm({ defaults }: { defaults: { nameAr: string; n
     <form action={action} className="flex flex-col gap-4" noValidate>
       <input type="hidden" name="uiLocale" value={locale} />
       <FormSection title={t("company.title")}>
-        <FormField name="nameAr" label={t("company.nameAr")} defaultValue={defaults.nameAr} error={bad("nameAr")} required dir="rtl" />
-        <FormField name="nameEn" label={t("company.nameEn")} defaultValue={defaults.nameEn} error={bad("nameEn")} optionalLabel={tCommon("optional")} dir="ltr" />
+        <FormField
+          name="nameAr"
+          label={t("company.nameAr")}
+          defaultValue={defaults.nameAr}
+          error={bad("nameAr")}
+          required
+          dir="rtl"
+          disabled={!canEdit}
+        />
+        <FormField
+          name="nameEn"
+          label={t("company.nameEn")}
+          defaultValue={defaults.nameEn}
+          error={bad("nameEn")}
+          optionalLabel={tCommon("optional")}
+          dir="ltr"
+          disabled={!canEdit}
+        />
         <FormField
           name="commercialReg"
           label={t("company.commercialReg")}
@@ -53,24 +75,37 @@ export function CompanyProfileForm({ defaults }: { defaults: { nameAr: string; n
           optionalLabel={tCommon("optional")}
           inputMode="numeric"
           dir="ltr"
+          disabled={!canEdit}
         />
       </FormSection>
-      <div className="flex flex-wrap items-center gap-3">
-        <Button type="submit" disabled={pending}>
-          {pending ? tCommon("saving") : tCommon("save")}
-        </Button>
-        <Saved show={!!state?.ok} label={t("saved")} />
-        {state && !state.ok && !state.fields && (
-          <p role="alert" className="text-label text-brick">
-            {errorText(state)}
-          </p>
-        )}
-      </div>
+      {canEdit ? (
+        <div className="flex flex-wrap items-center gap-3">
+          <Button type="submit" disabled={pending}>
+            {pending ? tCommon("saving") : tCommon("save")}
+          </Button>
+          <Saved show={!!state?.ok} label={t("saved")} />
+          {state && !state.ok && !state.fields && (
+            <p role="alert" className="text-label text-brick">
+              {errorText(state)}
+            </p>
+          )}
+        </div>
+      ) : (
+        <p className="text-caption text-secondary">
+          ℹ️ {t("ownerOnlyNotice")}
+        </p>
+      )}
     </form>
   );
 }
 
-export function LogoForm({ logoUrl }: { logoUrl: string | null }) {
+export function LogoForm({
+  logoUrl,
+  canEdit = true,
+}: {
+  logoUrl: string | null;
+  canEdit?: boolean;
+}) {
   const t = useTranslations("settings");
   const locale = useLocale();
   const errorText = useErrorText();
@@ -96,41 +131,47 @@ export function LogoForm({ logoUrl }: { logoUrl: string | null }) {
             <ImageUp className="size-7 text-ink-soft" aria-hidden />
           )}
         </div>
-        <div className="flex flex-col gap-3">
-          <form action={action} className="flex flex-col gap-2">
-            <input type="hidden" name="uiLocale" value={locale} />
-            <Label htmlFor="logo">{t("logo.choose")}</Label>
-            <div className="flex flex-wrap gap-2">
-              <Input
-                id="logo"
-                name="logo"
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                required
-                aria-describedby="logo-hint"
-                className="h-11 flex-1 py-2 sm:min-w-72"
-              />
-              <Button type="submit" disabled={pending}>
-                {pending ? t("logo.uploading") : t("logo.upload")}
-              </Button>
-              {logoUrl && (
-                <Button type="submit" formAction={remove} formNoValidate variant="ghost" disabled={removing} className="text-brick">
-                  <X aria-hidden />
-                  {t("logo.remove")}
+        {canEdit ? (
+          <div className="flex flex-col gap-3">
+            <form action={action} className="flex flex-col gap-2">
+              <input type="hidden" name="uiLocale" value={locale} />
+              <Label htmlFor="logo">{t("logo.choose")}</Label>
+              <div className="flex flex-wrap gap-2">
+                <Input
+                  id="logo"
+                  name="logo"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  required
+                  aria-describedby="logo-hint"
+                  className="h-11 flex-1 py-2 sm:min-w-72"
+                />
+                <Button type="submit" disabled={pending}>
+                  {pending ? t("logo.uploading") : t("logo.upload")}
                 </Button>
-              )}
-            </div>
-            <p id="logo-hint" className="text-caption text-ink-soft">
-              {t("logo.hint")}
-            </p>
-          </form>
-          <Saved show={!!state?.ok} label={t("logo.saved")} />
-          {error && (
-            <p role="alert" className="text-label text-brick">
-              {error}
-            </p>
-          )}
-        </div>
+                {logoUrl && (
+                  <Button type="submit" formAction={remove} formNoValidate variant="ghost" disabled={removing} className="text-brick">
+                    <X aria-hidden />
+                    {t("logo.remove")}
+                  </Button>
+                )}
+              </div>
+              <p id="logo-hint" className="text-caption text-ink-soft">
+                {t("logo.hint")}
+              </p>
+            </form>
+            <Saved show={!!state?.ok} label={t("logo.saved")} />
+            {error && (
+              <p role="alert" className="text-label text-brick">
+                {error}
+              </p>
+            )}
+          </div>
+        ) : (
+          <p className="text-caption text-secondary">
+            ℹ️ {t("ownerOnlyNotice")}
+          </p>
+        )}
       </div>
     </section>
   );
