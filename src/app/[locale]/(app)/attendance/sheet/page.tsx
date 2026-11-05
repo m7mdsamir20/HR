@@ -17,7 +17,7 @@ type Totals = { present: number; absent: number; leave: number; lateCount: numbe
 
 export default async function AttendanceSheetPage({ params, searchParams }: PageProps<"/[locale]/attendance/sheet">) {
   const locale = (await params).locale as Locale;
-  const member = await requireMember(locale, ["owner", "hr", "manager"]);
+  const member = await requireMember(locale, ["owner", "admin", "hr", "manager"]);
   const t = await getTranslations({ locale, namespace: "attendance" });
   const query = await searchParams;
   const month = monthParam(query.month);

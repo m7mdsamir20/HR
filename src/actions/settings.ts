@@ -31,7 +31,7 @@ function fieldsOf(error: z.ZodError) {
 }
 
 export async function createDepartment(_prev: SettingsState, formData: FormData): Promise<SettingsState> {
-  const member = await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "hr"]);
+  const member = await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin", "hr"]);
   const parsed = departmentSchema.safeParse({ nameAr: formData.get("nameAr"), nameEn: formData.get("nameEn") });
   if (!parsed.success) return { ok: false, error: "invalid", fields: fieldsOf(parsed.error) };
 
@@ -48,7 +48,7 @@ export async function createDepartment(_prev: SettingsState, formData: FormData)
 }
 
 export async function updateDepartment(departmentId: string, _prev: SettingsState, formData: FormData): Promise<SettingsState> {
-  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "hr"]);
+  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin", "hr"]);
   const id = z.uuid().safeParse(departmentId);
   const parsed = departmentSchema.safeParse({ nameAr: formData.get("nameAr"), nameEn: formData.get("nameEn") });
   if (!id.success) return { ok: false, error: "notFound" };
@@ -70,7 +70,7 @@ export async function updateDepartment(departmentId: string, _prev: SettingsStat
 }
 
 export async function deleteDepartment(departmentId: string, _prev: SettingsState, formData: FormData): Promise<SettingsState> {
-  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "hr"]);
+  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin", "hr"]);
   const id = z.uuid().safeParse(departmentId);
   if (!id.success) return { ok: false, error: "notFound" };
 
@@ -100,7 +100,7 @@ const companySchema = z.object({
 });
 
 export async function updateCompanyProfile(_prev: SettingsState, formData: FormData): Promise<SettingsState> {
-  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner"]);
+  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin"]);
   const parsed = companySchema.safeParse({
     nameAr: formData.get("nameAr"),
     nameEn: formData.get("nameEn"),
@@ -128,7 +128,7 @@ export async function updateCompanyProfile(_prev: SettingsState, formData: FormD
 }
 
 export async function uploadLogo(_prev: SettingsState, formData: FormData): Promise<SettingsState> {
-  const member = await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner"]);
+  const member = await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin"]);
   const file = formData.get("logo");
   if (!(file instanceof File) || file.size === 0) return { ok: false, error: "invalid", fields: ["logo"] };
   if (file.size > MAX_LOGO_BYTES) return { ok: false, error: "fileSize", fields: ["logo"] };
@@ -162,7 +162,7 @@ export async function uploadLogo(_prev: SettingsState, formData: FormData): Prom
 }
 
 export async function removeLogo(_prev: SettingsState, formData: FormData): Promise<SettingsState> {
-  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner"]);
+  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin"]);
   const supabase = await createClient();
   const { data: oldPath, error } = await supabase.rpc("company_set_logo", { p_logo_path: null as unknown as string });
   if (error) return { ok: false, error: toActionError(error, "removeLogo") };

@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export default async function SettingsUsersPage({ params }: PageProps<"/[locale]/settings/users">) {
   const locale = (await params).locale as Locale;
-  const member = await requireMember(locale, ["owner", "hr"]);
+  const member = await requireMember(locale, ["owner", "admin", "hr"]);
   const tSettings = await getTranslations({ locale, namespace: "settings" });
 
   const supabase = await createClient();

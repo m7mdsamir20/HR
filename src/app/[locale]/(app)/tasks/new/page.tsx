@@ -10,7 +10,7 @@ import { assigneeOptions } from "@/lib/task-data";
 
 export default async function NewTaskPage({ params }: PageProps<"/[locale]/tasks/new">) {
   const locale = (await params).locale as Locale;
-  const member = await requireMember(locale, ["owner", "manager"]);
+  const member = await requireMember(locale, ["owner", "admin", "manager"]);
   const t = await getTranslations({ locale, namespace: "tasks" });
   const assignees = await assigneeOptions(locale, member.employee_id);
 

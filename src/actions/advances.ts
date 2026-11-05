@@ -39,7 +39,7 @@ export async function requestAdvance(_prev: AdvanceState, formData: FormData): P
 }
 
 export async function decideAdvance(_prev: AdvanceState, formData: FormData): Promise<AdvanceState> {
-  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "hr"]);
+  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin", "hr"]);
   const parsed = advanceDecisionSchema.safeParse({
     id: formData.get("id"),
     decision: formData.get("decision"),
@@ -79,7 +79,7 @@ export async function cancelAdvance(_prev: AdvanceState, formData: FormData): Pr
 }
 
 export async function repayAdvance(_prev: AdvanceState, formData: FormData): Promise<AdvanceState> {
-  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "hr"]);
+  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin", "hr"]);
   const parsed = advanceRepaymentSchema.safeParse({
     advanceId: formData.get("advanceId"),
     amount: formData.get("amount"),

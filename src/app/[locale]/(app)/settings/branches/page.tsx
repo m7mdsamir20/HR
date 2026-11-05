@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export default async function SettingsBranchesPage({ params }: PageProps<"/[locale]/settings/branches">) {
   const locale = (await params).locale as Locale;
-  await requireMember(locale, ["owner", "hr"]);
+  await requireMember(locale, ["owner", "admin", "hr"]);
   const tSettings = await getTranslations({ locale, namespace: "settings" });
   const tBranches = await getTranslations({ locale, namespace: "attendance.branches" });
 

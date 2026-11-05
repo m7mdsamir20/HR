@@ -9,7 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export default async function LeaveBalancesPage({ params }: PageProps<"/[locale]/leave/balances">) {
   const locale = (await params).locale as Locale;
-  const member = await requireMember(locale, ["owner", "hr"]);
+  const member = await requireMember(locale, ["owner", "admin", "hr"]);
   const t = await getTranslations({ locale, namespace: "leave" });
 
   const supabase = await createClient();

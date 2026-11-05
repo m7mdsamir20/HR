@@ -37,7 +37,7 @@ const accountSchema = z.discriminatedUnion("kind", [
     kind: z.literal("employee"),
     employee_id: z.uuid(),
     role: z.enum(ROLES),
-    status: z.enum(["active", "disabled", "deleted"]),
+    status: z.enum(["active", "disabled", "terminated", "deleted"]),
     full_name_ar: z.string(),
     full_name_en: z.string().nullable(),
     locale: z.enum(["ar", "en"]),

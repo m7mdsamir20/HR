@@ -8,7 +8,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const member = await requireMember("ar", ["owner", "hr"]);
+  const member = await requireMember("ar", ["owner", "admin", "hr"]);
   const supabase = await createClient();
 
   const [{ data: run }, { data: company }] = await Promise.all([

@@ -32,13 +32,14 @@ interface UsersManagerProps {
 
 const roleTones: Record<Role, Tone> = {
   owner: "indigo",
+  admin: "indigo",
   hr: "stamp",
   manager: "saffron",
   employee: "neutral",
 };
 
 interface RoleDefinition {
-  id: "manager" | "hr" | "employee";
+  id: "admin" | "manager" | "hr" | "employee";
   title: string;
   badge: string;
   tone: Tone;
@@ -48,6 +49,21 @@ interface RoleDefinition {
 }
 
 const ROLE_DEFINITIONS: RoleDefinition[] = [
+  {
+    id: "admin",
+    title: "مدير (صلاحيات كاملة)",
+    badge: "إدارة شاملة للمنشأة",
+    tone: "indigo",
+    summary: "مخصص للمدير العام أو التنفيذي لإدارة كافة شؤون الشركة بصلاحيات مطابقة لمدير النظام.",
+    visibleScreens: ["لوحة التحكم", "شؤون الموظفين", "المستخدمين", "الرواتب والسلف", "الحضور والإجازات", "المهام", "إعدادات الشركة"],
+    permissions: [
+      "التحكم الكامل في إضافة وتعديل الموظفين وإنهاء الخدمات",
+      "إنشاء حسابات المستخدمين وتعيين الصلاحيات وكلمات المرور",
+      "إعداد واعتماد مسيرات الرواتب الشهرية وصرف السلف",
+      "إدارة الفروع، الورديات، إعدادات الحضور والربط الجغرافي",
+      "إسناد ومتابعة كافة المهام واعتماد التقارير عبر كافة الأقسام",
+    ],
+  },
   {
     id: "manager",
     title: "مدير / مشرف (فرع أو قسم)",
@@ -69,7 +85,7 @@ const ROLE_DEFINITIONS: RoleDefinition[] = [
     summary: "مخصص لمسؤولي الموارد البشرية، الرواتب، والشؤون الإدارية بالمنشأة.",
     visibleScreens: ["شؤون الموظفين", "الحضور والانصراف", "الإجازات", "مسيرات الرواتب والسلف", "الأقسام والورديات"],
     permissions: [
-      "إضافة وتعديل بيانات الموظفين وعقودهم ومستنداتهم",
+      "إضافة وتعديل بيانات الموظفين وعقودهم",
       "ضبط الورديات، الفروع، وقواعد الحضور والانصراف للشركة بالكامل",
       "معالجة طلبات الإجازات والخصومات لجميع موظفي الشركة",
       "إعداد واعتماد مسيرات الرواتب الشهرية وطلبات السلف",
@@ -98,7 +114,7 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
 
   const [state, action, pending] = useActionState<UserAccountState, FormData>(createUserAccount, undefined);
   const [selectedEmpId, setSelectedEmpId] = useState<string>("");
-  const [selectedRole, setSelectedRole] = useState<"manager" | "hr" | "employee">("employee");
+  const [selectedRole, setSelectedRole] = useState<"admin" | "manager" | "hr" | "employee">("employee");
   const [password, setPassword] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
@@ -196,7 +212,7 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
               </span>
               <input type="hidden" name="role" value={selectedRole} />
 
-              <div className="grid gap-3 lg:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 {ROLE_DEFINITIONS.map((r) => {
                   const isSelected = selectedRole === r.id;
                   return (

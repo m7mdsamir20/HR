@@ -9,7 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 // Company profile and logo (owner can edit; HR can view). Branches and shifts live in sibling tabs.
 export default async function SettingsPage({ params }: PageProps<"/[locale]/settings">) {
   const locale = (await params).locale as Locale;
-  const member = await requireMember(locale, ["owner", "hr"]);
+  const member = await requireMember(locale, ["owner", "admin", "hr"]);
   const t = await getTranslations({ locale, namespace: "settings" });
 
   const supabase = await createClient();

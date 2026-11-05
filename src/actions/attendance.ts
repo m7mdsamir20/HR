@@ -39,7 +39,7 @@ export async function checkOut(locale: string, location: Location): Promise<Atte
 }
 
 export async function assignShift(_prev: AttendanceState, formData: FormData): Promise<AttendanceState> {
-  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "hr"]);
+  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin", "hr"]);
   const parsed = assignSchema.safeParse({
     employeeIds: formData.getAll("employeeIds"),
     branchId: formData.get("branchId"),
@@ -59,7 +59,7 @@ export async function assignShift(_prev: AttendanceState, formData: FormData): P
 }
 
 export async function correctAttendance(_prev: AttendanceState, formData: FormData): Promise<AttendanceState> {
-  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "hr"]);
+  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin", "hr"]);
   const parsed = correctionSchema.safeParse({
     employeeId: formData.get("employeeId"),
     date: formData.get("date"),
@@ -85,7 +85,7 @@ export async function correctAttendance(_prev: AttendanceState, formData: FormDa
 }
 
 export async function decideDeduction(_prev: AttendanceState, formData: FormData): Promise<AttendanceState> {
-  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "hr"]);
+  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin", "hr"]);
   const parsed = decisionSchema.safeParse({
     id: formData.get("id"),
     decision: formData.get("decision"),

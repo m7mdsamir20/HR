@@ -9,9 +9,10 @@ import { requirePlatformAdmin } from "@/lib/auth/account";
 import { isValidNationalId, normalizeNationalId } from "@/lib/auth/national-id";
 import { createClient } from "@/lib/supabase/server";
 
-const statusTone: Record<"active" | "disabled" | "deleted", Tone> = {
+const statusTone: Record<"active" | "disabled" | "terminated" | "deleted", Tone> = {
   active: "stamp",
   disabled: "saffron",
+  terminated: "brick",
   deleted: "brick",
 };
 
@@ -28,7 +29,7 @@ export default async function LookupPage({ params, searchParams }: PageProps<"/[
   const valid = isValidNationalId(nationalId);
 
   let admin = false;
-  let matches: { id: string; status: "active" | "disabled" | "deleted"; companyId: string; company: string }[] = [];
+  let matches: { id: string; status: "active" | "disabled" | "terminated" | "deleted"; companyId: string; company: string }[] = [];
   if (valid) {
     const supabase = await createClient();
     const [{ data: admins }, { data: employees }] = await Promise.all([

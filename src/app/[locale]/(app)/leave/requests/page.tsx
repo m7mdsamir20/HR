@@ -16,7 +16,7 @@ type Filter = (typeof FILTERS)[number];
 
 export default async function LeaveRequestsPage({ params, searchParams }: PageProps<"/[locale]/leave/requests">) {
   const locale = (await params).locale as Locale;
-  const member = await requireMember(locale, ["owner", "hr", "manager"]);
+  const member = await requireMember(locale, ["owner", "admin", "hr", "manager"]);
   const t = await getTranslations({ locale, namespace: "leave" });
   const query = await searchParams;
   const raw = Array.isArray(query.filter) ? query.filter[0] : query.filter;

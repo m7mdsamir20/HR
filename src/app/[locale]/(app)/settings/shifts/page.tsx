@@ -11,7 +11,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export default async function SettingsShiftsPage({ params }: PageProps<"/[locale]/settings/shifts">) {
   const locale = (await params).locale as Locale;
-  const member = await requireMember(locale, ["owner", "hr"]);
+  const member = await requireMember(locale, ["owner", "admin", "hr"]);
   const tSettings = await getTranslations({ locale, namespace: "settings" });
   const tShifts = await getTranslations({ locale, namespace: "attendance.shifts" });
   const pick = (ar: string, en: string | null) => (locale === "en" && en) || ar;

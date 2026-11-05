@@ -185,6 +185,29 @@ export function EmployeeForm({ mode, action, departments, managers, nationalitie
           />
         )}
 
+        {/* بيانات الإقامة للمقيم فقط: تاريخ البداية والنهاية */}
+        {idType === "resident" && (
+          <>
+            <FormField
+              name="iqamaStart"
+              label={t("form.iqamaStart")}
+              type="date"
+              defaultValue={v("iqamaStart")}
+              error={err("iqamaStart")}
+              dir="ltr"
+            />
+            <FormField
+              name="iqamaEnd"
+              label={t("form.iqamaEnd")}
+              hint={t("form.iqamaEndHint")}
+              type="date"
+              defaultValue={v("iqamaEnd")}
+              error={err("iqamaEnd")}
+              dir="ltr"
+            />
+          </>
+        )}
+
         {/* 6. الجنس */}
         <SelectField
           name="gender"

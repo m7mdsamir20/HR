@@ -37,7 +37,7 @@ export async function requestLeave(_prev: LeaveState, formData: FormData): Promi
 }
 
 export async function decideLeave(_prev: LeaveState, formData: FormData): Promise<LeaveState> {
-  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "hr", "manager"]);
+  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin", "hr", "manager"]);
   const parsed = leaveDecisionSchema.safeParse({ id: formData.get("id"), decision: formData.get("decision"), note: formData.get("note") });
   if (!parsed.success) return { ok: false, error: "invalid", fields: fieldsOf(parsed.error) };
 
@@ -65,7 +65,7 @@ export async function cancelLeave(_prev: LeaveState, formData: FormData): Promis
 }
 
 export async function adjustBalance(_prev: LeaveState, formData: FormData): Promise<LeaveState> {
-  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "hr"]);
+  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin", "hr"]);
   const parsed = adjustmentSchema.safeParse({ employeeId: formData.get("employeeId"), days: formData.get("days"), reason: formData.get("reason") });
   if (!parsed.success) return { ok: false, error: "invalid", fields: fieldsOf(parsed.error) };
 

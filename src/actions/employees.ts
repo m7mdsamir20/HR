@@ -24,7 +24,7 @@ import {
 
 const localeSchema = z.enum(routing.locales).catch(routing.defaultLocale);
 const idSchema = z.uuid();
-const PEOPLE_ROLES = ["owner", "hr"] as const;
+const PEOPLE_ROLES = ["owner", "admin", "hr"] as const;
 // Banned until deleted or re-enabled; Supabase takes a duration, so this is effectively forever.
 const BAN_FOREVER = "876000h";
 
@@ -213,16 +213,77 @@ export async function setEmployeeStatus(
     p_employee_id: id.data,
     p_status: next.data,
   });
-  if (error || !userId) return { ok: false, error: toActionError(error, "setEmployeeStatus") };
+  if (error) return { ok: false, error: toActionError(error, "setEmployeeStatus") };
 
-  const { error: banError } = await createAdminClient().auth.admin.updateUserById(userId, {
-    ban_duration: next.data === "disabled" ? BAN_FOREVER : "none",
+  if (userId) {
+    const { error: banError } = await createAdminClient().auth.admin.updateUserById(userId, {
+      ban_duration: next.data === "disabled" ? BAN_FOREVER : "none",
+    });
+    if (banError) {
+      console.error("setEmployeeStatus: ban", banError.code);
+      return { ok: false, error: "unexpected" };
+    }
+  }
+
+  refresh();
+  return { ok: true };
+}
+
+export async function terminateEmployee(
+  employeeId: string,
+  _prev: EmployeeActionState,
+  formData: FormData,
+): Promise<EmployeeActionState> {
+  const locale = localeSchema.parse(formData.get("uiLocale"));
+  await requireMember(locale, PEOPLE_ROLES);
+  const id = idSchema.safeParse(employeeId);
+  const rawType = formData.get("terminationType");
+  const type = z.enum(["resignation", "contract_end", "termination", "absence", "other"]).safeParse(rawType);
+  const dateStr = String(formData.get("terminationDate") ?? "").trim();
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(dateStr) ? dateStr : new Date().toISOString().slice(0, 10);
+  const reason = String(formData.get("terminationReason") ?? "").slice(0, 500);
+
+  if (!id.success || !type.success) return { ok: false, error: "invalid" };
+
+  const supabase = await createClient();
+  const { data: userId, error } = await supabase.rpc("employee_terminate", {
+    p_employee_id: id.data,
+    p_type: type.data,
+    p_date: date,
+    p_reason: reason,
   });
-  // A failed ban isn't a hole (RLS already blocks a disabled employee) but the login would still
-  // succeed and then be refused; report it so the action can be retried.
-  if (banError) {
-    console.error("setEmployeeStatus: ban", banError.code);
-    return { ok: false, error: "unexpected" };
+  if (error) return { ok: false, error: toActionError(error, "terminateEmployee") };
+
+  if (userId) {
+    await createAdminClient().auth.admin.updateUserById(userId, {
+      ban_duration: BAN_FOREVER,
+    });
+  }
+
+  refresh();
+  return { ok: true };
+}
+
+export async function reactivateEmployee(
+  employeeId: string,
+  _prev: EmployeeActionState,
+  formData: FormData,
+): Promise<EmployeeActionState> {
+  const locale = localeSchema.parse(formData.get("uiLocale"));
+  await requireMember(locale, PEOPLE_ROLES);
+  const id = idSchema.safeParse(employeeId);
+  if (!id.success) return { ok: false, error: "notFound" };
+
+  const supabase = await createClient();
+  const { data: userId, error } = await supabase.rpc("employee_reactivate", {
+    p_employee_id: id.data,
+  });
+  if (error) return { ok: false, error: toActionError(error, "reactivateEmployee") };
+
+  if (userId) {
+    await createAdminClient().auth.admin.updateUserById(userId, {
+      ban_duration: "none",
+    });
   }
 
   refresh();

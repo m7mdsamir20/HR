@@ -19,7 +19,7 @@ const fieldsOf = (error: z.ZodError) => [...new Set(error.issues.map((i) => Stri
 export type PayrollState = { ok: true; runId?: string } | { ok: false; error: PayrollError; fields?: string[] } | undefined;
 
 export async function createPayrollRun(_prev: PayrollState, formData: FormData): Promise<PayrollState> {
-  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "hr"]);
+  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin", "hr"]);
   const parsed = payrollRunCreateSchema.safeParse({
     year: formData.get("year"),
     month: formData.get("month"),
@@ -40,7 +40,7 @@ export async function createPayrollRun(_prev: PayrollState, formData: FormData):
 }
 
 export async function adjustPayrollSlip(_prev: PayrollState, formData: FormData): Promise<PayrollState> {
-  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "hr"]);
+  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin", "hr"]);
   const parsed = payrollSlipAdjustSchema.safeParse({
     slipId: formData.get("slipId"),
     otherAllowances: formData.get("otherAllowances"),
@@ -63,7 +63,7 @@ export async function adjustPayrollSlip(_prev: PayrollState, formData: FormData)
 }
 
 export async function approvePayrollRun(_prev: PayrollState, formData: FormData): Promise<PayrollState> {
-  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner"]);
+  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin"]);
   const parsed = payrollRunApproveSchema.safeParse({ runId: formData.get("runId") });
   if (!parsed.success) return { ok: false, error: "invalid", fields: fieldsOf(parsed.error) };
 
@@ -78,7 +78,7 @@ export async function approvePayrollRun(_prev: PayrollState, formData: FormData)
 }
 
 export async function deletePayrollRun(_prev: PayrollState, formData: FormData): Promise<PayrollState> {
-  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "hr"]);
+  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin", "hr"]);
   const parsed = payrollRunDeleteSchema.safeParse({ runId: formData.get("runId") });
   if (!parsed.success) return { ok: false, error: "invalid", fields: fieldsOf(parsed.error) };
 

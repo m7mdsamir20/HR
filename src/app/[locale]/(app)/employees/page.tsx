@@ -1,7 +1,7 @@
-import { Plus } from "lucide-react";
+import { Eye, Pencil, Plus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { EmployeeSearchInput } from "@/components/employees/employee-search-input";
-import { StatusPill } from "@/components/status-pill";
+import { StatusPill, type Tone } from "@/components/status-pill";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Link } from "@/i18n/navigation";
@@ -13,13 +13,13 @@ import { localName, one } from "@/lib/employees";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
-const FILTERS = ["active", "disabled", "all"] as const;
+const FILTERS = ["active", "disabled", "terminated", "all"] as const;
 type Filter = (typeof FILTERS)[number];
 const cleanSearch = (q: string) => q.replace(/[,()*%\\:"'.]/g, " ").trim().slice(0, 60);
 
 export default async function EmployeesPage({ params, searchParams }: PageProps<"/[locale]/employees">) {
   const locale = (await params).locale as Locale;
-  const member = await requireMember(locale, ["owner", "hr", "manager"]);
+  const member = await requireMember(locale, ["owner", "admin", "hr", "manager"]);
   const t = await getTranslations({ locale, namespace: "employees" });
   const tRoles = await getTranslations({ locale, namespace: "roles" });
   const sp = await searchParams;
@@ -59,7 +59,7 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
       role: tRoles(e.role),
       department: e.department ? localName(locale, e.department.name_ar, e.department.name_en) : "—",
       manager: manager ? localName(locale, manager.full_name_ar, manager.full_name_en) : "—",
-      status: e.status as "active" | "disabled",
+      status: e.status as "active" | "disabled" | "terminated",
     };
   });
 
@@ -123,69 +123,104 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
         <>
           <p className="text-secondary">{t("count", { count: rows.length })}</p>
           <ul className="flex flex-col gap-2 md:hidden">
-            {rows.map((r) => (
-              <li key={r.id}>
-                <Link
-                  href={`/employees/${r.id}`}
-                  className="flex flex-col gap-1.5 rounded-card border border-line bg-surface p-4 focus-visible:outline-2 focus-visible:outline-indigo"
-                >
-                  <span className="flex items-start justify-between gap-3">
-                    <span className="flex items-center gap-2">
-                      <span className="font-semibold">{r.name}</span>
-                      {r.code !== "—" && (
-                        <span className="font-mono text-2xs font-semibold px-1.5 py-0.5 rounded-[4px] bg-paper text-ink border border-line">
-                          {r.code}
-                        </span>
+            {rows.map((r) => {
+              const tone: Tone = r.status === "active" ? "stamp" : r.status === "disabled" ? "brick" : "saffron";
+              return (
+                <li key={r.id}>
+                  <div className="flex flex-col gap-2.5 rounded-card border border-line bg-surface p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-ink">{r.name}</span>
+                        {r.code !== "—" && (
+                          <span className="font-mono text-2xs font-semibold px-1.5 py-0.5 rounded-[4px] bg-paper text-ink border border-line">
+                            {r.code}
+                          </span>
+                        )}
+                      </div>
+                      <StatusPill tone={tone}>{t(`status.${r.status}`)}</StatusPill>
+                    </div>
+
+                    <div className="flex items-center justify-between text-caption text-secondary">
+                      <span>{r.role} · {r.department}</span>
+                      <bdi dir="ltr" className="tabular-nums font-mono">{r.nationalId}</bdi>
+                    </div>
+
+                    <div className="flex items-center justify-end gap-2 border-t border-line/60 pt-2.5">
+                      <Button asChild variant="ghost" size="sm">
+                        <Link href={`/employees/${r.id}`}>
+                          <Eye className="size-3.5" aria-hidden />
+                          {t("actions.view")}
+                        </Link>
+                      </Button>
+                      {canAdd && (
+                        <Button asChild variant="outline" size="sm">
+                          <Link href={`/employees/${r.id}/edit`}>
+                            <Pencil className="size-3.5" aria-hidden />
+                            {t("actions.edit")}
+                          </Link>
+                        </Button>
                       )}
-                    </span>
-                    {r.status === "disabled" && <StatusPill tone="brick">{t("status.disabled")}</StatusPill>}
-                  </span>
-                  <span className="text-secondary">
-                    {r.role} · {r.department}
-                  </span>
-                  <bdi dir="ltr" className="text-secondary tabular-nums">
-                    {r.nationalId}
-                  </bdi>
-                </Link>
-              </li>
-            ))}
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
 
           <div className="hidden overflow-hidden rounded-card border border-line bg-surface md:block">
             <Table>
               <TableHeader>
                 <TableRow>
-                  {(["code", "name", "nationalId", "role", "department", "manager", "status"] as const).map((c) => (
-                    <TableHead key={c} className="text-start">
+                  {(["code", "name", "nationalId", "role", "department", "manager", "status", "actions"] as const).map((c) => (
+                    <TableHead key={c} className={c === "actions" ? "text-end" : "text-start"}>
                       {t(`columns.${c}`)}
                     </TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {rows.map((r) => (
-                  <TableRow key={r.id}>
-                    <TableCell className="font-mono text-xs font-semibold text-ink">
-                      <span className="inline-block px-2 py-0.5 rounded-[6px] bg-paper border border-line">
-                        {r.code}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <Link href={`/employees/${r.id}`} className="font-semibold text-indigo hover:underline">
-                        {r.name}
-                      </Link>
-                    </TableCell>
-                    <TableCell className="tabular-nums">
-                      <bdi dir="ltr">{r.nationalId}</bdi>
-                    </TableCell>
-                    <TableCell>{r.role}</TableCell>
-                    <TableCell>{r.department}</TableCell>
-                    <TableCell>{r.manager}</TableCell>
-                    <TableCell>
-                      <StatusPill tone={r.status === "active" ? "stamp" : "brick"}>{t(`status.${r.status}`)}</StatusPill>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {rows.map((r) => {
+                  const tone: Tone = r.status === "active" ? "stamp" : r.status === "disabled" ? "brick" : "saffron";
+                  return (
+                    <TableRow key={r.id}>
+                      <TableCell className="font-mono text-xs font-semibold text-ink">
+                        <span className="inline-block px-2 py-0.5 rounded-[6px] bg-paper border border-line">
+                          {r.code}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="font-semibold text-ink">{r.name}</span>
+                      </TableCell>
+                      <TableCell className="tabular-nums font-mono">
+                        <bdi dir="ltr">{r.nationalId}</bdi>
+                      </TableCell>
+                      <TableCell>{r.role}</TableCell>
+                      <TableCell>{r.department}</TableCell>
+                      <TableCell>{r.manager}</TableCell>
+                      <TableCell>
+                        <StatusPill tone={tone}>{t(`status.${r.status}`)}</StatusPill>
+                      </TableCell>
+                      <TableCell className="text-end">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Button asChild variant="ghost" size="sm" className="text-secondary hover:text-ink">
+                            <Link href={`/employees/${r.id}`}>
+                              <Eye className="size-3.5" aria-hidden />
+                              {t("actions.view")}
+                            </Link>
+                          </Button>
+                          {canAdd && (
+                            <Button asChild variant="outline" size="sm" className="text-indigo font-medium">
+                              <Link href={`/employees/${r.id}/edit`}>
+                                <Pencil className="size-3.5" aria-hidden />
+                                {t("actions.edit")}
+                              </Link>
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </div>

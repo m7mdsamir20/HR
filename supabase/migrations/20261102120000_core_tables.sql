@@ -14,8 +14,8 @@ alter default privileges in schema public revoke execute on functions from publi
 alter default privileges in schema private revoke execute on functions from public;
 
 create type public.company_status as enum ('active', 'suspended');
-create type public.employee_role as enum ('owner', 'hr', 'manager', 'employee');
-create type public.employee_status as enum ('active', 'disabled', 'deleted');
+create type public.employee_role as enum ('owner', 'admin', 'hr', 'manager', 'employee');
+create type public.employee_status as enum ('active', 'disabled', 'terminated', 'deleted');
 create type public.id_type as enum ('citizen', 'resident');
 
 create function private.touch_updated_at() returns trigger

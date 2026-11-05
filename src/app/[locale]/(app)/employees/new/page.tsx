@@ -9,7 +9,7 @@ import { employeeFormOptions } from "@/lib/employees";
 
 export default async function NewEmployeePage({ params }: PageProps<"/[locale]/employees/new">) {
   const locale = (await params).locale as Locale;
-  await requireMember(locale, ["owner", "hr"]);
+  await requireMember(locale, ["owner", "admin", "hr"]);
   const t = await getTranslations({ locale, namespace: "employees" });
   const { departments, managers, nationalities } = await employeeFormOptions(locale);
 

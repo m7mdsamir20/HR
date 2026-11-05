@@ -35,6 +35,8 @@ const fileFields = {
   contractType: optional(z.enum(CONTRACT_TYPES)),
   contractStart: optionalDate,
   contractEnd: optionalDate,
+  iqamaStart: optionalDate,
+  iqamaEnd: optionalDate,
   probationDays: z.preprocess(blankToUndefined, z.coerce.number().int().min(0).max(180).optional()),
   basicSalary: money,
   housingAllowance: money,
@@ -49,7 +51,14 @@ const fileFields = {
   gosiNumber: z.preprocess(digitsOnly, z.string().regex(/^\d{1,15}$/).optional()),
 };
 
-type FileShape = { birthDate?: string; contractType?: string; contractStart?: string; contractEnd?: string };
+type FileShape = {
+  birthDate?: string;
+  contractType?: string;
+  contractStart?: string;
+  contractEnd?: string;
+  iqamaStart?: string;
+  iqamaEnd?: string;
+};
 
 // Cross-field rules, reported on the field the user has to fix.
 function checkFile(d: FileShape, ctx: z.RefinementCtx) {
@@ -61,6 +70,9 @@ function checkFile(d: FileShape, ctx: z.RefinementCtx) {
   }
   if (d.contractStart && d.contractEnd && d.contractEnd < d.contractStart) {
     ctx.addIssue({ code: "custom", path: ["contractEnd"], message: "beforeStart" });
+  }
+  if (d.iqamaStart && d.iqamaEnd && d.iqamaEnd < d.iqamaStart) {
+    ctx.addIssue({ code: "custom", path: ["iqamaEnd"], message: "beforeStart" });
   }
 }
 
@@ -107,6 +119,8 @@ export function toRpcPayload(d: EmployeeInput, locale?: string) {
     contract_type: d.contractType ?? "",
     contract_start: d.contractStart ?? "",
     contract_end: d.contractEnd ?? "",
+    iqama_start: d.iqamaStart ?? "",
+    iqama_end: d.iqamaEnd ?? "",
     probation_days: d.probationDays?.toString() ?? "",
     ...(locale ? { locale } : {}),
   };

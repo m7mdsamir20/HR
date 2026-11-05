@@ -16,7 +16,7 @@ const kindTone: Record<DeductionKind, "brick" | "saffron"> = { late: "brick", ea
 
 export default async function DeductionsPage({ params, searchParams }: PageProps<"/[locale]/attendance/deductions">) {
   const locale = (await params).locale as Locale;
-  const member = await requireMember(locale, ["owner", "hr"]);
+  const member = await requireMember(locale, ["owner", "admin", "hr"]);
   const t = await getTranslations({ locale, namespace: "attendance" });
   const query = await searchParams;
   const month = monthParam(query.month);

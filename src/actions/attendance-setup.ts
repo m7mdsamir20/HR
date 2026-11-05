@@ -16,7 +16,7 @@ const idSchema = z.uuid();
 const fieldsOf = (error: z.ZodError) => [...new Set(error.issues.map((i) => String(i.path[0])))];
 
 async function setup(formData: FormData) {
-  return requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "hr"]);
+  return requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin", "hr"]);
 }
 
 function readBranch(formData: FormData) {
@@ -157,7 +157,7 @@ export async function deleteCalendarEntry(entryId: string, _prev: AttendanceStat
 
 // Owner only: the tiers decide how much pay is suggested (the RLS policy says the same).
 export async function saveRules(_prev: AttendanceState, formData: FormData): Promise<AttendanceState> {
-  const member = await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner"]);
+  const member = await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin"]);
   const parsed = rulesSchema.safeParse({
     tier1Minutes: formData.get("tier1Minutes"),
     tier2Minutes: formData.get("tier2Minutes"),

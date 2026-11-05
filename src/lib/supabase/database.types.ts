@@ -1,4 +1,4 @@
-
+﻿
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export type Database = {
@@ -301,14 +301,14 @@ isOneToOne: false
                   ]
                 },"employees": {
                   Row: {
-                    "birth_date": string | null,"branch_id": string | null,"company_id": string,"contract_end": string | null,"contract_start": string | null,"contract_type": string | null,"created_at": string,"created_by": string | null,"deleted_at": string | null,"department_id": string | null,"disabled_at": string | null,"email": string | null,"employee_number": string | null,"full_name_ar": string,"full_name_en": string | null,"gender": string | null,"hire_date": string | null,"id": string,"id_type": Database["public"]['Enums']["id_type"],"job_title": string | null,"locale": string,"manager_id": string | null,"marital_status": string | null,"national_id": string,"nationality": string | null,"occupation": string | null,"phone": string | null,"probation_days": number | null,"role": Database["public"]['Enums']["employee_role"],"shift_id": string | null,"shift_since": string | null,"status": Database["public"]['Enums']["employee_status"],"updated_at": string,"user_id": string | null
+                    "birth_date": string | null,"branch_id": string | null,"company_id": string,"contract_end": string | null,"contract_start": string | null,"contract_type": string | null,"created_at": string,"created_by": string | null,"deleted_at": string | null,"department_id": string | null,"disabled_at": string | null,"email": string | null,"employee_number": string | null,"full_name_ar": string,"full_name_en": string | null,"gender": string | null,"hire_date": string | null,"id": string,"id_type": Database["public"]['Enums']["id_type"],"iqama_end": string | null,"iqama_start": string | null,"job_title": string | null,"locale": string,"manager_id": string | null,"marital_status": string | null,"national_id": string,"nationality": string | null,"occupation": string | null,"phone": string | null,"probation_days": number | null,"role": Database["public"]['Enums']["employee_role"],"shift_id": string | null,"shift_since": string | null,"status": Database["public"]['Enums']["employee_status"],"terminated_at": string | null,"termination_date": string | null,"termination_reason": string | null,"termination_type": string | null,"updated_at": string,"user_id": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "birth_date"?: string | null,"branch_id"?: string | null,"company_id": string,"contract_end"?: string | null,"contract_start"?: string | null,"contract_type"?: string | null,"created_at"?: string,"created_by"?: string | null,"deleted_at"?: string | null,"department_id"?: string | null,"disabled_at"?: string | null,"email"?: string | null,"employee_number"?: string | null,"full_name_ar": string,"full_name_en"?: string | null,"gender"?: string | null,"hire_date"?: string | null,"id"?: string,"id_type": Database["public"]['Enums']["id_type"],"job_title"?: string | null,"locale"?: string,"manager_id"?: string | null,"marital_status"?: string | null,"national_id": string,"nationality"?: string | null,"occupation"?: string | null,"phone"?: string | null,"probation_days"?: number | null,"role"?: Database["public"]['Enums']["employee_role"],"shift_id"?: string | null,"shift_since"?: string | null,"status"?: Database["public"]['Enums']["employee_status"],"updated_at"?: string,"user_id"?: string | null
+                    "birth_date"?: string | null,"branch_id"?: string | null,"company_id": string,"contract_end"?: string | null,"contract_start"?: string | null,"contract_type"?: string | null,"created_at"?: string,"created_by"?: string | null,"deleted_at"?: string | null,"department_id"?: string | null,"disabled_at"?: string | null,"email"?: string | null,"employee_number"?: string | null,"full_name_ar": string,"full_name_en"?: string | null,"gender"?: string | null,"hire_date"?: string | null,"id"?: string,"id_type": Database["public"]['Enums']["id_type"],"iqama_end"?: string | null,"iqama_start"?: string | null,"job_title"?: string | null,"locale"?: string,"manager_id"?: string | null,"marital_status"?: string | null,"national_id": string,"nationality"?: string | null,"occupation"?: string | null,"phone"?: string | null,"probation_days"?: number | null,"role"?: Database["public"]['Enums']["employee_role"],"shift_id"?: string | null,"shift_since"?: string | null,"status"?: Database["public"]['Enums']["employee_status"],"terminated_at"?: string | null,"termination_date"?: string | null,"termination_reason"?: string | null,"termination_type"?: string | null,"updated_at"?: string,"user_id"?: string | null
                   }
                   Update: {
-                    "birth_date"?: string | null,"branch_id"?: string | null,"company_id"?: string,"contract_end"?: string | null,"contract_start"?: string | null,"contract_type"?: string | null,"created_at"?: string,"created_by"?: string | null,"deleted_at"?: string | null,"department_id"?: string | null,"disabled_at"?: string | null,"email"?: string | null,"employee_number"?: string | null,"full_name_ar"?: string,"full_name_en"?: string | null,"gender"?: string | null,"hire_date"?: string | null,"id"?: string,"id_type"?: Database["public"]['Enums']["id_type"],"job_title"?: string | null,"locale"?: string,"manager_id"?: string | null,"marital_status"?: string | null,"national_id"?: string,"nationality"?: string | null,"occupation"?: string | null,"phone"?: string | null,"probation_days"?: number | null,"role"?: Database["public"]['Enums']["employee_role"],"shift_id"?: string | null,"shift_since"?: string | null,"status"?: Database["public"]['Enums']["employee_status"],"updated_at"?: string,"user_id"?: string | null
+                    "birth_date"?: string | null,"branch_id"?: string | null,"company_id"?: string,"contract_end"?: string | null,"contract_start"?: string | null,"contract_type"?: string | null,"created_at"?: string,"created_by"?: string | null,"deleted_at"?: string | null,"department_id"?: string | null,"disabled_at"?: string | null,"email"?: string | null,"employee_number"?: string | null,"full_name_ar"?: string,"full_name_en"?: string | null,"gender"?: string | null,"hire_date"?: string | null,"id"?: string,"id_type"?: Database["public"]['Enums']["id_type"],"iqama_end"?: string | null,"iqama_start"?: string | null,"job_title"?: string | null,"locale"?: string,"manager_id"?: string | null,"marital_status"?: string | null,"national_id"?: string,"nationality"?: string | null,"occupation"?: string | null,"phone"?: string | null,"probation_days"?: number | null,"role"?: Database["public"]['Enums']["employee_role"],"shift_id"?: string | null,"shift_since"?: string | null,"status"?: Database["public"]['Enums']["employee_status"],"terminated_at"?: string | null,"termination_date"?: string | null,"termination_reason"?: string | null,"termination_type"?: string | null,"updated_at"?: string,"user_id"?: string | null
                   }
                   Relationships: [
                     {
@@ -636,6 +636,9 @@ isOneToOne: false
 "advance_request_decide":
 { Args: { "p_decision": string,"p_id": string,"p_note"?: string }; Returns: undefined
                            },
+"approve_payroll_run":
+{ Args: { "p_run_id": string }; Returns: undefined
+                           },
 "attendance_assign":
 { Args: { "p_branch_id": string,"p_employee_ids": (string)[],"p_shift_id": string }; Returns: number
                            },
@@ -657,6 +660,9 @@ isOneToOne: false
 "can_submit_task":
 { Args: { "p_task_id": string }; Returns: boolean
                            },
+"cancel_payroll_run":
+{ Args: { "p_run_id": string }; Returns: undefined
+                           },
 "company_set_logo":
 { Args: { "p_logo_path": string }; Returns: string
                            },
@@ -667,6 +673,9 @@ isOneToOne: false
                            },
 "consume_rate_limit":
 { Args: { "p_kind": string }; Returns: undefined
+                           },
+"create_payroll_run":
+{ Args: { "p_month": number,"p_notes"?: string,"p_year": number }; Returns: string
                            },
 "employee_assign_user":
 { Args: { "p_employee_id": string,"p_locale": string,"p_role": Database["public"]['Enums']["employee_role"],"p_user_id": string }; Returns: undefined
@@ -689,8 +698,14 @@ isOneToOne: false
 "employee_password_reset_begin":
 { Args: { "p_employee_id": string }; Returns: string
                            },
+"employee_reactivate":
+{ Args: { "p_employee_id": string }; Returns: string
+                           },
 "employee_set_status":
 { Args: { "p_employee_id": string,"p_status": Database["public"]['Enums']["employee_status"] }; Returns: string
+                           },
+"employee_terminate":
+{ Args: { "p_date": string,"p_employee_id": string,"p_reason": string,"p_type": string }; Returns: string
                            },
 "employee_update":
 { Args: { "p_employee_id": string,"p_file": Json,"p_pay": Json,"p_role": Database["public"]['Enums']["employee_role"] }; Returns: undefined
@@ -782,7 +797,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "company_status": "active"|"suspended","document_type": "iqama"|"national_id"|"work_permit"|"passport"|"health_card"|"contract","employee_role": "owner"|"hr"|"manager"|"employee","employee_status": "active"|"disabled"|"deleted","id_type": "citizen"|"resident","report_status": "submitted"|"changes_requested"|"approved","task_priority": "low"|"medium"|"high"|"urgent","task_status": "assigned"|"in_progress"|"submitted"|"changes_requested"|"approved"
+            "company_status": "active"|"suspended","document_type": "iqama"|"national_id"|"work_permit"|"passport"|"health_card"|"contract","employee_role": "owner"|"admin"|"hr"|"manager"|"employee","employee_status": "active"|"disabled"|"terminated"|"deleted","id_type": "citizen"|"resident","report_status": "submitted"|"changes_requested"|"approved","task_priority": "low"|"medium"|"high"|"urgent","task_status": "assigned"|"in_progress"|"submitted"|"changes_requested"|"approved"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -902,7 +917,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "company_status": ["active", "suspended"],"document_type": ["iqama", "national_id", "work_permit", "passport", "health_card", "contract"],"employee_role": ["owner", "hr", "manager", "employee"],"employee_status": ["active", "disabled", "deleted"],"id_type": ["citizen", "resident"],"report_status": ["submitted", "changes_requested", "approved"],"task_priority": ["low", "medium", "high", "urgent"],"task_status": ["assigned", "in_progress", "submitted", "changes_requested", "approved"]
+            "company_status": ["active", "suspended"],"document_type": ["iqama", "national_id", "work_permit", "passport", "health_card", "contract"],"employee_role": ["owner", "admin", "hr", "manager", "employee"],"employee_status": ["active", "disabled", "terminated", "deleted"],"id_type": ["citizen", "resident"],"report_status": ["submitted", "changes_requested", "approved"],"task_priority": ["low", "medium", "high", "urgent"],"task_status": ["assigned", "in_progress", "submitted", "changes_requested", "approved"]
           }
         }
 } as const

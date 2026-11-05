@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export default async function DepartmentsPage({ params }: PageProps<"/[locale]/departments">) {
   const locale = (await params).locale as Locale;
-  await requireMember(locale, ["owner", "hr"]);
+  await requireMember(locale, ["owner", "admin", "hr"]);
 
   const supabase = await createClient();
   const { data: departments } = await supabase

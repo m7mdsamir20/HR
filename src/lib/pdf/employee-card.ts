@@ -20,7 +20,7 @@ export async function buildEmployeeCardPdf(locale: Locale, member: Member, emplo
     supabase
       .from("employees")
       .select(
-        "id, national_id, id_type, full_name_ar, full_name_en, phone, email, employee_number, job_title, occupation, role, status, nationality, gender, birth_date, marital_status, hire_date, contract_type, contract_start, contract_end, probation_days, department:departments(name_ar, name_en), manager:manager_id(full_name_ar, full_name_en)",
+        "id, national_id, id_type, iqama_start, iqama_end, full_name_ar, full_name_en, phone, email, employee_number, job_title, occupation, role, status, nationality, gender, birth_date, marital_status, hire_date, contract_type, contract_start, contract_end, probation_days, department:departments(name_ar, name_en), manager:manager_id(full_name_ar, full_name_en)",
       )
       .eq("id", employeeId)
       .neq("status", "deleted")
@@ -77,6 +77,12 @@ export async function buildEmployeeCardPdf(locale: Locale, member: Member, emplo
       { label: te("columns.nationalId"), value: ltr(e.national_id) },
       { label: te("form.idType"), value: esc(idTypeName) },
       { label: te("form.nationality"), value: txt(nationalityName(locale, e.nationality)) },
+      ...(e.id_type === "resident"
+        ? [
+            { label: te("form.iqamaStart"), value: date(e.iqama_start) },
+            { label: te("form.iqamaEnd"), value: date(e.iqama_end) },
+          ]
+        : []),
       { label: te("form.gender"), value: e.gender ? esc(te(`options.gender.${e.gender as "male"}`)) : "—" },
       { label: te("form.birthDate"), value: date(e.birth_date) },
       { label: te("form.maritalStatus"), value: e.marital_status ? esc(te(`options.maritalStatus.${e.marital_status as "single"}`)) : "—" },
@@ -121,11 +127,11 @@ export async function buildEmployeeCardPdf(locale: Locale, member: Member, emplo
         : ""
     }
 
-    <!-- 5. Official Documents -->
-    <h2>${esc(td("title"))}</h2>
+    <!-- 5. Official Documents (if any) -->
     ${
       documents.length
-        ? `<table><thead><tr><th>${esc(td("type"))}</th><th>${esc(td("number"))}</th><th>${esc(td("issueDate"))}</th><th>${esc(td("expiryDate"))}</th><th></th></tr></thead><tbody>
+        ? `<h2>${esc(td("title"))}</h2>
+           <table><thead><tr><th>${esc(td("type"))}</th><th>${esc(td("number"))}</th><th>${esc(td("issueDate"))}</th><th>${esc(td("expiryDate"))}</th><th></th></tr></thead><tbody>
             ${documents
               .map(
                 (d) => `<tr>
@@ -138,7 +144,7 @@ export async function buildEmployeeCardPdf(locale: Locale, member: Member, emplo
               )
               .join("")}
           </tbody></table>`
-        : `<p class="muted">${esc(td("empty"))}</p>`
+        : ""
     }
   `;
 

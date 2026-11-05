@@ -15,6 +15,7 @@
   },
   "roles": {
     "owner": "Company Admin (Owner)",
+    "admin": "General Manager (Full Access)",
     "hr": "HR Specialist (HR)",
     "manager": "Manager / Supervisor",
     "employee": "Employee"
@@ -217,6 +218,7 @@
       "employeeStatus": {
         "active": "Active account",
         "disabled": "Disabled account",
+        "terminated": "Terminated account",
         "deleted": "Deleted account (number is free)"
       }
     }
@@ -278,6 +280,7 @@
       "label": "Status",
       "active": "Active",
       "disabled": "Disabled",
+      "terminated": "Terminated",
       "all": "All"
     },
     "empty": "No employees yet. Add the first one and set their role and supervisor.",
@@ -291,12 +294,20 @@
       "role": "Role",
       "department": "Department",
       "manager": "Direct Manager",
-      "status": "Status"
+      "status": "Status",
+      "actions": "Actions"
     },
     "status": {
       "active": "Active",
       "disabled": "Disabled",
+      "terminated": "Terminated",
       "deleted": "Deleted"
+    },
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "manageStatus": "Status / Termination",
+      "print": "Print Card"
     },
     "form": {
       "personal": "Basic details",
@@ -358,6 +369,9 @@
       "contractStart": "Contract start",
       "contractEnd": "Contract end",
       "contractEndHint": "Required for a fixed-term contract.",
+      "iqamaStart": "Iqama Start Date",
+      "iqamaEnd": "Iqama Expiry Date",
+      "iqamaEndHint": "Resident ID expiration date.",
       "probationDays": "Probation (days)",
       "probationHint": "90 days, extendable to 180.",
       "basicSalary": "Basic salary",
@@ -403,7 +417,35 @@
       "otherAllowances": "Enter a valid amount (0 or more).",
       "bankName": "Bank name is at most 80 characters.",
       "iban": "That IBAN isn't valid. Check all 24 characters.",
-      "gosiNumber": "GOSI number is digits only (up to 15)."
+      "gosiNumber": "GOSI number is digits only (up to 15).",
+      "iqamaStart": "Iqama start date is invalid.",
+      "iqamaEnd": "Iqama expiry must be after start date."
+    },
+    "termination": {
+      "title": "Employee Status & Separation",
+      "subtitle": "Manage employee end-of-service (resignation, contract end, termination), suspension, or deletion.",
+      "terminateTab": "End of Service",
+      "statusTab": "Disable / Enable",
+      "deleteTab": "Permanent Delete",
+      "type": "Separation Reason",
+      "types": {
+        "resignation": "Resignation",
+        "contract_end": "Contract End",
+        "termination": "Termination / Dismissal",
+        "absence": "Absence / Job Desertion",
+        "other": "Other Reasons"
+      },
+      "date": "Termination Effective Date",
+      "reason": "Termination Notes / Details",
+      "reasonPlaceholder": "Enter separation details or grounds…",
+      "confirm": "Confirm Separation",
+      "warning": "Important: Terminated employees will not receive salary slips in upcoming payroll runs, cannot log in, and their seat is freed.",
+      "reactivateTitle": "Reactivate employee?",
+      "reactivateBody": "The employee status will be restored to active and will resume appearing in payroll runs and attendance.",
+      "reactivateConfirm": "Reactivate Employee",
+      "infoTitle": "Separation Details",
+      "terminatedAt": "Separation Date",
+      "reasonLabel": "Reason / Notes"
     },
     "detail": {
       "back": "Employees",
