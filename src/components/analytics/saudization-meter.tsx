@@ -1,4 +1,4 @@
-import { AlertTriangle, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import { StatusPill } from "@/components/status-pill";
 import { saudizationTone, type WorkforceKpis } from "@/lib/analytics";
 
@@ -66,19 +66,6 @@ export function SaudizationMeter({ workforce, t }: SaudizationMeterProps) {
           </span>
         </div>
       </div>
-
-      {/* Expiry alerts footer if any */}
-      {((workforce.expiring_docs_30d ?? 0) > 0 || (workforce.critical_docs_15d ?? 0) > 0) && (
-        <div className="flex items-center justify-between rounded-control border border-saffron/30 bg-saffron/10 px-3 py-2 text-caption text-saffron">
-          <span className="flex items-center gap-1.5 font-medium">
-            <AlertTriangle className="size-4 shrink-0" aria-hidden />
-            {t("expiringDocs")}
-          </span>
-          <span className="font-bold tabular-nums">
-            {workforce.expiring_docs_30d}
-          </span>
-        </div>
-      )}
     </div>
   );
 }

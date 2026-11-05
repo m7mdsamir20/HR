@@ -1,15 +1,8 @@
 import {
-  Banknote,
   BarChart3,
-  CalendarClock,
-  CalendarDays,
   Clock,
   DollarSign,
-  HandCoins,
   ListChecks,
-  MapPin,
-  Network,
-  Settings,
   Star,
   Users,
 } from "lucide-react";
@@ -20,14 +13,12 @@ import { FinancialSummaryCard } from "@/components/analytics/financial-summary-c
 import { KpiCard } from "@/components/analytics/kpi-card";
 import { SaudizationMeter } from "@/components/analytics/saudization-meter";
 import { TaskEfficiencyCard } from "@/components/analytics/task-efficiency-card";
-import { StatusPill } from "@/components/status-pill";
 import { TaskCard, type TaskRow } from "@/components/tasks/task-card";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import type { AnalyticsSummary } from "@/lib/analytics";
 import { requireMember } from "@/lib/auth/account";
-import { documentStatus, documentStatusTone, EXPIRY_WARNING_DAYS } from "@/lib/documents";
-import { formatDate, todayInRiyadh } from "@/lib/format";
+import { todayInRiyadh } from "@/lib/format";
 import { formatAmount } from "@/lib/money";
 import { createClient } from "@/lib/supabase/server";
 import { loadNames } from "@/lib/task-data";
@@ -41,9 +32,6 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const t = await getTranslations({ locale, namespace: "home" });
   const tApp = await getTranslations({ locale, namespace: "app" });
   const tTasks = await getTranslations({ locale, namespace: "tasks" });
-  const tDocs = await getTranslations({ locale, namespace: "documents" });
-  const tNav = await getTranslations({ locale, namespace: "nav" });
-  const tEmployees = await getTranslations({ locale, namespace: "employees" });
   const tAnalytics = await getTranslations({ locale, namespace: "analytics" });
 
   const isLeader = member.role === "owner" || member.role === "admin";
@@ -53,10 +41,9 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const managesPeople = isLeader || isHR;
 
   const today = todayInRiyadh();
-  const soon = new Date(Date.parse(today) + EXPIRY_WARNING_DAYS * 86_400_000).toISOString().slice(0, 10);
 
   const supabase = await createClient();
-  const [mine, review, overdue, docs, analyticsRes] = await Promise.all([
+  const [mine, review, overdue, analyticsRes] = await Promise.all([
     // Only non-owners usually have personal daily assignee tasks
     !isLeader
       ? supabase.from("tasks").select(TASK_COLUMNS).eq("assignee_id", member.employee_id).neq("status", "approved").order("due_date").limit(6)
@@ -67,16 +54,13 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
     isLeader || isManager
       ? supabase.from("tasks").select(TASK_COLUMNS).in("status", ["assigned", "in_progress", "changes_requested"]).lt("due_date", today).neq("assignee_id", member.employee_id).order("due_date").limit(6)
       : Promise.resolve({ data: [] }),
-    managesPeople
-      ? supabase.from("employee_documents").select("id, employee_id, doc_type, expiry_date").not("expiry_date", "is", null).lte("expiry_date", soon).order("expiry_date").limit(8)
-      : Promise.resolve({ data: [] }),
     supabase.rpc("get_analytics_summary"),
   ]);
 
   const summary = (analyticsRes.data as unknown as AnalyticsSummary) || null;
 
   const taskRows = [...(mine.data ?? []), ...(review.data ?? []), ...(overdue.data ?? [])];
-  const names = await loadNames(locale, [...taskRows.map((r) => r.assignee_id), ...(docs.data ?? []).map((d) => d.employee_id)]);
+  const names = await loadNames(locale, taskRows.map((r) => r.assignee_id));
   const toRows = (rows: typeof taskRows): TaskRow[] =>
     rows.map((r) => ({
       id: r.id,
@@ -264,65 +248,6 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           )}
         </Section>
       )}
-
-      {/* Expiring Documents Alert for HR and Leaders */}
-      {managesPeople && (docs.data ?? []).length > 0 && (
-        <Section title={t("expiringDocs")} href="/employees" more={tEmployees("title")}>
-          <ul className="grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
-            {(docs.data ?? []).map((d) => {
-              const status = documentStatus(d.expiry_date, today);
-              return (
-                <li key={d.id}>
-                  <Link
-                    href={`/employees/${d.employee_id}`}
-                    className="flex flex-col gap-1.5 rounded-card border border-line bg-surface p-4 hover:border-indigo focus-visible:outline-2 focus-visible:outline-indigo transition-colors"
-                  >
-                    <span className="flex items-start justify-between gap-3">
-                      <span className="font-semibold">{tDocs(`types.${d.doc_type as "iqama"}`)}</span>
-                      {status !== "noExpiry" && <StatusPill tone={documentStatusTone[status]}>{tDocs(`status.${status}`)}</StatusPill>}
-                    </span>
-                    <span className="text-secondary">{names.get(d.employee_id) ?? "—"}</span>
-                    <span className="text-secondary tabular-nums">{t("expiresOn", { date: formatDate(locale, d.expiry_date!) })}</span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </Section>
-      )}
-
-      {/* Quick Administrative Links (Leadership and HR) */}
-      {managesPeople && (
-        <section aria-labelledby="quick" className="flex flex-col gap-3">
-          <h2 id="quick" className="text-section">
-            {t("quickLinks")}
-          </h2>
-          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              { href: "/attendance/sheet", label: tNav("attendance"), icon: Clock, show: true },
-              { href: "/payroll", label: tNav("payroll"), icon: Banknote, show: true },
-              { href: "/advances/requests", label: tNav("advances"), icon: HandCoins, show: true },
-              { href: "/leave", label: tNav("leave"), icon: CalendarDays, show: true },
-              { href: "/departments", label: tNav("departments"), icon: Network, show: true },
-              { href: "/settings/branches", label: tNav("branches"), icon: MapPin, show: true },
-              { href: "/settings/shifts", label: tNav("shifts"), icon: CalendarClock, show: true },
-              { href: "/settings", label: tNav("settings"), icon: Settings, show: true },
-            ]
-              .filter((l) => l.show)
-              .map(({ href, label, icon: Icon }) => (
-                <li key={href}>
-                  <Link
-                    href={href}
-                    className="flex min-h-14 items-center gap-3 rounded-card border border-line bg-surface px-4 hover:border-indigo focus-visible:outline-2 focus-visible:outline-indigo transition-colors"
-                  >
-                    <Icon className="size-5 text-ink-soft" aria-hidden />
-                    <span className="font-semibold">{label}</span>
-                  </Link>
-                </li>
-              ))}
-          </ul>
-        </section>
-      )}
     </main>
   );
 }
@@ -334,7 +259,7 @@ function Section({
   children,
 }: {
   title: string;
-  href?: "/tasks" | "/employees" | "/tasks?status=review";
+  href?: "/tasks" | "/tasks?status=review";
   more?: string;
   children: React.ReactNode;
 }) {
