@@ -13,7 +13,7 @@ import { createClient } from "@/lib/supabase/server";
 export default async function PayrollRunsPage({ params }: PageProps<"/[locale]">) {
   const locale = (await params).locale as Locale;
   const member = await requireMember(locale);
-  if (member.role !== "owner" && member.role !== "hr") {
+  if (member.role !== "owner" && member.role !== "admin" && member.role !== "hr") {
     notFound();
   }
 
@@ -95,4 +95,3 @@ export default async function PayrollRunsPage({ params }: PageProps<"/[locale]">
     </main>
   );
 }
-

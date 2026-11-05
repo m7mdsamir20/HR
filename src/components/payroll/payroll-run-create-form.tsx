@@ -1,12 +1,21 @@
 "use client";
 
-import { CalendarPlus } from "lucide-react";
+import { CalendarPlus, Loader2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useActionState, useState } from "react";
 import { createPayrollRun, type PayrollState } from "@/actions/payroll";
 import { FormField } from "@/components/form-field";
 import { SelectField } from "@/components/select-field";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export function PayrollRunCreateForm() {
   const t = useTranslations("payroll");
@@ -32,66 +41,76 @@ export function PayrollRunCreateForm() {
     undefined
   );
 
-  const error = state && !state.ok ? tErrors(state.error) : null;
-
-  if (!open) {
-    return (
-      <Button onClick={() => setOpen(true)} className="gap-2">
-        <CalendarPlus className="size-4" aria-hidden />
-        {t("newRun")}
-      </Button>
-    );
-  }
+  const error = state && !state.ok ? (tErrors.has(state.error) ? tErrors(state.error) : tErrors("unexpected")) : null;
 
   return (
-    <form action={action} className="rounded-card border border-line bg-surface p-4 md:p-6" noValidate>
-      <input type="hidden" name="uiLocale" value={locale} />
-      <p className="mb-1 text-card">{t("newRun")}</p>
-      <p className="mb-5 text-secondary">{t("creatingRun")}</p>
-
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        <FormField
-          name="year"
-          type="number"
-          label={t("year")}
-          value={year}
-          onChange={(e) => setYear(Number(e.target.value))}
-          min={2020}
-          max={2100}
-          required
-          dir="ltr"
-        />
-
-        <SelectField
-          name="month"
-          label={t("month")}
-          value={String(month)}
-          onChange={(e) => setMonth(Number(e.target.value))}
-          options={Array.from({ length: 12 }, (_, i) => ({
-            value: String(i + 1),
-            label: `${i + 1}`,
-          }))}
-        />
-
-        <FormField
-          name="notes"
-          label={t("notes")}
-          placeholder={t("notesPlaceholder")}
-          className="sm:col-span-2 lg:col-span-3"
-        />
-      </div>
-
-      {error && <p className="mt-4 text-caption text-brick">{error}</p>}
-
-      <div className="mt-5 flex items-center gap-2">
-        <Button type="submit" disabled={pending}>
-          {pending ? "..." : t("createRunSubmit")}
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className="gap-2">
+          <CalendarPlus className="size-4" aria-hidden />
+          {t("newRun")}
         </Button>
-        <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
-          إلغاء
-        </Button>
-      </div>
-    </form>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-primary font-bold">
+            <CalendarPlus className="size-5 text-indigo" />
+            {t("newRun")}
+          </DialogTitle>
+          <DialogDescription>{t("creatingRun")}</DialogDescription>
+        </DialogHeader>
+
+        <form action={action} className="flex flex-col gap-4 mt-2" noValidate>
+          <input type="hidden" name="uiLocale" value={locale} />
+
+          <div className="grid grid-cols-2 gap-3">
+            <FormField
+              name="year"
+              type="number"
+              label={t("year")}
+              value={year}
+              onChange={(e) => setYear(Number(e.target.value))}
+              min={2020}
+              max={2100}
+              required
+              dir="ltr"
+            />
+
+            <SelectField
+              name="month"
+              label={t("month")}
+              value={String(month)}
+              onChange={(e) => setMonth(Number(e.target.value))}
+              options={Array.from({ length: 12 }, (_, i) => ({
+                value: String(i + 1),
+                label: `${i + 1}`,
+              }))}
+            />
+          </div>
+
+          <FormField
+            name="notes"
+            label={t("notes")}
+            placeholder={t("notesPlaceholder")}
+          />
+
+          {error && (
+            <p role="alert" className="text-caption font-medium text-brick bg-brick/10 p-2.5 rounded-card border border-brick/20">
+              {error}
+            </p>
+          )}
+
+          <DialogFooter className="mt-2">
+            <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={pending}>
+              {locale === "ar" ? "إلغاء" : "Cancel"}
+            </Button>
+            <Button type="submit" disabled={pending} className="gap-2">
+              {pending && <Loader2 className="size-4 animate-spin" />}
+              {pending ? (locale === "ar" ? "جاري الإنشاء..." : "Creating...") : t("createRunSubmit")}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
-

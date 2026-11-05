@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 export function PayrollTabs({ role }: { role: Role }) {
   const t = useTranslations("payroll");
   const pathname = usePathname();
-  const canManage = role === "owner" || role === "hr";
+  const canManage = role === "owner" || role === "admin" || role === "hr";
 
   const tabs = [
     { href: "/payroll", label: t("mySlips") },
@@ -41,4 +41,3 @@ export function PayrollTabs({ role }: { role: Role }) {
     </div>
   );
 }
-

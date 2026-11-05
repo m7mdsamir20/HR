@@ -28,8 +28,9 @@ export default async function SettingsShiftsPage({ params }: PageProps<"/[locale
 
   const shiftNames = new Map((shifts ?? []).map((s) => [s.id, pick(s.name_ar, s.name_en)]));
   const branchNames = new Map((branches ?? []).map((b) => [b.id, pick(b.name_ar, b.name_en)]));
-  // HR can't assign the owner or themself (the database says the same); the owner can assign anyone.
-  const assignable = (employees ?? []).filter((e) => member.role === "owner" || (e.role !== "owner" && e.role !== "hr"));
+  // HR can't assign the owner or themself (the database says the same); the owner/admin can assign anyone.
+  const isLeader = member.role === "owner" || member.role === "admin";
+  const assignable = (employees ?? []).filter((e) => isLeader || (e.role !== "owner" && e.role !== "hr"));
 
   return (
     <main className="flex flex-col gap-6">
@@ -85,7 +86,7 @@ export default async function SettingsShiftsPage({ params }: PageProps<"/[locale
 
         {rules && (
           <RulesForm
-            canEdit={member.role === "owner"}
+            canEdit={isLeader}
             rules={{
               tier1Minutes: rules.late_tier1_minutes,
               tier2Minutes: rules.late_tier2_minutes,

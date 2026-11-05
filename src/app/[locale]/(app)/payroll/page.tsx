@@ -13,7 +13,7 @@ export default async function PayrollPage({ params }: PageProps<"/[locale]">) {
   const locale = (await params).locale as Locale;
   const member = await requireMember(locale);
   const t = await getTranslations({ locale, namespace: "payroll" });
-  const isOwnerOrHr = member.role === "owner" || member.role === "hr";
+  const isOwnerOrHr = member.role === "owner" || member.role === "admin" || member.role === "hr";
 
   const supabase = await createClient();
 

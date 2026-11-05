@@ -39,19 +39,37 @@ export function RulesForm({ rules, canEdit }: { rules: Rules; canEdit: boolean }
         <h2 className="text-section">{t("title")}</h2>
         <p className="text-secondary">{canEdit ? t("intro") : t("introReadOnly")}</p>
       </div>
-      <FormSection title={t("late")} description={t("lateHint")}>
-        <FormField name="tier1Minutes" label={t("tier1Minutes")} defaultValue={rules.tier1Minutes} error={bad("tier1Minutes")} {...ro} />
-        <FormField name="tier2Minutes" label={t("tier2Minutes")} defaultValue={rules.tier2Minutes} error={bad("tier2Minutes")} {...ro} />
-        <FormField name="tier3Minutes" label={t("tier3Minutes")} defaultValue={rules.tier3Minutes} error={bad("tier3Minutes")} {...ro} />
-        <FormField name="tier1Percent" label={t("tier1Percent")} hint={t("warningHint")} defaultValue={rules.tier1Percent} error={bad("tier1Percent")} {...ro} />
-        <FormField name="tier2Percent" label={t("tier2Percent")} defaultValue={rules.tier2Percent} error={bad("tier2Percent")} {...ro} />
-        <FormField name="tier3Percent" label={t("tier3Percent")} defaultValue={rules.tier3Percent} error={bad("tier3Percent")} {...ro} />
-        <FormField name="tier4Percent" label={t("tier4Percent")} defaultValue={rules.tier4Percent} error={bad("tier4Percent")} {...ro} />
-      </FormSection>
+
+      <fieldset className="min-w-0 rounded-card border border-line bg-surface p-4 md:p-6">
+        <legend className="sr-only">{t("late")}</legend>
+        <div className="mb-5 flex flex-col gap-1" aria-hidden>
+          <p className="text-card">{t("late")}</p>
+          <p className="text-secondary">{t("lateHint")}</p>
+        </div>
+
+        <div className="flex flex-col gap-6">
+          {/* Minutes thresholds: Tier 1, Tier 2, Tier 3 */}
+          <div className="grid gap-5 sm:grid-cols-3">
+            <FormField name="tier1Minutes" label={t("tier1Minutes")} defaultValue={rules.tier1Minutes} error={bad("tier1Minutes")} {...ro} />
+            <FormField name="tier2Minutes" label={t("tier2Minutes")} defaultValue={rules.tier2Minutes} error={bad("tier2Minutes")} {...ro} />
+            <FormField name="tier3Minutes" label={t("tier3Minutes")} defaultValue={rules.tier3Minutes} error={bad("tier3Minutes")} {...ro} />
+          </div>
+
+          {/* Deduction percentages: Tier 1, Tier 2, Tier 3, Tier 4 - all 4 side-by-side in the row below */}
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <FormField name="tier1Percent" label={t("tier1Percent")} hint={t("warningHint")} defaultValue={rules.tier1Percent} error={bad("tier1Percent")} {...ro} />
+            <FormField name="tier2Percent" label={t("tier2Percent")} defaultValue={rules.tier2Percent} error={bad("tier2Percent")} {...ro} />
+            <FormField name="tier3Percent" label={t("tier3Percent")} defaultValue={rules.tier3Percent} error={bad("tier3Percent")} {...ro} />
+            <FormField name="tier4Percent" label={t("tier4Percent")} defaultValue={rules.tier4Percent} error={bad("tier4Percent")} {...ro} />
+          </div>
+        </div>
+      </fieldset>
+
       <FormSection title={t("otherTitle")}>
         <FormField name="earlyGraceMinutes" label={t("earlyGrace")} hint={t("earlyGraceHint")} defaultValue={rules.earlyGraceMinutes} error={bad("earlyGraceMinutes")} {...ro} />
         <FormField name="absencePercent" label={t("absencePercent")} defaultValue={rules.absencePercent} error={bad("absencePercent")} {...ro} />
       </FormSection>
+
       {canEdit && (
         <div className="flex flex-wrap items-center gap-3">
           <Button type="submit" disabled={pending}>
