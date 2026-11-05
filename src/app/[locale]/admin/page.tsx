@@ -28,6 +28,7 @@ export default async function CompaniesPage({ params, searchParams }: PageProps<
       "id, name_ar, name_en, status, max_employees, subscription_ends_at, seats:employees(count), owners:employees(full_name_ar, full_name_en)",
     )
     .eq("seats.status", "active")
+    .neq("seats.role", "owner")
     .eq("owners.role", "owner")
     .eq("owners.status", "active")
     .order("created_at", { ascending: false })

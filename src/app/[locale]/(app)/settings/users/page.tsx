@@ -16,6 +16,7 @@ export default async function SettingsUsersPage({ params }: PageProps<"/[locale]
     .select("id, national_id, full_name_ar, full_name_en, job_title, role, user_id, locale, employee_number, departments(name_ar, name_en)")
     .eq("company_id", member.company.id)
     .neq("status", "deleted")
+    .neq("role", "owner")
     .order("employee_number", { ascending: true, nullsFirst: false });
 
   const pick = (ar: string, en: string | null | undefined) => (locale === "en" && en) || ar;

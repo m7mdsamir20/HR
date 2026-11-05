@@ -14,9 +14,9 @@
     "unexpected": "Something went wrong. Try again, and contact support if it keeps happening."
   },
   "roles": {
-    "owner": "Company manager",
-    "hr": "HR officer",
-    "manager": "Supervisor",
+    "owner": "Company Admin (Owner)",
+    "hr": "HR Specialist (HR)",
+    "manager": "Manager / Supervisor",
     "employee": "Employee"
   },
   "login": {
@@ -64,7 +64,7 @@
     "note": "Your company data is kept. Employees can't sign in until the subscription is renewed."
   },
   "admin": {
-    "panel": "System Admin",
+    "panel": "Platform Admin (Super Admin)",
     "nav": {
       "companies": "Companies",
       "lookup": "ID lookup"

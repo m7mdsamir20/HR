@@ -102,7 +102,8 @@ export default async function CompanyPage({ params }: PageProps<"/[locale]/admin
       .from("employees")
       .select("id", { count: "exact", head: true })
       .eq("company_id", id.data)
-      .eq("status", "active"),
+      .eq("status", "active")
+      .neq("role", "owner"),
     supabase
       .from("audit_logs")
       .select("id, action, created_at")

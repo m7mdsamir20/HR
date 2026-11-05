@@ -17,6 +17,7 @@ export default async function LeaveBalancesPage({ params }: PageProps<"/[locale]
     .from("employees")
     .select("id, full_name_ar, full_name_en, role, employee_number")
     .eq("status", "active")
+    .neq("role", "owner")
     .order("employee_number", { ascending: true, nullsFirst: false })
     .limit(200);
   const people = (employees ?? []).sort((a, b) => {

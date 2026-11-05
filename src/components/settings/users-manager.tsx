@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { Role } from "@/lib/auth/roles";
 import { suggestPassword } from "@/lib/password";
+import { cn } from "@/lib/utils";
 
 export interface EmployeeUserItem {
   id: string;
@@ -36,6 +37,60 @@ const roleTones: Record<Role, Tone> = {
   employee: "neutral",
 };
 
+interface RoleDefinition {
+  id: "manager" | "hr" | "employee";
+  title: string;
+  badge: string;
+  tone: Tone;
+  summary: string;
+  visibleScreens: string[];
+  permissions: string[];
+}
+
+const ROLE_DEFINITIONS: RoleDefinition[] = [
+  {
+    id: "manager",
+    title: "مدير / مشرف (فرع أو قسم)",
+    badge: "إدارة الفريق والعمليات",
+    tone: "saffron",
+    summary: "مخصص لمدراء الفروع، رؤساء الأقسام، ومشرفي المواقع والفرق الميدانية.",
+    visibleScreens: ["لوحة التحكم", "المهام", "حضور فريقي", "إجازات فريقي"],
+    permissions: [
+      "متابعة وإسناد المهام لأعضاء فريقه واعتماد تقارير الإنجاز",
+      "الموافقة على طلبات إجازات موظفي قسمه أو رفضها",
+      "الاطلاع على بصمات الحضور والانصراف وسجلات فريقه فقط",
+    ],
+  },
+  {
+    id: "hr",
+    title: "مسؤول الموارد البشرية (HR)",
+    badge: "شؤون الموظفين والرواتب",
+    tone: "stamp",
+    summary: "مخصص لمسؤولي الموارد البشرية، الرواتب، والشؤون الإدارية بالمنشأة.",
+    visibleScreens: ["شؤون الموظفين", "الحضور والانصراف", "الإجازات", "مسيرات الرواتب والسلف", "الأقسام والورديات"],
+    permissions: [
+      "إضافة وتعديل بيانات الموظفين وعقودهم ومستنداتهم",
+      "ضبط الورديات، الفروع، وقواعد الحضور والانصراف للشركة بالكامل",
+      "معالجة طلبات الإجازات والخصومات لجميع موظفي الشركة",
+      "إعداد واعتماد مسيرات الرواتب الشهرية وطلبات السلف",
+    ],
+  },
+  {
+    id: "employee",
+    title: "موظف (الخدمة الذاتية)",
+    badge: "الخدمة الذاتية للموظف",
+    tone: "neutral",
+    summary: "مخصص للموظفين لمتابعة أعمالهم وخدماتهم الذاتية بدون صلاحيات إدارية.",
+    visibleScreens: ["مهامي الشخصية", "تسجيل الحضور (بصمة)", "طلباتي (إجازات وسلف)", "قسائم رواتبي"],
+    permissions: [
+      "تسجيل بصمة الدخول والخروج الجغرافية (GPS) المعتمدة",
+      "استعراض المهام المسندة ورفع تقارير الإنجاز والمرفقات",
+      "تقديم طلبات الإجازات والسلف ومتابعة حالتها",
+      "استعراض قسائم الراتب الشخصية فقط (دون رؤية بيانات زملائه)",
+    ],
+  },
+];
+
 export function UsersManager({ employees, canManage }: UsersManagerProps) {
   const tRoles = useTranslations("roles");
   const tCommon = useTranslations("common");
@@ -43,6 +98,7 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
 
   const [state, action, pending] = useActionState<UserAccountState, FormData>(createUserAccount, undefined);
   const [selectedEmpId, setSelectedEmpId] = useState<string>("");
+  const [selectedRole, setSelectedRole] = useState<"manager" | "hr" | "employee">("employee");
   const [password, setPassword] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
@@ -50,9 +106,23 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
   const selectedEmp = employees.find((e) => e.id === selectedEmpId);
 
   const openForEmployee = (empId: string) => {
+    const target = employees.find((e) => e.id === empId);
     setSelectedEmpId(empId);
+    if (target?.role && target.role !== "owner") {
+      setSelectedRole(target.role);
+    } else {
+      setSelectedRole("employee");
+    }
     setPassword(suggestPassword());
     setIsOpen(true);
+  };
+
+  const handleSelectEmployee = (empId: string) => {
+    setSelectedEmpId(empId);
+    const target = employees.find((e) => e.id === empId);
+    if (target?.role && target.role !== "owner") {
+      setSelectedRole(target.role);
+    }
   };
 
   return (
@@ -109,7 +179,7 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
                 name="employeeId"
                 label="الموظف"
                 value={selectedEmpId}
-                onChange={(e) => setSelectedEmpId(e.target.value)}
+                onChange={(e) => handleSelectEmployee(e.target.value)}
                 options={employees
                   .filter((e) => e.role !== "owner")
                   .map((e) => ({
@@ -119,16 +189,96 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
               />
             </div>
 
-            <SelectField
-              name="role"
-              label="الصلاحية في النظام"
-              defaultValue={selectedEmp?.role && selectedEmp.role !== "owner" ? selectedEmp.role : "employee"}
-              options={[
-                { value: "employee", label: tRoles("employee") },
-                { value: "manager", label: tRoles("manager") },
-                { value: "hr", label: tRoles("hr") },
-              ]}
-            />
+            {/* Categorized Role Selection with Clear Permissions and Visible Screens */}
+            <div className="sm:col-span-2 flex flex-col gap-2.5">
+              <span className="text-label font-medium text-ink">
+                الدور والصلاحية في النظام
+              </span>
+              <input type="hidden" name="role" value={selectedRole} />
+
+              <div className="grid gap-3 lg:grid-cols-3">
+                {ROLE_DEFINITIONS.map((r) => {
+                  const isSelected = selectedRole === r.id;
+                  return (
+                    <div
+                      key={r.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setSelectedRole(r.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setSelectedRole(r.id);
+                        }
+                      }}
+                      className={cn(
+                        "flex flex-col justify-between gap-3 p-4 rounded-card border-2 cursor-pointer transition-all select-none",
+                        isSelected
+                          ? "border-indigo bg-indigo/5 shadow-sm"
+                          : "border-line bg-surface hover:border-line-hover hover:bg-paper/40",
+                        "focus-visible:outline-2 focus-visible:outline-indigo"
+                      )}
+                    >
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="font-semibold text-sm text-ink leading-tight">
+                            {r.title}
+                          </span>
+                          <div
+                            className={cn(
+                              "size-4 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5",
+                              isSelected
+                                ? "border-indigo bg-indigo text-white"
+                                : "border-line bg-surface"
+                            )}
+                          >
+                            {isSelected && <div className="size-1.5 rounded-full bg-white" />}
+                          </div>
+                        </div>
+
+                        <StatusPill tone={r.tone}>{r.badge}</StatusPill>
+
+                        <p className="text-caption text-secondary leading-normal">
+                          {r.summary}
+                        </p>
+                      </div>
+
+                      <div className="flex flex-col gap-2.5 border-t border-line/60 pt-2.5 text-caption">
+                        <div>
+                          <span className="font-semibold text-ink-soft text-2xs block mb-1">
+                            ما سيظهر له في القائمة:
+                          </span>
+                          <div className="flex flex-wrap gap-1">
+                            {r.visibleScreens.map((s) => (
+                              <span
+                                key={s}
+                                className="inline-block px-1.5 py-0.5 rounded-[4px] bg-paper text-ink text-2xs border border-line"
+                              >
+                                {s}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+                          <span className="font-semibold text-ink-soft text-2xs block mb-1">
+                            أبرز الصلاحيات:
+                          </span>
+                          <ul className="flex flex-col gap-1 text-2xs text-secondary">
+                            {r.permissions.map((p) => (
+                              <li key={p} className="flex items-start gap-1">
+                                <span className="text-indigo shrink-0 font-bold">✓</span>
+                                <span>{p}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
 
             <SelectField
               name="locale"
