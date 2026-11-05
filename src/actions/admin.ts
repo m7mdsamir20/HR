@@ -8,7 +8,7 @@ import { z } from "zod";
 import { redirect } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { requirePlatformAdmin } from "@/lib/auth/account";
-import { authEmailFor } from "@/lib/auth/national-id";
+import { authEmailFor, isValidNationalId, normalizeNationalId } from "@/lib/auth/national-id";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -31,6 +31,22 @@ export type CreateCompanyState =
     }
   | undefined;
 
+export async function lookupOwner(nationalId: string): Promise<{ exists: boolean; nameAr?: string }> {
+  const norm = normalizeNationalId(nationalId);
+  if (!isValidNationalId(norm)) return { exists: false };
+  const service = createAdminClient();
+  const { data } = await service
+    .from("employees")
+    .select("full_name_ar")
+    .eq("national_id", norm)
+    .eq("role", "owner")
+    .eq("status", "active")
+    .limit(1)
+    .maybeSingle();
+
+  return data ? { exists: true, nameAr: data.full_name_ar } : { exists: false };
+}
+
 export async function createCompany(_prev: CreateCompanyState, formData: FormData): Promise<CreateCompanyState> {
   const locale = localeSchema.parse(formData.get("locale"));
   await requirePlatformAdmin(locale);
@@ -44,16 +60,60 @@ export async function createCompany(_prev: CreateCompanyState, formData: FormDat
   const d = parsed.data;
 
   const service = createAdminClient();
-  const { data: created, error: createError } = await service.auth.admin.createUser({
-    email: authEmailFor(d.ownerNationalId),
-    password: d.password,
-    email_confirm: true,
-  });
-  if (createError || !created.user) {
-    if (createError?.code === "email_exists") return { error: "nationalIdTaken", fields: { ownerNationalId: true }, values };
-    if (createError?.code === "weak_password") return { error: "invalid", fields: { password: true }, values };
-    console.error("createCompany: auth user", createError?.code);
-    return { error: "unexpected", values };
+  const email = authEmailFor(d.ownerNationalId);
+
+  // Check if national ID belongs to a platform admin (never allowed as company owner)
+  const { data: adminExists } = await service.from("platform_admins").select("user_id").eq("national_id", d.ownerNationalId).maybeSingle();
+  if (adminExists) {
+    return { error: "nationalIdTaken", fields: { ownerNationalId: true }, values };
+  }
+
+  // Check if owner already has an active company account
+  const { data: existingOwner } = await service
+    .from("employees")
+    .select("user_id")
+    .eq("national_id", d.ownerNationalId)
+    .eq("status", "active")
+    .not("user_id", "is", null)
+    .limit(1)
+    .maybeSingle();
+
+  let ownerUserId: string;
+  let createdNewAuthUser = false;
+
+  if (existingOwner?.user_id) {
+    ownerUserId = existingOwner.user_id;
+  } else {
+    // If new owner, password is required
+    if (!d.password) {
+      return { error: "invalid", fields: { password: true }, values };
+    }
+
+    const { data: created, error: createError } = await service.auth.admin.createUser({
+      email,
+      password: d.password,
+      email_confirm: true,
+    });
+    if (createError || !created.user) {
+      if (createError?.code === "email_exists") {
+        // Find existing auth user by email
+        const { data: usersData } = await service.auth.admin.listUsers({ page: 1, perPage: 1000 });
+        const matched = usersData?.users.find((u) => u.email === email);
+        if (matched) {
+          ownerUserId = matched.id;
+        } else {
+          return { error: "nationalIdTaken", fields: { ownerNationalId: true }, values };
+        }
+      } else if (createError?.code === "weak_password") {
+        return { error: "invalid", fields: { password: true }, values };
+      } else {
+        console.error("createCompany: auth user", createError?.code);
+        return { error: "unexpected", values };
+      }
+    } else {
+      ownerUserId = created.user.id;
+      createdNewAuthUser = true;
+    }
   }
 
   const supabase = await createClient();
@@ -63,15 +123,16 @@ export async function createCompany(_prev: CreateCompanyState, formData: FormDat
     p_commercial_reg: d.commercialReg ?? "",
     p_max_employees: d.maxEmployees,
     p_subscription_ends_at: d.endsAt,
-    p_owner_user_id: created.user.id,
+    p_owner_user_id: ownerUserId,
     p_owner_national_id: d.ownerNationalId,
     p_owner_name_ar: d.ownerNameAr,
     p_owner_name_en: d.ownerNameEn ?? "",
     p_owner_phone: d.ownerPhone ?? "",
   });
   if (error || !companyId) {
-    // Don't leave an Auth user behind that holds the national ID.
-    await service.auth.admin.deleteUser(created.user.id);
+    if (createdNewAuthUser) {
+      await service.auth.admin.deleteUser(ownerUserId);
+    }
     if (error?.code === "23505") return { error: "nationalIdTaken", fields: { ownerNationalId: true }, values };
     console.error("createCompany: rpc", error?.code);
     return { error: "unexpected", values };

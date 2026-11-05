@@ -5,12 +5,11 @@ import { EmployeeForm } from "@/components/employees/employee-form";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { requireMember } from "@/lib/auth/account";
-import { assignableRoles } from "@/lib/auth/permissions";
 import { employeeFormOptions } from "@/lib/employees";
 
 export default async function NewEmployeePage({ params }: PageProps<"/[locale]/employees/new">) {
   const locale = (await params).locale as Locale;
-  const member = await requireMember(locale, ["owner", "hr"]);
+  await requireMember(locale, ["owner", "hr"]);
   const t = await getTranslations({ locale, namespace: "employees" });
   const { departments, managers, nationalities } = await employeeFormOptions(locale);
 
@@ -26,11 +25,9 @@ export default async function NewEmployeePage({ params }: PageProps<"/[locale]/e
       <EmployeeForm
         mode="create"
         action={createEmployee}
-        roles={assignableRoles(member.role)}
         departments={departments}
         managers={managers}
         nationalities={nationalities}
-        defaults={{ locale }}
       />
     </main>
   );

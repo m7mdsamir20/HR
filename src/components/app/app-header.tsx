@@ -4,41 +4,57 @@ import { Bell } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { UserProfileMenu } from "@/components/app/user-profile-menu";
+import { CompanySwitcher } from "@/components/app/company-switcher";
 import { Link } from "@/i18n/navigation";
+import type { CompanySummary } from "@/lib/auth/account";
 import type { Role } from "@/lib/auth/roles";
 import { cn } from "@/lib/utils";
 
 interface AppHeaderProps {
   name: string;
   role: Role;
+  companyId: string;
   companyName: string;
   logo: string | null;
   unread: number;
+  companies?: CompanySummary[];
 }
 
-export function AppHeader({ name, role, companyName, logo, unread }: AppHeaderProps) {
+export function AppHeader({
+  name,
+  role,
+  companyId,
+  companyName,
+  logo,
+  unread,
+  companies = [],
+}: AppHeaderProps) {
   const tNav = useTranslations("nav");
+  const hasMultipleCompanies = companies.length > 1;
 
   return (
     <header className="sticky top-0 z-30 flex h-14 w-full items-center justify-between gap-3 border-b border-line bg-surface/95 px-4 backdrop-blur-xs md:px-8">
-      {/* Start side: On mobile shows Company Brand since sidebar is hidden; on desktop kept clean */}
-      <div className="flex min-w-0 items-center gap-2.5 md:hidden">
-        {logo && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={logo}
-            alt=""
-            className="size-8 shrink-0 rounded-control border border-line bg-surface object-contain"
-          />
+      {/* Start side: On mobile shows Company Brand / Switcher; on desktop shows Switcher if multi-company */}
+      <div className="flex min-w-0 items-center gap-2.5">
+        {hasMultipleCompanies ? (
+          <CompanySwitcher currentCompanyId={companyId} companies={companies} />
+        ) : (
+          <div className="flex min-w-0 items-center gap-2.5 md:hidden">
+            {logo && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={logo}
+                alt=""
+                className="size-8 shrink-0 rounded-control border border-line bg-surface object-contain"
+              />
+            )}
+            <span className="truncate text-card font-semibold text-ink">{companyName}</span>
+          </div>
         )}
-        <span className="truncate text-card font-semibold text-ink">{companyName}</span>
       </div>
 
-      {/* Spacer for desktop to keep actions at the end */}
-      <div className="hidden md:block" aria-hidden />
-
       {/* End side: Notifications, Language Switcher (EN/AR), and User Profile Dropdown */}
-      <div className="flex shrink-0 items-center gap-2 sm:gap-3 ms-auto md:ms-0">
+      <div className="flex shrink-0 items-center gap-2 sm:gap-3 ms-auto">
         {/* Notifications Icon Button */}
         <Link
           href="/notifications"

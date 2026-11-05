@@ -254,7 +254,14 @@
       "personal": "Basic details",
       "work": "Work",
       "account": "Sign-in account",
+      "idType": "ID / Residency Type",
+      "idTypeCitizen": "Saudi Citizen",
+      "idTypeResident": "Resident (Expat)",
       "nationalId": "National ID / Iqama",
+      "citizenNationalId": "National ID",
+      "citizenNationalIdHint": "10 digits starting with 1",
+      "residentNationalId": "Iqama Number",
+      "residentNationalIdHint": "10 digits starting with 2",
       "nationalIdHint": "10 digits starting with 1 or 2. It can't be changed after adding.",
       "fullNameAr": "Name (Arabic)",
       "fullNameEn": "Name (English)",
@@ -265,8 +272,10 @@
       "roleHint": "Decides what this person can see and manage.",
       "department": "Department",
       "noDepartment": "No department",
-      "manager": "Direct supervisor",
-      "noManager": "No supervisor",
+      "manager": "Direct manager",
+      "directManager": "Direct manager",
+      "noManager": "No direct manager",
+      "noDirectManager": "No direct manager",
       "locale": "Interface language",
       "password": "Password",
       "passwordHint": "At least 8 characters. Share it with the employee yourself.",
@@ -395,7 +404,8 @@
     "tabs": {
       "company": "Company Settings",
       "branches": "Branches",
-      "shifts": "Shifts"
+      "shifts": "Shifts",
+      "users": "System Users"
     },
     "ownerOnlyNotice": "Only the company owner can modify company details and logo.",
     "company": {

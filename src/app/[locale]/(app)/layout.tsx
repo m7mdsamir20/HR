@@ -44,9 +44,11 @@ export default async function AppLayout({ children, params }: LayoutProps<"/[loc
         <AppHeader
           name={myName}
           role={member.role}
+          companyId={member.company.id}
           companyName={companyName}
           logo={logo}
           unread={unread}
+          companies={member.companies}
         />
 
         {/* Content container */}

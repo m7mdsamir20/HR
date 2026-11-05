@@ -254,7 +254,15 @@
       "personal": "البيانات الأساسية",
       "work": "العمل",
       "account": "حساب الدخول",
+      "idType": "نوع الإقامة",
+      "idTypeCitizen": "مواطن",
+      "idTypeResident": "مقيم",
+      "saudiArabia": "المملكة العربية السعودية",
       "nationalId": "رقم الهوية / الإقامة",
+      "citizenNationalId": "رقم الهوية الوطنية",
+      "citizenNationalIdHint": "10 أرقام تبدأ بـ 1",
+      "residentNationalId": "رقم الإقامة",
+      "residentNationalIdHint": "10 أرقام تبدأ بـ 2",
       "nationalIdHint": "10 أرقام تبدأ بـ 1 أو 2، ولا يمكن تغييره بعد الإضافة.",
       "fullNameAr": "الاسم بالعربية",
       "fullNameEn": "الاسم بالإنجليزية",
@@ -265,8 +273,10 @@
       "roleHint": "يحدد ما يستطيع الموظف رؤيته وإدارته.",
       "department": "القسم",
       "noDepartment": "بدون قسم",
-      "manager": "المشرف المباشر",
-      "noManager": "بدون مشرف",
+      "manager": "المدير المباشر",
+      "directManager": "المدير المباشر",
+      "noManager": "بدون مدير مباشر",
+      "noDirectManager": "بدون مدير مباشر",
       "locale": "لغة الواجهة",
       "password": "الرقم السري",
       "passwordHint": "8 خانات على الأقل. أبلغ الموظف به بنفسك.",
@@ -395,7 +405,8 @@
     "tabs": {
       "company": "إعدادات الشركة",
       "branches": "الفروع",
-      "shifts": "الورديات"
+      "shifts": "الورديات",
+      "users": "حسابات النظام"
     },
     "ownerOnlyNotice": "فقط مالك المنشأة يمكنه تعديل بيانات الشركة والشعار.",
     "company": {

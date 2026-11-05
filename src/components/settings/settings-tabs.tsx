@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, CalendarClock, MapPin } from "lucide-react";
+import { Building2, CalendarClock, MapPin, UserCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,7 @@ export function SettingsTabs() {
     { href: "/settings", label: t("company"), icon: Building2 },
     { href: "/settings/branches", label: t("branches"), icon: MapPin },
     { href: "/settings/shifts", label: t("shifts"), icon: CalendarClock },
+    { href: "/settings/users", label: t("users"), icon: UserCheck },
   ];
 
   return (

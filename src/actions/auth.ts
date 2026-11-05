@@ -1,8 +1,9 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { z } from "zod";
 import { redirect } from "@/i18n/navigation";
-import { routing } from "@/i18n/routing";
+import { routing, type Locale } from "@/i18n/routing";
 import { canEnter, homePathFor, loadAccount } from "@/lib/auth/account";
 import { authEmailFor, isValidNationalId, normalizeNationalId } from "@/lib/auth/national-id";
 import { clientIp, rateLimitKey } from "@/lib/auth/rate-limit";
@@ -66,8 +67,24 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
   redirect({ href: homePathFor(account), locale: account.kind === "employee" ? account.locale : locale });
 }
 
+export async function switchCompany(companyId: string, locale: Locale): Promise<void> {
+  const cookieStore = await cookies();
+  const id = z.uuid().safeParse(companyId);
+  if (id.success) {
+    cookieStore.set("active_company_id", id.data, {
+      path: "/",
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 24 * 365,
+    });
+  }
+  redirect({ href: "/", locale });
+}
+
 export async function logout(formData: FormData): Promise<void> {
   const locale = localeSchema.parse(formData.get("locale"));
+  const cookieStore = await cookies();
+  cookieStore.delete("active_company_id");
   const supabase = await createClient();
   await supabase.auth.signOut({ scope: "local" });
   redirect({ href: "/login", locale });

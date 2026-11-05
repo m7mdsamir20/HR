@@ -27,7 +27,7 @@ export const createCompanySchema = z.object({
   ownerNameAr: nameAr,
   ownerNameEn: nameEn,
   ownerPhone: z.preprocess(digitsOnly, z.string().regex(/^05\d{8}$/).optional()),
-  password: passwordSchema,
+  password: z.preprocess(blankToUndefined, passwordSchema.optional()),
 });
 
 export type CreateCompanyField = keyof z.infer<typeof createCompanySchema>;

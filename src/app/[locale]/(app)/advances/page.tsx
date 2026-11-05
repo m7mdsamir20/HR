@@ -20,7 +20,7 @@ export default async function AdvancesPage({ params }: PageProps<"/[locale]">) {
     .order("created_at", { ascending: false });
 
   const hasActiveOrPending = (advances ?? []).some(
-    (a) => a.status === "pending" || (a.status === "approved" && a.remaining_amount > 0)
+    (a) => a.status === "pending" || (a.status === "approved" && (a.remaining_amount ?? 0) > 0)
   );
 
   return (
@@ -55,7 +55,7 @@ export default async function AdvancesPage({ params }: PageProps<"/[locale]">) {
                   installmentsCount: a.installments_count,
                   monthlyInstallment: a.monthly_installment,
                   paidAmount: a.paid_amount,
-                  remainingAmount: a.remaining_amount,
+                  remainingAmount: a.remaining_amount ?? 0,
                   reason: a.reason,
                   status: a.status as AdvanceStatus,
                   decisionNote: a.decision_note,

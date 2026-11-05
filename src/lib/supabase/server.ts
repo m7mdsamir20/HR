@@ -9,9 +9,13 @@ import type { Database } from "./database.types";
 export async function createClient() {
   const { NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY } = publicEnv();
   const cookieStore = await cookies();
+  const activeCompanyId = cookieStore.get("active_company_id")?.value;
 
   return createServerClient<Database>(NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
     cookieOptions: sessionCookieOptions,
+    global: {
+      headers: activeCompanyId ? { "x-company-id": activeCompanyId } : {},
+    },
     cookies: {
       getAll() {
         return cookieStore.getAll();

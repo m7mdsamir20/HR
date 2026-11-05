@@ -40,7 +40,7 @@ export type EmployeeFormState =
 
 function readFields(formData: FormData, fields: EmployeeField[]) {
   const raw = Object.fromEntries(fields.map((f) => [f, String(formData.get(f) ?? "")]));
-  const values = Object.fromEntries(fields.filter((f) => f !== "password").map((f) => [f, raw[f]!.slice(0, 200)]));
+  const values = Object.fromEntries(fields.map((f) => [f, raw[f]!.slice(0, 200)]));
   return { raw, values };
 }
 
@@ -52,40 +52,121 @@ export async function createEmployee(_prev: EmployeeFormState, formData: FormDat
   if (!parsed.success) return { error: "invalid", fields: invalidFields(parsed.error), values };
   const d = parsed.data;
 
-  // Authorize and spend the creation allowance before calling Auth (no unlimited ID probing).
+  // Authorize and spend creation allowance
   const supabase = await createClient();
-  const { error: beginError } = await supabase.rpc("employee_create_begin", { p_role: d.role });
+  const { error: beginError } = await supabase.rpc("employee_create_begin", { p_role: "employee" });
   if (beginError) return { error: toActionError(beginError, "createEmployee"), values };
 
-  const service = createAdminClient();
-  const { data: created, error: createError } = await service.auth.admin.createUser({
-    email: authEmailFor(d.nationalId),
-    password: d.password,
-    email_confirm: true,
-  });
-  if (createError || !created.user) {
-    // Same message whichever company holds the ID: never reveal it (CLAUDE.md §4).
-    if (createError?.code === "email_exists") return { error: "nationalIdTaken", fields: { nationalId: true }, values };
-    if (createError?.code === "weak_password") return { error: "invalid", fields: { password: true }, values };
-    console.error("createEmployee: auth user", createError?.code);
-    return { error: "unexpected", values };
-  }
+  // Set nationality to SA if citizen
+  const effectiveNationality = d.idType === "citizen" ? "SA" : d.nationality || "";
+  const { file, pay } = toRpcPayload({ ...d, nationality: effectiveNationality });
 
-  const { file, pay } = toRpcPayload(d, d.locale);
+  // Call employee_create with null user_id (user account is separate in Settings > Users)
   const { data: employeeId, error } = await supabase.rpc("employee_create", {
-    p_user_id: created.user.id,
+    p_user_id: null as unknown as string,
     p_national_id: d.nationalId,
-    p_role: d.role,
+    p_role: "employee",
     p_file: file,
     p_pay: pay,
   });
+
   if (error || !employeeId) {
-    await service.auth.admin.deleteUser(created.user.id);
     const code = toActionError(error, "createEmployee");
     return { error: code, fields: code === "nationalIdTaken" ? { nationalId: true } : undefined, values };
   }
 
   redirect({ href: `/employees/${employeeId}`, locale });
+}
+
+export type UserAccountState =
+  | { ok: true }
+  | { ok: false; error: "invalid" | "nationalIdTaken" | "weak_password" | ActionError; fields?: Record<string, boolean> }
+  | undefined;
+
+export async function createUserAccount(
+  _prev: UserAccountState,
+  formData: FormData
+): Promise<UserAccountState> {
+  const locale = localeSchema.parse(formData.get("uiLocale"));
+  await requireMember(locale, ["owner", "hr"]);
+
+  const employeeId = String(formData.get("employeeId") ?? "");
+  const role = String(formData.get("role") ?? "");
+  const userLocale = String(formData.get("locale") ?? "ar");
+  const password = String(formData.get("password") ?? "");
+
+  const idParsed = z.uuid().safeParse(employeeId);
+  const roleParsed = z.enum(["hr", "manager", "employee"]).safeParse(role);
+  const localeParsed = z.enum(["ar", "en"]).safeParse(userLocale);
+  const passParsed = passwordSchema.safeParse(password);
+
+  if (!idParsed.success || !roleParsed.success || !localeParsed.success || !passParsed.success) {
+    return {
+      ok: false,
+      error: "invalid",
+      fields: {
+        employeeId: !idParsed.success,
+        role: !roleParsed.success,
+        locale: !localeParsed.success,
+        password: !passParsed.success,
+      },
+    };
+  }
+
+  const supabase = await createClient();
+  const { data: emp, error: empErr } = await supabase
+    .from("employees")
+    .select("id, national_id, user_id")
+    .eq("id", idParsed.data)
+    .single();
+
+  if (empErr || !emp) return { ok: false, error: "notFound" };
+
+  const service = createAdminClient();
+  const email = authEmailFor(emp.national_id);
+
+  let userId: string;
+  let createdNew = false;
+
+  if (emp.user_id) {
+    userId = emp.user_id;
+    await service.auth.admin.updateUserById(userId, { password });
+  } else {
+    const { data: created, error: createError } = await service.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+    });
+
+    if (created?.user) {
+      userId = created.user.id;
+      createdNew = true;
+    } else if (createError?.code === "email_exists") {
+      const { data: usersData } = await service.auth.admin.listUsers({ page: 1, perPage: 1000 });
+      const matched = usersData?.users.find((u) => u.email === email);
+      if (!matched) return { ok: false, error: "unexpected" };
+      userId = matched.id;
+    } else {
+      return { ok: false, error: "invalid", fields: { password: true } };
+    }
+  }
+
+  const { error: assignError } = await supabase.rpc("employee_assign_user", {
+    p_employee_id: emp.id,
+    p_user_id: userId,
+    p_role: roleParsed.data,
+    p_locale: localeParsed.data,
+  });
+
+  if (assignError) {
+    if (createdNew) {
+      await service.auth.admin.deleteUser(userId);
+    }
+    return { ok: false, error: toActionError(assignError, "employee_assign_user") };
+  }
+
+  refresh();
+  return { ok: true };
 }
 
 export async function updateEmployee(employeeId: string, _prev: EmployeeFormState, formData: FormData): Promise<EmployeeFormState> {
@@ -102,7 +183,7 @@ export async function updateEmployee(employeeId: string, _prev: EmployeeFormStat
   const { file, pay } = toRpcPayload(d);
   const { error } = await supabase.rpc("employee_update", {
     p_employee_id: id.data,
-    p_role: d.role,
+    p_role: (d.role || "employee") as "owner" | "hr" | "manager" | "employee",
     p_file: file,
     p_pay: pay,
   });

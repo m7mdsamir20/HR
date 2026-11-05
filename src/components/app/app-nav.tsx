@@ -41,14 +41,18 @@ function itemsFor(role: Role): Item[] {
   const manages = role === "owner" || role === "manager";
   const items: Item[] = [
     { href: "/", key: "home", icon: House, tab: true },
-    { href: "/tasks", key: manages ? "tasks" : "myTasks", icon: ListChecks, tab: true },
   ];
+
+  // Employees is right after Home, followed by Departments for Owner/HR
   if (role === "owner" || role === "hr") {
     items.push({ href: "/employees", key: "employees", icon: Users, tab: true });
-  }
-  if (role === "manager") {
+    items.push({ href: "/departments", key: "departments", icon: Network, tab: false });
+  } else if (role === "manager") {
     items.push({ href: "/employees", key: "team", icon: Users, tab: true });
   }
+
+  // Tasks is now under Employees & Departments
+  items.push({ href: "/tasks", key: manages ? "tasks" : "myTasks", icon: ListChecks, tab: true });
 
   // Attendance is daily for all users
   items.push({ href: "/attendance", key: "attendance", icon: Clock, tab: true });
@@ -61,7 +65,6 @@ function itemsFor(role: Role): Item[] {
     items.push({ href: "/advances", key: "advances", icon: HandCoins, tab: false });
   }
   if (role === "owner" || role === "hr") {
-    items.push({ href: "/departments", key: "departments", icon: Network, tab: false });
     items.push({ href: "/settings", key: "settings", icon: Settings, tab: false });
   }
 

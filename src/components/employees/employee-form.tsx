@@ -1,16 +1,15 @@
 "use client";
 
-import { CheckCircle2, Sparkles } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useActionState, useState } from "react";
 import type { EmployeeFormState } from "@/actions/employees";
+import { ComboboxField } from "@/components/combobox-field";
 import { FormField } from "@/components/form-field";
 import { FormSection } from "@/components/form-section";
 import { SelectField } from "@/components/select-field";
 import { Button } from "@/components/ui/button";
-import type { Role } from "@/lib/auth/roles";
 import { formatAmount, normalizeAmount } from "@/lib/money";
-import { suggestPassword } from "@/lib/password";
 import { CONTRACT_TYPES, GENDERS, MARITAL_STATUSES, type EmployeeField } from "@/lib/validation/employee";
 
 export type Option = { value: string; label: string };
@@ -18,25 +17,21 @@ export type Option = { value: string; label: string };
 type Props = {
   mode: "create" | "edit";
   action: (prev: EmployeeFormState, formData: FormData) => Promise<EmployeeFormState>;
-  roles: Role[];
   departments: Option[];
   managers: Option[];
   nationalities: Option[];
-  /** Edit mode: the stored ID type decides whether nationality is fixed to Saudi. */
   idType?: "citizen" | "resident";
   defaults?: Partial<Record<EmployeeField, string>>;
 };
 
 const PAY_FIELDS = ["basicSalary", "housingAllowance", "transportAllowance", "communicationAllowance", "otherAllowances"] as const;
 
-export function EmployeeForm({ mode, action, roles, departments, managers, nationalities, idType, defaults = {} }: Props) {
+export function EmployeeForm({ mode, action, departments, managers, nationalities, idType: initialIdType, defaults = {} }: Props) {
   const t = useTranslations("employees");
-  const tRoles = useTranslations("roles");
   const tErrors = useTranslations("errors");
   const tCommon = useTranslations("common");
   const locale = useLocale();
   const [state, formAction, pending] = useActionState<EmployeeFormState, FormData>(action, undefined);
-  const [password, setPassword] = useState("");
 
   const failed = state && !state.saved ? state : undefined;
   const v = (f: EmployeeField) => failed?.values[f] ?? defaults[f] ?? "";
@@ -46,9 +41,16 @@ export function EmployeeForm({ mode, action, roles, departments, managers, natio
     return t(`fields.${f}`);
   };
 
-  // Live: citizen/resident from the typed ID (create) and the salary total.
-  const [typedId, setTypedId] = useState(v("nationalId"));
-  const citizen = mode === "create" ? typedId.trim().startsWith("1") : idType === "citizen";
+  // Live state: idType (مواطن أو مقيم)
+  const [idType, setIdType] = useState<"citizen" | "resident">(() => {
+    const rawVal = v("idType");
+    if (rawVal === "citizen" || rawVal === "resident") return rawVal;
+    if (initialIdType) return initialIdType;
+    const typed = v("nationalId");
+    return typed.trim().startsWith("2") ? "resident" : "citizen";
+  });
+
+  const [nationality, setNationality] = useState(() => (idType === "citizen" ? "SA" : v("nationality")));
   const [pay, setPay] = useState(() => Object.fromEntries(PAY_FIELDS.map((f) => [f, v(f)])));
   const total = PAY_FIELDS.reduce((sum, f) => sum + (Number(normalizeAmount(pay[f] ?? "")) || 0), 0);
 
@@ -63,7 +65,7 @@ export function EmployeeForm({ mode, action, roles, departments, managers, natio
     className: "tabular-nums",
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => setPay((p) => ({ ...p, [f]: e.target.value })),
   });
-  // Re-mount after a failed submit so the inputs show the values that were sent back.
+
   const formKey = failed ? JSON.stringify(failed.values) : "initial";
 
   return (
@@ -76,14 +78,35 @@ export function EmployeeForm({ mode, action, roles, departments, managers, natio
         </p>
       )}
 
+      {/* 1. البيانات الأساسية - بالترتيب المطلوب بدقة */}
       <FormSection title={t("form.sections.identity")} description={t("form.sections.identityHint")}>
-        {mode === "create" && (
+        {/* 1. الاسم بالعربية */}
+        <FormField
+          name="fullNameAr"
+          label={t("form.fullNameAr")}
+          defaultValue={v("fullNameAr")}
+          error={err("fullNameAr")}
+          required
+          dir="rtl"
+        />
+
+        {/* 2. الاسم بالإنجليزية */}
+        <FormField
+          name="fullNameEn"
+          label={t("form.fullNameEn")}
+          defaultValue={v("fullNameEn")}
+          error={err("fullNameEn")}
+          optionalLabel={tCommon("optional")}
+          dir="ltr"
+        />
+
+        {/* 3. رقم الهوية / الإقامة */}
+        {mode === "create" ? (
           <FormField
             name="nationalId"
-            label={t("form.nationalId")}
-            hint={t("form.nationalIdHint")}
+            label={idType === "citizen" ? t("form.citizenNationalId") : t("form.residentNationalId")}
+            hint={idType === "citizen" ? t("form.citizenNationalIdHint") : t("form.residentNationalIdHint")}
             defaultValue={v("nationalId")}
-            onChange={(e) => setTypedId(e.target.value)}
             error={err("nationalId")}
             required
             inputMode="numeric"
@@ -91,14 +114,78 @@ export function EmployeeForm({ mode, action, roles, departments, managers, natio
             dir="ltr"
             className="tabular-nums"
           />
-        )}
-        <FormField name="fullNameAr" label={t("form.fullNameAr")} defaultValue={v("fullNameAr")} error={err("fullNameAr")} required dir="rtl" />
-        <FormField name="fullNameEn" label={t("form.fullNameEn")} defaultValue={v("fullNameEn")} error={err("fullNameEn")} optionalLabel={tCommon("optional")} dir="ltr" />
-        {citizen ? (
-          <FormField name="nationality" label={t("form.nationality")} value={t("form.nationalityCitizen")} readOnly disabled />
         ) : (
-          <SelectField name="nationality" label={t("form.nationality")} defaultValue={v("nationality")} error={err("nationality")} options={[choose, ...nationalities.filter((n) => n.value !== "SA")]} />
+          <FormField
+            name="nationalId"
+            label={idType === "citizen" ? t("form.citizenNationalId") : t("form.residentNationalId")}
+            value={v("nationalId")}
+            readOnly
+            disabled
+            dir="ltr"
+            className="tabular-nums opacity-75"
+          />
         )}
+
+        {/* 4. نوع الإقامة (سيلكت ليست بنفس الحجم والشكل العادي) */}
+        {mode === "create" ? (
+          <SelectField
+            name="idType"
+            label={t("form.idType")}
+            value={idType}
+            onChange={(e) => {
+              const val = e.target.value as "citizen" | "resident";
+              setIdType(val);
+              if (val === "citizen") {
+                setNationality("SA");
+              } else if (nationality === "SA") {
+                setNationality("");
+              }
+            }}
+            options={[
+              { value: "citizen", label: t("form.idTypeCitizen") },
+              { value: "resident", label: t("form.idTypeResident") },
+            ]}
+          />
+        ) : (
+          <SelectField
+            name="idType"
+            label={t("form.idType")}
+            value={idType}
+            disabled
+            options={[
+              { value: "citizen", label: t("form.idTypeCitizen") },
+              { value: "resident", label: t("form.idTypeResident") },
+            ]}
+          />
+        )}
+
+        {/* 5. الجنسية: لو مواطن "المملكة العربية السعودية"، لو مقيم سيلكت قابل للبحث */}
+        {idType === "citizen" ? (
+          <div>
+            <input type="hidden" name="nationality" value="SA" />
+            <FormField
+              name="_displayNationality"
+              label={t("form.nationality")}
+              value={t("form.saudiArabia")}
+              readOnly
+              disabled
+            />
+          </div>
+        ) : (
+          <ComboboxField
+            name="nationality"
+            label={t("form.nationality")}
+            options={nationalities.filter((n) => n.value !== "SA")}
+            defaultValue={v("nationality")}
+            value={nationality}
+            onChange={setNationality}
+            error={err("nationality")}
+            searchPlaceholder="ابحث عن جنسية..."
+            placeholder="اختر الجنسية..."
+          />
+        )}
+
+        {/* 6. الجنس */}
         <SelectField
           name="gender"
           label={t("form.gender")}
@@ -106,7 +193,11 @@ export function EmployeeForm({ mode, action, roles, departments, managers, natio
           error={err("gender")}
           options={[choose, ...GENDERS.map((g) => ({ value: g, label: t(`options.gender.${g}`) }))]}
         />
+
+        {/* 7. تاريخ الميلاد */}
         <FormField name="birthDate" label={t("form.birthDate")} type="date" defaultValue={v("birthDate")} error={err("birthDate")} dir="ltr" />
+
+        {/* 8. الحالة الاجتماعية */}
         <SelectField
           name="maritalStatus"
           label={t("form.maritalStatus")}
@@ -114,20 +205,25 @@ export function EmployeeForm({ mode, action, roles, departments, managers, natio
           error={err("maritalStatus")}
           options={[choose, ...MARITAL_STATUSES.map((m) => ({ value: m, label: t(`options.maritalStatus.${m}`) }))]}
         />
+
+        {/* 9. رقم الجوال */}
         <FormField name="phone" label={t("form.phone")} hint={t("form.phoneHint")} type="tel" inputMode="tel" defaultValue={v("phone")} error={err("phone")} optionalLabel={tCommon("optional")} dir="ltr" />
+
+        {/* 10. البريد الإلكتروني */}
         <FormField name="email" label={t("form.email")} hint={t("form.emailHint")} type="email" defaultValue={v("email")} error={err("email")} optionalLabel={tCommon("optional")} dir="ltr" />
       </FormSection>
 
+      {/* 2. بيانات العمل - مع تسمية "المدير المباشر" وبدون حقل الدور */}
       <FormSection title={t("form.sections.work")} description={t("form.sections.workHint")}>
-        <SelectField name="role" label={t("form.role")} defaultValue={v("role") || "employee"} error={err("role")} options={roles.map((r) => ({ value: r, label: tRoles(r) }))} />
         <SelectField name="departmentId" label={t("form.department")} defaultValue={v("departmentId")} error={err("departmentId")} options={[{ value: "", label: t("form.noDepartment") }, ...departments]} />
-        <SelectField name="managerId" label={t("form.manager")} defaultValue={v("managerId")} error={err("managerId")} options={[{ value: "", label: t("form.noManager") }, ...managers]} />
+        <SelectField name="managerId" label={t("form.directManager")} defaultValue={v("managerId")} error={err("managerId")} options={[{ value: "", label: t("form.noDirectManager") }, ...managers]} />
         <FormField name="employeeNumber" label={t("form.employeeNumber")} defaultValue={v("employeeNumber")} error={err("employeeNumber")} optionalLabel={tCommon("optional")} dir="ltr" />
         <FormField name="jobTitle" label={t("form.jobTitle")} defaultValue={v("jobTitle")} error={err("jobTitle")} optionalLabel={tCommon("optional")} />
         <FormField name="occupation" label={t("form.occupation")} hint={t("form.occupationHint")} defaultValue={v("occupation")} error={err("occupation")} optionalLabel={tCommon("optional")} />
         <FormField name="hireDate" label={t("form.hireDate")} type="date" defaultValue={v("hireDate")} error={err("hireDate")} dir="ltr" />
       </FormSection>
 
+      {/* 3. بيانات العقد */}
       <FormSection title={t("form.sections.contract")} description={t("form.sections.contractHint")}>
         <SelectField
           name="contractType"
@@ -151,6 +247,7 @@ export function EmployeeForm({ mode, action, roles, departments, managers, natio
         />
       </FormSection>
 
+      {/* 4. الراتب والبدلات */}
       <FormSection title={t("form.sections.pay")} description={t("form.sections.payHint")}>
         {PAY_FIELDS.map((f) => (
           <FormField key={f} {...amountProps(f)} />
@@ -165,40 +262,6 @@ export function EmployeeForm({ mode, action, roles, departments, managers, natio
         <FormField name="iban" label={t("form.iban")} hint={t("form.ibanHint")} defaultValue={v("iban")} error={err("iban")} optionalLabel={tCommon("optional")} dir="ltr" maxLength={34} className="tabular-nums" />
         <FormField name="gosiNumber" label={t("form.gosiNumber")} defaultValue={v("gosiNumber")} error={err("gosiNumber")} optionalLabel={tCommon("optional")} inputMode="numeric" dir="ltr" />
       </FormSection>
-
-      {mode === "create" && (
-        <FormSection title={t("form.sections.account")}>
-          <SelectField
-            name="locale"
-            label={t("form.locale")}
-            defaultValue={v("locale") || "ar"}
-            options={[
-              { value: "ar", label: "العربية" },
-              { value: "en", label: "English" },
-            ]}
-          />
-          {/* Clear text on purpose: the manager reads it out. Never returned on errors. */}
-          <FormField
-            name="password"
-            label={t("form.password")}
-            hint={t("form.passwordHint")}
-            error={err("password")}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            autoComplete="off"
-            spellCheck={false}
-            maxLength={72}
-            dir="ltr"
-            className="sm:col-span-2"
-          >
-            <Button type="button" variant="outline" onClick={() => setPassword(suggestPassword())} className="shrink-0">
-              <Sparkles aria-hidden />
-              {t("form.generate")}
-            </Button>
-          </FormField>
-        </FormSection>
-      )}
 
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" size="lg" disabled={pending}>

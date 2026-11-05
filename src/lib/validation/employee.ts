@@ -2,7 +2,6 @@ import { z } from "zod";
 import { isValidNationalId, normalizeNationalId } from "@/lib/auth/national-id";
 import { ROLES } from "@/lib/auth/roles";
 import { isValidSaudiIban, normalizeAmount, normalizeIban } from "@/lib/money";
-import { passwordSchema } from "./company";
 
 const blankToUndefined = (v: unknown) => (typeof v === "string" ? v.trim() || undefined : v);
 const digitsOnly = (v: unknown) => (typeof v === "string" ? normalizeNationalId(v) || undefined : v);
@@ -29,7 +28,7 @@ const fileFields = {
   employeeNumber: optional(z.string().max(30)),
   jobTitle: optional(z.string().max(120)),
   occupation: optional(z.string().max(120)),
-  role: z.enum(ROLES),
+  role: optional(z.enum(ROLES)),
   departmentId: optional(z.uuid()),
   managerId: optional(z.uuid()),
   hireDate: optionalDate,
@@ -67,19 +66,26 @@ function checkFile(d: FileShape, ctx: z.RefinementCtx) {
 
 export const createEmployeeSchema = z
   .object({
+    idType: z.enum(["citizen", "resident"]).default("citizen"),
     nationalId: z.string().transform(normalizeNationalId).refine(isValidNationalId),
     ...fileFields,
-    locale: z.enum(["ar", "en"]),
-    password: passwordSchema,
   })
-  .superRefine(checkFile);
+  .superRefine((d, ctx) => {
+    checkFile(d, ctx);
+    if (d.idType === "citizen" && !d.nationalId.startsWith("1")) {
+      ctx.addIssue({ code: "custom", path: ["nationalId"], message: "citizenIdStart" });
+    }
+    if (d.idType === "resident" && !d.nationalId.startsWith("2")) {
+      ctx.addIssue({ code: "custom", path: ["nationalId"], message: "residentIdStart" });
+    }
+  });
 
 export const updateEmployeeSchema = z.object(fileFields).superRefine(checkFile);
 
 export type EmployeeInput = z.infer<typeof updateEmployeeSchema>;
 export type EmployeeField = keyof z.infer<typeof createEmployeeSchema>;
 export const updateEmployeeFields = Object.keys(fileFields) as EmployeeField[];
-export const createEmployeeFields = ["nationalId", ...updateEmployeeFields, "locale", "password"] as EmployeeField[];
+export const createEmployeeFields = ["idType", "nationalId", ...updateEmployeeFields] as EmployeeField[];
 
 /** The jsonb the employee RPCs take: the file and the pay, in database column names. */
 export function toRpcPayload(d: EmployeeInput, locale?: string) {

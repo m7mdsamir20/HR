@@ -21,6 +21,16 @@ const companySchema = z.object({
   is_active: z.boolean(),
 });
 
+const companySummarySchema = z.object({
+  id: z.uuid(),
+  name_ar: z.string(),
+  name_en: z.string().nullable(),
+  logo_path: z.string().nullable(),
+  role: z.enum(ROLES),
+});
+
+export type CompanySummary = z.infer<typeof companySummarySchema>;
+
 const accountSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("platform_admin"), full_name: z.string() }),
   z.object({
@@ -32,6 +42,7 @@ const accountSchema = z.discriminatedUnion("kind", [
     full_name_en: z.string().nullable(),
     locale: z.enum(["ar", "en"]),
     company: companySchema,
+    companies: z.array(companySummarySchema).default([]),
   }),
 ]);
 

@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Link, redirect } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { requireMember } from "@/lib/auth/account";
-import { assignableRoles, canManageEmployee } from "@/lib/auth/permissions";
+import { canManageEmployee } from "@/lib/auth/permissions";
 import { nationalityName } from "@/lib/countries";
 import { loadDocuments } from "@/lib/employee-documents";
 import { employeeFormOptions, localName, one } from "@/lib/employees";
@@ -39,7 +39,6 @@ export default async function EmployeePage({ params }: PageProps<"/[locale]/empl
   if (!e) notFound();
 
   const t = await getTranslations({ locale, namespace: "employees" });
-  const tRoles = await getTranslations({ locale, namespace: "roles" });
   const tPdf = await getTranslations({ locale, namespace: "pdf" });
   const name = localName(locale, e.full_name_ar, e.full_name_en);
   const status = e.status as "active" | "disabled";
@@ -72,7 +71,7 @@ export default async function EmployeePage({ params }: PageProps<"/[locale]/empl
           )}
         </div>
         <p className="text-secondary">
-          {tRoles(e.role)} · <bdi dir="ltr">{e.national_id}</bdi> · {t("detail.createdAt")} {formatDateTime(locale, e.created_at)}
+          {t("detail.createdAt")} {formatDateTime(locale, e.created_at)}
         </p>
       </div>
 
@@ -81,7 +80,6 @@ export default async function EmployeePage({ params }: PageProps<"/[locale]/empl
           <EmployeeForm
             mode="edit"
             action={updateEmployee.bind(null, e.id)}
-            roles={assignableRoles(member.role)}
             departments={options.departments}
             managers={options.managers}
             nationalities={options.nationalities}
@@ -89,6 +87,8 @@ export default async function EmployeePage({ params }: PageProps<"/[locale]/empl
             defaults={{
               fullNameAr: e.full_name_ar,
               fullNameEn: s(e.full_name_en),
+              nationalId: e.national_id,
+              idType: e.id_type,
               nationality: s(e.nationality),
               gender: s(e.gender),
               birthDate: s(e.birth_date),
@@ -98,7 +98,6 @@ export default async function EmployeePage({ params }: PageProps<"/[locale]/empl
               employeeNumber: s(e.employee_number),
               jobTitle: s(e.job_title),
               occupation: s(e.occupation),
-              role: e.role,
               departmentId: s(e.department_id),
               managerId: s(e.manager_id),
               hireDate: s(e.hire_date),

@@ -58,7 +58,7 @@ export default async function AllAdvancesPage({ params }: PageProps<"/[locale]">
                   installmentsCount: a.installments_count,
                   monthlyInstallment: a.monthly_installment,
                   paidAmount: a.paid_amount,
-                  remainingAmount: a.remaining_amount,
+                  remainingAmount: a.remaining_amount ?? 0,
                   reason: a.reason,
                   status: a.status as AdvanceStatus,
                   decisionNote: a.decision_note,

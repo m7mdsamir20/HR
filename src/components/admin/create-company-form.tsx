@@ -1,9 +1,9 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
+import { Sparkles, UserCheck } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useActionState, useState } from "react";
-import { createCompany, type CreateCompanyState } from "@/actions/admin";
+import { useActionState, useState, useTransition } from "react";
+import { createCompany, lookupOwner, type CreateCompanyState } from "@/actions/admin";
 import { FormField } from "@/components/form-field";
 import { FormSection } from "@/components/form-section";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,21 @@ export function CreateCompanyForm({ minDate }: { minDate: string }) {
   const locale = useLocale();
   const [state, action, pending] = useActionState<CreateCompanyState, FormData>(createCompany, undefined);
   const [password, setPassword] = useState("");
+  const [existingOwner, setExistingOwner] = useState<{ exists: boolean; nameAr?: string } | null>(null);
+  const [, startTransition] = useTransition();
+
+  const handleNidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    const clean = val.trim();
+    if (clean.length === 10 && /^[12]\d{9}$/.test(clean)) {
+      startTransition(async () => {
+        const res = await lookupOwner(clean);
+        setExistingOwner(res);
+      });
+    } else {
+      setExistingOwner(null);
+    }
+  };
 
   const v = (f: CreateCompanyField) => state?.values[f] ?? "";
   const err = (f: CreateCompanyField) => {
@@ -92,7 +107,18 @@ export function CreateCompanyForm({ minDate }: { minDate: string }) {
           maxLength={14}
           dir="ltr"
           className="tabular-nums"
+          onChange={handleNidChange}
         />
+
+        {existingOwner?.exists && (
+          <div className="flex items-center gap-2 rounded-control border border-indigo/20 bg-indigo/5 p-3 text-caption text-indigo sm:col-span-2">
+            <UserCheck className="size-4 shrink-0 text-indigo" aria-hidden />
+            <span>
+              المالك مسجل مسبقاً في النظام باسم (<strong>{existingOwner.nameAr}</strong>). سيتم ربط الشركة بحسابه الموحد دون الحاجة لكلمة مرور جديدة.
+            </span>
+          </div>
+        )}
+
         <FormField
           name="ownerPhone"
           label={t("ownerPhone")}
@@ -104,7 +130,7 @@ export function CreateCompanyForm({ minDate }: { minDate: string }) {
           inputMode="tel"
           dir="ltr"
         />
-        <FormField name="ownerNameAr" label={t("ownerNameAr")} defaultValue={v("ownerNameAr")} error={err("ownerNameAr")} required dir="rtl" />
+        <FormField name="ownerNameAr" label={t("ownerNameAr")} defaultValue={v("ownerNameAr") || existingOwner?.nameAr || ""} error={err("ownerNameAr")} required dir="rtl" />
         <FormField
           name="ownerNameEn"
           label={t("ownerNameEn")}
@@ -113,26 +139,28 @@ export function CreateCompanyForm({ minDate }: { minDate: string }) {
           optionalLabel={tCommon("optional")}
           dir="ltr"
         />
-        {/* Shown in clear text on purpose: the admin reads it to the owner. Never sent back on errors. */}
-        <FormField
-          name="password"
-          label={t("password")}
-          hint={t("passwordHint")}
-          error={err("password")}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          autoComplete="off"
-          spellCheck={false}
-          maxLength={72}
-          dir="ltr"
-          className="sm:col-span-2"
-        >
-          <Button type="button" variant="outline" onClick={() => setPassword(suggestPassword())} className="shrink-0">
-            <Sparkles aria-hidden />
-            {t("generate")}
-          </Button>
-        </FormField>
+
+        {!existingOwner?.exists && (
+          <FormField
+            name="password"
+            label={t("password")}
+            hint={t("passwordHint")}
+            error={err("password")}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            autoComplete="off"
+            spellCheck={false}
+            maxLength={72}
+            dir="ltr"
+            className="sm:col-span-2"
+          >
+            <Button type="button" variant="outline" onClick={() => setPassword(suggestPassword())} className="shrink-0">
+              <Sparkles aria-hidden />
+              {t("generate")}
+            </Button>
+          </FormField>
+        )}
       </FormSection>
 
       <div>

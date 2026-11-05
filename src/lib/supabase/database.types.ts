@@ -23,31 +23,7 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "payroll_runs": {
-  Row: {
-    "approved_at": string | null,"approved_by": string | null,"company_id": string,"created_at": string,"created_by": string | null,"employee_count": number,"id": string,"month": number,"notes": string | null,"status": string,"total_advance_deductions": number,"total_attendance_deductions": number,"total_basic": number,"total_deductions": number,"total_gosi_employee": number,"total_gosi_employer": number,"total_gross": number,"total_housing": number,"total_leave_deductions": number,"total_net": number,"total_other_allowances": number,"total_other_deductions": number,"year": number
-  }
-  ComputedFields: never
-  Insert: {
-    "approved_at"?: string | null,"approved_by"?: string | null,"company_id": string,"created_at"?: string,"created_by"?: string | null,"employee_count"?: number,"id"?: string,"month": number,"notes"?: string | null,"status"?: string,"total_advance_deductions"?: number,"total_attendance_deductions"?: number,"total_basic"?: number,"total_deductions"?: number,"total_gosi_employee"?: number,"total_gosi_employer"?: number,"total_gross"?: number,"total_housing"?: number,"total_leave_deductions"?: number,"total_net"?: number,"total_other_allowances"?: number,"total_other_deductions"?: number,"year": number
-  }
-  Update: {
-    "approved_at"?: string | null,"approved_by"?: string | null,"company_id"?: string,"created_at"?: string,"created_by"?: string | null,"employee_count"?: number,"id"?: string,"month"?: number,"notes"?: string | null,"status"?: string,"total_advance_deductions"?: number,"total_attendance_deductions"?: number,"total_basic"?: number,"total_deductions"?: number,"total_gosi_employee"?: number,"total_gosi_employer"?: number,"total_gross"?: number,"total_housing"?: number,"total_leave_deductions"?: number,"total_net"?: number,"total_other_allowances"?: number,"total_other_deductions"?: number,"year"?: number
-  }
-  Relationships: []
-},"payroll_slips": {
-  Row: {
-    "advance_deduction": number,"attendance_deduction": number,"bank_name": string | null,"basic_salary": number,"communication_allowance": number,"company_id": string,"created_at": string,"employee_id": string,"gosi_employee": number,"gosi_employer": number,"gross_salary": number,"housing_allowance": number,"iban": string | null,"id": string,"leave_deduction": number,"net_salary": number,"notes": string | null,"other_allowances": number,"other_deductions": number,"payroll_run_id": string,"total_deductions": number,"transport_allowance": number
-  }
-  ComputedFields: never
-  Insert: {
-    "advance_deduction"?: number,"attendance_deduction"?: number,"bank_name"?: string | null,"basic_salary"?: number,"communication_allowance"?: number,"company_id": string,"created_at"?: string,"employee_id": string,"gosi_employee"?: number,"gosi_employer"?: number,"gross_salary"?: number,"housing_allowance"?: number,"iban"?: string | null,"id"?: string,"leave_deduction"?: number,"net_salary"?: number,"notes"?: string | null,"other_allowances"?: number,"other_deductions"?: number,"payroll_run_id": string,"total_deductions"?: number,"transport_allowance"?: number
-  }
-  Update: {
-    "advance_deduction"?: number,"attendance_deduction"?: number,"bank_name"?: string | null,"basic_salary"?: number,"communication_allowance"?: number,"company_id"?: string,"created_at"?: string,"employee_id"?: string,"gosi_employee"?: number,"gosi_employer"?: number,"gross_salary"?: number,"housing_allowance"?: number,"iban"?: string | null,"id"?: string,"leave_deduction"?: number,"net_salary"?: number,"notes"?: string | null,"other_allowances"?: number,"other_deductions"?: number,"payroll_run_id"?: string,"total_deductions"?: number,"transport_allowance"?: number
-  }
-  Relationships: []
-},"advance_installments": {
+            "advance_installments": {
                   Row: {
                     "advance_id": string,"amount": number,"company_id": string,"created_at": string,"created_by": string | null,"employee_id": string,"id": string,"method": string,"notes": string | null,"payment_date": string
                   }
@@ -60,32 +36,50 @@ export type Database = {
                   }
                   Relationships: [
                     {
-                      foreignKeyName: "advance_installments_advance_id_fkey"
-                      columns: ["advance_id"]
-                      isOneToOne: false
-                      referencedRelation: "advance_requests"
-                      referencedColumns: ["id"]
-                    }
+      foreignKeyName: "advance_installments_advance_id_fkey"
+      columns: ["advance_id"]
+isOneToOne: false
+      referencedRelation: "advance_requests"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "advance_installments_company_id_employee_id_fkey"
+      columns: ["company_id","employee_id"]
+isOneToOne: false
+      referencedRelation: "employees"
+      referencedColumns: ["company_id","id"]
+    },{
+      foreignKeyName: "advance_installments_company_id_fkey"
+      columns: ["company_id"]
+isOneToOne: false
+      referencedRelation: "companies"
+      referencedColumns: ["id"]
+    }
                   ]
                 },"advance_requests": {
                   Row: {
-                    "amount": number,"company_id": string,"created_at": string,"decided_at": string | null,"decided_by": string | null,"decision_note": string | null,"employee_id": string,"id": string,"installments_count": number,"monthly_installment": number,"paid_amount": number,"reason": string,"remaining_amount": number,"status": string
+                    "amount": number,"company_id": string,"created_at": string,"decided_at": string | null,"decided_by": string | null,"decision_note": string | null,"employee_id": string,"id": string,"installments_count": number,"monthly_installment": number,"paid_amount": number,"reason": string,"remaining_amount": number | null,"status": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "amount": number,"company_id": string,"created_at"?: string,"decided_at"?: string | null,"decided_by"?: string | null,"decision_note"?: string | null,"employee_id": string,"id"?: string,"installments_count": number,"monthly_installment": number,"paid_amount"?: number,"reason": string,"status"?: string
+                    "amount": number,"company_id": string,"created_at"?: string,"decided_at"?: string | null,"decided_by"?: string | null,"decision_note"?: string | null,"employee_id": string,"id"?: string,"installments_count": number,"monthly_installment": number,"paid_amount"?: number,"reason": string,"remaining_amount"?: never,"status"?: string
                   }
                   Update: {
-                    "amount"?: number,"company_id"?: string,"created_at"?: string,"decided_at"?: string | null,"decided_by"?: string | null,"decision_note"?: string | null,"employee_id"?: string,"id"?: string,"installments_count"?: number,"monthly_installment"?: number,"paid_amount"?: number,"reason"?: string,"status"?: string
+                    "amount"?: number,"company_id"?: string,"created_at"?: string,"decided_at"?: string | null,"decided_by"?: string | null,"decision_note"?: string | null,"employee_id"?: string,"id"?: string,"installments_count"?: number,"monthly_installment"?: number,"paid_amount"?: number,"reason"?: string,"remaining_amount"?: never,"status"?: string
                   }
                   Relationships: [
                     {
-                      foreignKeyName: "advance_requests_company_id_employee_id_fkey"
-                      columns: ["company_id","employee_id"]
-                      isOneToOne: false
-                      referencedRelation: "employees"
-                      referencedColumns: ["company_id","id"]
-                    }
+      foreignKeyName: "advance_requests_company_id_employee_id_fkey"
+      columns: ["company_id","employee_id"]
+isOneToOne: false
+      referencedRelation: "employees"
+      referencedColumns: ["company_id","id"]
+    },{
+      foreignKeyName: "advance_requests_company_id_fkey"
+      columns: ["company_id"]
+isOneToOne: false
+      referencedRelation: "companies"
+      referencedColumns: ["id"]
+    }
                   ]
                 },"attendance_deductions": {
                   Row: {
@@ -409,17 +403,23 @@ isOneToOne: false
                   ]
                 },"notifications": {
                   Row: {
-                    "actor_id": string | null,"company_id": string,"created_at": string,"days_left": number | null,"document_id": string | null,"id": number,"leave_id": string | null,"read_at": string | null,"recipient_id": string,"task_id": string | null,"type": string
+                    "actor_id": string | null,"advance_id": string | null,"company_id": string,"created_at": string,"days_left": number | null,"document_id": string | null,"id": number,"leave_id": string | null,"payroll_slip_id": string | null,"read_at": string | null,"recipient_id": string,"task_id": string | null,"type": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "actor_id"?: string | null,"company_id": string,"created_at"?: string,"days_left"?: number | null,"document_id"?: string | null,"id"?: never,"leave_id"?: string | null,"read_at"?: string | null,"recipient_id": string,"task_id"?: string | null,"type": string
+                    "actor_id"?: string | null,"advance_id"?: string | null,"company_id": string,"created_at"?: string,"days_left"?: number | null,"document_id"?: string | null,"id"?: never,"leave_id"?: string | null,"payroll_slip_id"?: string | null,"read_at"?: string | null,"recipient_id": string,"task_id"?: string | null,"type": string
                   }
                   Update: {
-                    "actor_id"?: string | null,"company_id"?: string,"created_at"?: string,"days_left"?: number | null,"document_id"?: string | null,"id"?: never,"leave_id"?: string | null,"read_at"?: string | null,"recipient_id"?: string,"task_id"?: string | null,"type"?: string
+                    "actor_id"?: string | null,"advance_id"?: string | null,"company_id"?: string,"created_at"?: string,"days_left"?: number | null,"document_id"?: string | null,"id"?: never,"leave_id"?: string | null,"payroll_slip_id"?: string | null,"read_at"?: string | null,"recipient_id"?: string,"task_id"?: string | null,"type"?: string
                   }
                   Relationships: [
                     {
+      foreignKeyName: "notifications_advance_id_fkey"
+      columns: ["advance_id"]
+isOneToOne: false
+      referencedRelation: "advance_requests"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "notifications_company_id_recipient_id_fkey"
       columns: ["company_id","recipient_id"]
 isOneToOne: false
@@ -438,10 +438,68 @@ isOneToOne: false
       referencedRelation: "leave_requests"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "notifications_payroll_slip_id_fkey"
+      columns: ["payroll_slip_id"]
+isOneToOne: false
+      referencedRelation: "payroll_slips"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "notifications_task_id_fkey"
       columns: ["task_id"]
 isOneToOne: false
       referencedRelation: "tasks"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"payroll_runs": {
+                  Row: {
+                    "approved_at": string | null,"approved_by": string | null,"company_id": string,"created_at": string,"created_by": string | null,"employee_count": number,"id": string,"month": number,"notes": string | null,"status": string,"total_advance_deductions": number,"total_attendance_deductions": number,"total_basic": number,"total_deductions": number,"total_gosi_employee": number,"total_gosi_employer": number,"total_gross": number,"total_housing": number,"total_leave_deductions": number,"total_net": number,"total_other_allowances": number,"total_other_deductions": number,"year": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "approved_at"?: string | null,"approved_by"?: string | null,"company_id": string,"created_at"?: string,"created_by"?: string | null,"employee_count"?: number,"id"?: string,"month": number,"notes"?: string | null,"status"?: string,"total_advance_deductions"?: number,"total_attendance_deductions"?: number,"total_basic"?: number,"total_deductions"?: number,"total_gosi_employee"?: number,"total_gosi_employer"?: number,"total_gross"?: number,"total_housing"?: number,"total_leave_deductions"?: number,"total_net"?: number,"total_other_allowances"?: number,"total_other_deductions"?: number,"year": number
+                  }
+                  Update: {
+                    "approved_at"?: string | null,"approved_by"?: string | null,"company_id"?: string,"created_at"?: string,"created_by"?: string | null,"employee_count"?: number,"id"?: string,"month"?: number,"notes"?: string | null,"status"?: string,"total_advance_deductions"?: number,"total_attendance_deductions"?: number,"total_basic"?: number,"total_deductions"?: number,"total_gosi_employee"?: number,"total_gosi_employer"?: number,"total_gross"?: number,"total_housing"?: number,"total_leave_deductions"?: number,"total_net"?: number,"total_other_allowances"?: number,"total_other_deductions"?: number,"year"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "payroll_runs_company_id_fkey"
+      columns: ["company_id"]
+isOneToOne: false
+      referencedRelation: "companies"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"payroll_slips": {
+                  Row: {
+                    "advance_deduction": number,"attendance_deduction": number,"bank_name": string | null,"basic_salary": number,"communication_allowance": number,"company_id": string,"created_at": string,"employee_id": string,"gosi_employee": number,"gosi_employer": number,"gross_salary": number,"housing_allowance": number,"iban": string | null,"id": string,"leave_deduction": number,"net_salary": number,"notes": string | null,"other_allowances": number,"other_deductions": number,"payroll_run_id": string,"total_deductions": number,"transport_allowance": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "advance_deduction"?: number,"attendance_deduction"?: number,"bank_name"?: string | null,"basic_salary"?: number,"communication_allowance"?: number,"company_id": string,"created_at"?: string,"employee_id": string,"gosi_employee"?: number,"gosi_employer"?: number,"gross_salary"?: number,"housing_allowance"?: number,"iban"?: string | null,"id"?: string,"leave_deduction"?: number,"net_salary"?: number,"notes"?: string | null,"other_allowances"?: number,"other_deductions"?: number,"payroll_run_id": string,"total_deductions"?: number,"transport_allowance"?: number
+                  }
+                  Update: {
+                    "advance_deduction"?: number,"attendance_deduction"?: number,"bank_name"?: string | null,"basic_salary"?: number,"communication_allowance"?: number,"company_id"?: string,"created_at"?: string,"employee_id"?: string,"gosi_employee"?: number,"gosi_employer"?: number,"gross_salary"?: number,"housing_allowance"?: number,"iban"?: string | null,"id"?: string,"leave_deduction"?: number,"net_salary"?: number,"notes"?: string | null,"other_allowances"?: number,"other_deductions"?: number,"payroll_run_id"?: string,"total_deductions"?: number,"transport_allowance"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "payroll_slips_company_id_employee_id_fkey"
+      columns: ["company_id","employee_id"]
+isOneToOne: false
+      referencedRelation: "employees"
+      referencedColumns: ["company_id","id"]
+    },{
+      foreignKeyName: "payroll_slips_company_id_fkey"
+      columns: ["company_id"]
+isOneToOne: false
+      referencedRelation: "companies"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "payroll_slips_payroll_run_id_fkey"
+      columns: ["payroll_run_id"]
+isOneToOne: false
+      referencedRelation: "payroll_runs"
       referencedColumns: ["id"]
     }
                   ]
@@ -563,12 +621,20 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "get_analytics_summary": {
-  Args: Record<PropertyKey, never>;
-  Returns: Json;
-},
-"admin_create_company":
+            "admin_create_company":
 { Args: { "p_commercial_reg": string,"p_max_employees": number,"p_name_ar": string,"p_name_en": string,"p_owner_name_ar": string,"p_owner_name_en": string,"p_owner_national_id": string,"p_owner_phone": string,"p_owner_user_id": string,"p_subscription_ends_at": string }; Returns: string
+                           },
+"advance_manual_repayment":
+{ Args: { "p_advance_id": string,"p_amount": number,"p_note"?: string }; Returns: string
+                           },
+"advance_request_cancel":
+{ Args: { "p_id": string }; Returns: undefined
+                           },
+"advance_request_create":
+{ Args: { "p_amount": number,"p_installments": number,"p_reason": string }; Returns: string
+                           },
+"advance_request_decide":
+{ Args: { "p_decision": string,"p_id": string,"p_note"?: string }; Returns: undefined
                            },
 "attendance_assign":
 { Args: { "p_branch_id": string,"p_employee_ids": (string)[],"p_shift_id": string }; Returns: number
@@ -585,33 +651,6 @@ isOneToOne: false
 "attendance_deduction_decide":
 { Args: { "p_decision": string,"p_id": string,"p_note"?: string }; Returns: undefined
                            },
-"advance_manual_repayment":
-{ Args: { "p_advance_id": string,"p_amount": number,"p_note"?: string }; Returns: string
-                           },
-"advance_request_cancel":
-{ Args: { "p_id": string }; Returns: undefined
-                           },
-"advance_request_create":
-{ Args: { "p_amount": number,"p_installments": number,"p_reason": string }; Returns: string
-                           },
-"advance_request_decide":
-{ Args: { "p_decision": string,"p_id": string,"p_note"?: string }; Returns: undefined
-                           },
-"employee_gosi_preview":
-{ Args: { "p_employee_id": string }; Returns: Json
-                           },
-"payroll_run_create":
-{ Args: { "p_month": number,"p_notes"?: string,"p_year": number }; Returns: string
-                           },
-"payroll_slip_adjust":
-{ Args: { "p_notes"?: string,"p_other_allowances": number,"p_other_deductions": number,"p_slip_id": string }; Returns: undefined
-                           },
-"payroll_run_approve":
-{ Args: { "p_run_id": string }; Returns: undefined
-                           },
-"payroll_run_delete":
-{ Args: { "p_run_id": string }; Returns: undefined
-                           },
 "can_manage_employee":
 { Args: { "p_employee_id": string }; Returns: boolean
                            },
@@ -627,6 +666,9 @@ isOneToOne: false
 "consume_rate_limit":
 { Args: { "p_kind": string }; Returns: undefined
                            },
+"employee_assign_user":
+{ Args: { "p_employee_id": string,"p_locale": string,"p_role": Database["public"]['Enums']["employee_role"],"p_user_id": string }; Returns: undefined
+                           },
 "employee_create":
 { Args: { "p_file": Json,"p_national_id": string,"p_pay": Json,"p_role": Database["public"]['Enums']["employee_role"],"p_user_id": string }; Returns: string
                            },
@@ -639,6 +681,9 @@ isOneToOne: false
 "employee_delete_finish":
 { Args: { "p_employee_id": string }; Returns: undefined
                            },
+"employee_gosi_preview":
+{ Args: { "p_employee_id": string }; Returns: Json
+                           },
 "employee_password_reset_begin":
 { Args: { "p_employee_id": string }; Returns: string
                            },
@@ -647,6 +692,9 @@ isOneToOne: false
                            },
 "employee_update":
 { Args: { "p_employee_id": string,"p_file": Json,"p_pay": Json,"p_role": Database["public"]['Enums']["employee_role"] }; Returns: undefined
+                           },
+"get_analytics_summary":
+{ Args: Record<PropertyKey, never>; Returns: Json
                            },
 "leave_adjust":
 { Args: { "p_days": number,"p_employee": string,"p_reason": string }; Returns: undefined
@@ -685,6 +733,18 @@ isOneToOne: false
 { Args: { "p_older_than"?: string }; Returns: {
               "name": string
             }[]
+                           },
+"payroll_run_approve":
+{ Args: { "p_run_id": string }; Returns: undefined
+                           },
+"payroll_run_create":
+{ Args: { "p_month": number,"p_notes"?: string,"p_year": number }; Returns: string
+                           },
+"payroll_run_delete":
+{ Args: { "p_run_id": string }; Returns: undefined
+                           },
+"payroll_slip_adjust":
+{ Args: { "p_notes"?: string,"p_other_allowances": number,"p_other_deductions": number,"p_slip_id": string }; Returns: undefined
                            },
 "people_names":
 { Args: { "p_ids": (string)[] }; Returns: {
