@@ -113,6 +113,9 @@ tr.total-row td{background:#f0f4fc;font-weight:700;color:${COLORS.indigo}}
 .photos figcaption{font-size:8pt;color:${COLORS.soft};overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .stamp-block{display:flex;align-items:center;gap:14px;border:1px solid #1f7a5540;background:#1f7a550d;border-radius:8px;padding:10px 14px;break-inside:avoid;margin:12px 0}
 .stamp-block svg{flex-shrink:0;transform:rotate(-6deg)}
+.stamp-box{display:inline-block;padding:3px 4px;border:2.5px solid ${COLORS.stamp};border-radius:6px;transform:rotate(-3deg);background:${COLORS.stamp}0d;break-inside:avoid}
+.stamp-box-inner{padding:6px 24px;border:1.5px dashed ${COLORS.stamp};border-radius:3px;color:${COLORS.stamp};font-size:15pt;font-weight:800;letter-spacing:2px;text-align:center;line-height:1.2}
+.stamp-footer{display:flex;justify-content:flex-end;align-items:center;margin-top:28px;padding-top:12px;break-inside:avoid}
 .note{border-radius:6px;padding:6px 10px;margin-top:6px;border:1px solid ${COLORS.line}}
 .note.ok{border-color:#1f7a5540;background:#1f7a550d}
 .note.bad{border-color:#b23a2b40;background:#b23a2b0d}
@@ -189,4 +192,9 @@ export function stampSvg(label: string, rating: number): string {
     <text x="46" y="40" text-anchor="middle" font-size="${label.length > 6 ? 10 : 13}" font-weight="600" fill="${COLORS.stamp}">${esc(label)}</text>
     <text x="46" y="62" text-anchor="middle" font-size="20" font-weight="600" fill="${COLORS.stamp}" direction="ltr">${rating}/5</text>
   </svg>`;
+}
+
+/** Rectangular approval stamp without rating or circular frame */
+export function stampBoxHtml(label: string): string {
+  return `<div class="stamp-footer"><div class="stamp-box"><div class="stamp-box-inner">${esc(label)}</div></div></div>`;
 }

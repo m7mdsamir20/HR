@@ -7,7 +7,7 @@ import { loadNames } from "@/lib/task-data";
 import { isOverdue, statusTone, type TaskStatus } from "@/lib/tasks";
 import { createClient } from "@/lib/supabase/server";
 import { imageDataUri, issuedNow, loadBrand } from "./data";
-import { documentHtml, dt, esc, grid, pill, stampSvg, txt } from "./html";
+import { documentHtml, dt, esc, grid, pill, stampBoxHtml, txt } from "./html";
 import { renderPdf } from "./render";
 
 const MAX_PHOTOS = 9;
@@ -65,20 +65,13 @@ export async function buildTaskReportPdf(locale: Locale, member: Member, taskId:
     </div>`);
   }
 
-  const verdict =
-    status === "approved" && task.rating && task.approved_at
-      ? `<div class="stamp-block">${stampSvg(t("stamp.label"), task.rating)}<div>
-           <div><strong>${esc(t("stamp.by", { name: names.get([...(reports ?? [])].reverse().find((r) => r.reviewed_by)?.reviewed_by ?? "") ?? "—" }))}</strong></div>
-           <div class="muted">${esc(t("stamp.on", { date: formatDate(locale, task.approved_at.slice(0, 10)) }))}</div>
-         </div></div>`
-      : "";
+  const verdict = status === "approved" ? stampBoxHtml(t("stamp.label")) : "";
 
   const body = `
     <h2>${esc(tp("taskDetails"))}</h2>
     <div class="card" style="margin-bottom:8px"><strong style="font-size:11.5pt">${txt(task.title)}</strong> ${pill(statusTone[status], t(`status.${status}`))}</div>
     ${grid([
       { label: t("detail.assignee"), value: txt(names.get(task.assignee_id)) },
-      { label: t("detail.createdBy", { name: "" }).replace(/\s*$/, ""), value: txt(names.get(task.created_by)) },
       { label: t("form.priority"), value: esc(t(`priority.${task.priority}`)) },
       {
         label: t("detail.due"),
@@ -88,21 +81,20 @@ export async function buildTaskReportPdf(locale: Locale, member: Member, taskId:
       { label: t("detail.location"), value: txt(task.location) },
       ...(task.description ? [{ label: t("form.description"), value: txt(task.description), wide: true }] : []),
     ])}
-    ${verdict}
     <h2>${esc(tp("reports"))}</h2>
     ${sections.length ? sections.join("") : `<p class="muted">${esc(tp("noReports"))}</p>`}
+    ${verdict}
   `;
 
   const html = documentHtml({
     locale,
     brand,
     title: tp("taskReportTitle"),
-    numberLabel: tp("number"),
-    number,
+    hideNumber: true,
     issuedLabel: tp("issued"),
     issued: esc(issuedNow(locale)),
     body,
   });
-  const pdf = await renderPdf(html, { locale, footerLabel: `${tp("taskReportTitle")} · ${number}`, pageLabel: tp("page"), ofLabel: tp("of") });
+  const pdf = await renderPdf(html, { locale, footerLabel: tp("taskReportTitle"), pageLabel: tp("page"), ofLabel: tp("of") });
   return { pdf, filename: `${number.toLowerCase()}.pdf` };
 }

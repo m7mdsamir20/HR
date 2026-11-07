@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { documentHtml, dt, esc, grid, ltr, stampSvg, txt } from "./html";
+import { documentHtml, dt, esc, grid, ltr, stampBoxHtml, stampSvg, txt } from "./html";
 
 describe("esc", () => {
   it("neutralises markup and attribute breakouts", () => {
@@ -52,5 +52,16 @@ describe("stampSvg", () => {
   it("shrinks long labels to fit the ring", () => {
     expect(stampSvg("معتمد", 5)).toContain('font-size="13"');
     expect(stampSvg("Approved", 5)).toContain('font-size="10"');
+  });
+});
+
+describe("stampBoxHtml", () => {
+  it("renders a rectangular badge stamp without circular ring or rating", () => {
+    const stamp = stampBoxHtml("معتمد");
+    expect(stamp).toContain("stamp-box");
+    expect(stamp).toContain("stamp-box-inner");
+    expect(stamp).toContain("معتمد");
+    expect(stamp).not.toContain("/5");
+    expect(stamp).not.toContain("<circle");
   });
 });

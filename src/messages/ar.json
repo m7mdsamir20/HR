@@ -647,6 +647,13 @@
       "filterByDate": "تصفية حسب التاريخ",
       "showingDate": "مهام تاريخ: {date}"
     },
+    "employeeFilter": {
+      "all": "جميع الموظفين",
+      "label": "تصفية بالموظف",
+      "choose": "اختر موظفاً...",
+      "showingEmployee": "المكلف: {name}",
+      "clear": "إلغاء تصفية الموظف"
+    },
     "noDueDate": "بدون موعد إنجاز محدد",
     "tasksCount": "{count, plural, one {# مهمة} two {# مهمتان} few {# مهام} other {# مهمة}}",
     "groups": {

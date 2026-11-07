@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { StatusPill } from "@/components/status-pill";
 import { TaskCard, type TaskRow } from "@/components/tasks/task-card";
 import { TaskDateFilter } from "@/components/tasks/task-date-filter";
+import { TaskEmployeeFilter, type EmployeeOption } from "@/components/tasks/task-employee-filter";
 import { TaskSearchInput } from "@/components/tasks/task-search-input";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -23,30 +24,55 @@ export default async function TasksPage({ params, searchParams }: PageProps<"/[l
   const member = await requireMember(locale);
   const t = await getTranslations({ locale, namespace: "tasks" });
   const sp = await searchParams;
-  const manages = member.role === "owner" || member.role === "manager";
+  const isLeader = member.role === "owner" || member.role === "admin";
+  const manages = isLeader || member.role === "manager" || member.role === "hr";
   const filters = manages ? FILTERS : (["all", "open"] as const);
   const filter: Filter = (filters as readonly string[]).includes(String(sp.status)) ? (sp.status as Filter) : "all";
   const q = cleanSearch(typeof sp.q === "string" ? sp.q : "");
   const dateParam = typeof sp.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(sp.date) ? sp.date : "";
+  const employeeParam = typeof sp.employee === "string" && sp.employee ? sp.employee : "";
 
   const today = todayInRiyadh();
   const tomorrow = addDays(today, 1);
 
   // RLS decides the rows: an employee's own tasks; an owner everything; a manager their team's.
   const supabase = await createClient();
-  let query = supabase
-    .from("tasks")
-    .select("id, title, status, priority, due_date, due_time, assignee_id")
-    .order("due_date", { ascending: true })
-    .limit(300);
-  if (filter === "open") query = query.neq("status", "approved");
-  if (filter === "review") query = query.eq("status", "submitted");
-  if (filter === "mine") query = query.eq("assignee_id", member.employee_id);
-  if (q) query = query.ilike("title", `%${q}%`);
-  if (dateParam) query = query.eq("due_date", dateParam);
 
-  const { data, error } = await query;
+  const [tasksRes, employeesRes] = await Promise.all([
+    (() => {
+      let query = supabase
+        .from("tasks")
+        .select("id, title, status, priority, due_date, due_time, assignee_id")
+        .order("due_date", { ascending: true })
+        .limit(300);
+      if (filter === "open") query = query.neq("status", "approved");
+      if (filter === "review") query = query.eq("status", "submitted");
+      if (employeeParam) {
+        query = query.eq("assignee_id", employeeParam);
+      } else if (filter === "mine") {
+        query = query.eq("assignee_id", member.employee_id);
+      }
+      if (q) query = query.ilike("title", `%${q}%`);
+      if (dateParam) query = query.eq("due_date", dateParam);
+      return query;
+    })(),
+    manages
+      ? supabase
+          .from("employees")
+          .select("id, full_name_ar, full_name_en, job_title")
+          .eq("status", "active")
+          .order("full_name_ar")
+      : Promise.resolve({ data: [] }),
+  ]);
+
+  const { data, error } = tasksRes;
   if (error) throw new Error("tasks query failed");
+
+  const employeeOptions: EmployeeOption[] = (employeesRes.data ?? []).map((e) => ({
+    id: e.id,
+    name: (locale === "en" && e.full_name_en) || e.full_name_ar,
+    jobTitle: e.job_title ?? null,
+  }));
 
   const names = await loadNames(locale, data.map((r) => r.assignee_id));
   const rows: TaskRow[] = data.map((r) => ({
@@ -80,6 +106,7 @@ export default async function TasksPage({ params, searchParams }: PageProps<"/[l
     query: {
       ...(q ? { q } : {}),
       ...(dateParam ? { date: dateParam } : {}),
+      ...(employeeParam ? { employee: employeeParam } : {}),
       ...(f !== "all" ? { status: f } : {}),
     },
   });
@@ -120,19 +147,34 @@ export default async function TasksPage({ params, searchParams }: PageProps<"/[l
         </nav>
       </div>
 
-      {/* Date Filter Bar */}
+      {/* Date & Employee Filter Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
-        <TaskDateFilter
-          todayStr={today}
-          tomorrowStr={tomorrow}
-          labels={{
-            all: t("dateFilter.all"),
-            today: t("dateFilter.today"),
-            tomorrow: t("dateFilter.tomorrow"),
-            pickDate: t("dateFilter.pickDate"),
-            clear: t("dateFilter.clear"),
-          }}
-        />
+        <div className="flex flex-wrap items-center gap-3">
+          <TaskDateFilter
+            todayStr={today}
+            tomorrowStr={tomorrow}
+            labels={{
+              all: t("dateFilter.all"),
+              today: t("dateFilter.today"),
+              tomorrow: t("dateFilter.tomorrow"),
+              pickDate: t("dateFilter.pickDate"),
+              clear: t("dateFilter.clear"),
+            }}
+          />
+
+          {manages && employeeOptions.length > 0 && (
+            <TaskEmployeeFilter
+              employees={employeeOptions}
+              labels={{
+                all: t("employeeFilter.all"),
+                label: t("employeeFilter.label"),
+                choose: t("employeeFilter.choose"),
+                showingEmployee: t("employeeFilter.showingEmployee"),
+                clear: t("employeeFilter.clear"),
+              }}
+            />
+          )}
+        </div>
 
         {dateParam && (
           <div className="flex items-center gap-2 text-label text-indigo bg-indigo/10 px-3 py-1.5 rounded-[6px]">
@@ -144,8 +186,8 @@ export default async function TasksPage({ params, searchParams }: PageProps<"/[l
 
       {rows.length === 0 ? (
         <div className="flex flex-col items-start gap-4 rounded-card border border-dashed border-line bg-surface p-6">
-          <p>{q || dateParam || filter !== "all" ? t("noResults") : manages ? t("empty") : t("emptyMine")}</p>
-          {manages && !q && !dateParam && filter === "all" && (
+          <p>{q || dateParam || employeeParam || filter !== "all" ? t("noResults") : manages ? t("empty") : t("emptyMine")}</p>
+          {manages && !q && !dateParam && !employeeParam && filter === "all" && (
             <Button asChild variant="outline">
               <Link href="/tasks/new">{t("add")}</Link>
             </Button>
