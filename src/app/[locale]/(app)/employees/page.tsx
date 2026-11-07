@@ -17,101 +17,6 @@ const FILTERS = ["active", "disabled", "terminated", "all"] as const;
 type Filter = (typeof FILTERS)[number];
 const cleanSearch = (q: string) => q.replace(/[,()*%\\:"'.]/g, " ").trim().slice(0, 60);
 
-type IqamaInfo = {
-  isCitizen: boolean;
-  iqamaEnd: string | null;
-  daysRemaining: number | null;
-  badgeText: string;
-  tone: "brick" | "stamp" | "neutral";
-};
-
-function getIqamaInfo(
-  idType: string,
-  iqamaEnd: string | null,
-  locale: Locale,
-): IqamaInfo {
-  // If Saudi citizen
-  if (idType === "citizen" && !iqamaEnd) {
-    return {
-      isCitizen: true,
-      iqamaEnd: null,
-      daysRemaining: null,
-      badgeText: locale === "ar" ? "مواطن" : "Citizen",
-      tone: "neutral",
-    };
-  }
-
-  if (!iqamaEnd) {
-    return {
-      isCitizen: false,
-      iqamaEnd: null,
-      daysRemaining: null,
-      badgeText: locale === "ar" ? "غير مسجل" : "Not set",
-      tone: "neutral",
-    };
-  }
-
-  // Calculate days remaining using UTC dates
-  const parts = iqamaEnd.split("-").map((v) => parseInt(v, 10));
-  const y = parts[0];
-  const m = parts[1];
-  const d = parts[2];
-  if (y === undefined || m === undefined || d === undefined || isNaN(y) || isNaN(m) || isNaN(d)) {
-    return {
-      isCitizen: false,
-      iqamaEnd,
-      daysRemaining: null,
-      badgeText: locale === "ar" ? "غير مسجل" : "Not set",
-      tone: "neutral",
-    };
-  }
-  const expiryUtc = Date.UTC(y, m - 1, d);
-  const now = new Date();
-  const todayUtc = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
-  const diffDays = Math.round((expiryUtc - todayUtc) / (1000 * 60 * 60 * 24));
-
-  if (diffDays < 0) {
-    const abs = Math.abs(diffDays);
-    return {
-      isCitizen: false,
-      iqamaEnd,
-      daysRemaining: diffDays,
-      badgeText: locale === "ar" ? `منتهية (منذ ${abs} يوم)` : `Expired (${abs}d ago)`,
-      tone: "brick",
-    };
-  }
-
-  if (diffDays === 0) {
-    return {
-      isCitizen: false,
-      iqamaEnd,
-      daysRemaining: 0,
-      badgeText: locale === "ar" ? "تنتهي اليوم" : "Expires today",
-      tone: "brick",
-    };
-  }
-
-  // Near expiry: within 60 days -> RED, showing remaining days
-  if (diffDays <= 60) {
-    return {
-      isCitizen: false,
-      iqamaEnd,
-      daysRemaining: diffDays,
-      badgeText: locale === "ar" ? `متبقي ${diffDays} يوم على انتهاء الإقامة` : `${diffDays} days left until expiry`,
-      tone: "brick",
-    };
-  }
-
-  // Valid (> 60 days)
-  return {
-    isCitizen: false,
-    iqamaEnd,
-    daysRemaining: diffDays,
-    badgeText: locale === "ar" ? `سارية (متبقي ${diffDays} يوم)` : `Valid (${diffDays}d)`,
-    tone: "stamp",
-  };
-}
-
 export default async function EmployeesPage({ params, searchParams }: PageProps<"/[locale]/employees">) {
   const locale = (await params).locale as Locale;
   const member = await requireMember(locale, ["owner", "admin", "hr", "manager"]);
@@ -126,7 +31,7 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
   let query = supabase
     .from("employees")
     .select(
-      "id, full_name_ar, full_name_en, national_id, employee_number, role, status, job_title, id_type, iqama_end, iqama_start",
+      "id, full_name_ar, full_name_en, national_id, employee_number, role, status, job_title",
     )
     .neq("status", "deleted")
     .not("role", "in", '("owner","admin")')
@@ -150,8 +55,6 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
       name: localName(locale, e.full_name_ar, e.full_name_en),
       nationalId: e.national_id,
       jobTitle: e.job_title || "—",
-      idType: e.id_type,
-      iqamaEnd: e.iqama_end,
       status: e.status as "active" | "disabled" | "terminated",
     };
   });
@@ -218,7 +121,6 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
           <ul className="flex flex-col gap-2 md:hidden">
             {rows.map((r) => {
               const tone: Tone = r.status === "active" ? "stamp" : r.status === "disabled" ? "brick" : "saffron";
-              const iqama = getIqamaInfo(r.idType, r.iqamaEnd, locale);
               return (
                 <li key={r.id}>
                   <div className="flex flex-col gap-2.5 rounded-card border border-line bg-surface p-4">
@@ -237,32 +139,6 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
                     <div className="flex items-center justify-between text-caption text-secondary">
                       <span className="font-medium text-ink">{r.jobTitle}</span>
                       <bdi dir="ltr" className="tabular-nums font-mono">{r.nationalId}</bdi>
-                    </div>
-
-                    <div className="flex items-center justify-between gap-2 border-t border-line/40 pt-2 text-caption">
-                      <span className="text-secondary">{t("columns.iqama")}:</span>
-                      <div className="flex items-center gap-1.5">
-                        <span
-                          className={cn(
-                            "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold",
-                            iqama.tone === "brick" &&
-                              "bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-900",
-                            iqama.tone === "stamp" &&
-                              "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900",
-                            iqama.tone === "neutral" && "bg-paper text-secondary border border-line",
-                          )}
-                        >
-                          {iqama.tone === "brick" && (
-                            <span className="size-1.5 rounded-full bg-rose-600 dark:bg-rose-400 animate-pulse" aria-hidden />
-                          )}
-                          {iqama.badgeText}
-                        </span>
-                        {iqama.iqamaEnd && (
-                          <span className="text-2xs font-mono text-secondary tabular-nums" dir="ltr">
-                            ({iqama.iqamaEnd})
-                          </span>
-                        )}
-                      </div>
                     </div>
 
                     <div className="flex items-center justify-end gap-2 border-t border-line/60 pt-2.5">
@@ -291,7 +167,7 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
             <Table>
               <TableHeader>
                 <TableRow>
-                  {(["code", "name", "nationalId", "jobTitle", "iqama", "status", "actions"] as const).map((c) => (
+                  {(["code", "name", "nationalId", "jobTitle", "status", "actions"] as const).map((c) => (
                     <TableHead key={c} className={c === "actions" ? "text-end" : "text-start"}>
                       {t(`columns.${c}`)}
                     </TableHead>
@@ -301,7 +177,6 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
               <TableBody>
                 {rows.map((r) => {
                   const tone: Tone = r.status === "active" ? "stamp" : r.status === "disabled" ? "brick" : "saffron";
-                  const iqama = getIqamaInfo(r.idType, r.iqamaEnd, locale);
                   return (
                     <TableRow key={r.id}>
                       <TableCell className="font-mono text-xs font-semibold text-ink">
@@ -317,33 +192,6 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
                       </TableCell>
                       <TableCell className="font-medium text-ink">
                         {r.jobTitle}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col gap-0.5 items-start">
-                          <span
-                            className={cn(
-                              "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap",
-                              iqama.tone === "brick" &&
-                                "bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-900",
-                              iqama.tone === "stamp" &&
-                                "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900",
-                              iqama.tone === "neutral" && "bg-paper text-secondary border border-line",
-                            )}
-                          >
-                            {iqama.tone === "brick" && (
-                              <span className="size-1.5 rounded-full bg-rose-600 dark:bg-rose-400 animate-pulse" aria-hidden />
-                            )}
-                            {iqama.tone === "stamp" && (
-                              <span className="size-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400" aria-hidden />
-                            )}
-                            {iqama.badgeText}
-                          </span>
-                          {iqama.iqamaEnd && (
-                            <span className="text-2xs font-mono text-secondary tabular-nums" dir="ltr">
-                              {iqama.iqamaEnd}
-                            </span>
-                          )}
-                        </div>
                       </TableCell>
                       <TableCell>
                         <StatusPill tone={tone}>{t(`status.${r.status}`)}</StatusPill>

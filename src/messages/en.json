@@ -241,6 +241,7 @@
     "leave": "Leave",
     "payroll": "Payroll",
     "advances": "Advances",
+    "reports": "Reports",
     "analytics": "Analytics & KPIs"
   },
   "errors": {
@@ -1451,5 +1452,49 @@
     "quickKpis": "Quick KPIs Overview",
     "viewFullAnalytics": "View Full Analytics Dashboard",
     "currency": "SAR"
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "Staff and resident reports, monitoring document and contract expirations",
+    "tabs": {
+      "residents": "Residents (Iqama Reports)",
+      "contracts": "Contract Expirations"
+    },
+    "kpi": {
+      "totalResidents": "Total Residents",
+      "expiringSoon": "Expiring Soon (within 60d)",
+      "expired": "Expired Iqamas",
+      "valid": "Valid Iqamas"
+    },
+    "filters": {
+      "all": "All",
+      "expiringSoon": "Expiring Soon",
+      "expired": "Expired",
+      "valid": "Valid"
+    },
+    "columns": {
+      "code": "Code",
+      "name": "Resident Name",
+      "iqamaNumber": "Iqama Number",
+      "jobTitle": "Job Title",
+      "expiryDate": "Expiry Date",
+      "daysLeft": "Days Remaining",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "expired": "Expired",
+      "today": "Expires Today",
+      "expiringSoon": "Expiring Soon",
+      "valid": "Valid",
+      "notSet": "Not Set"
+    },
+    "actions": {
+      "renew": "Edit / Renew",
+      "view": "Profile"
+    },
+    "search": "Search by resident name, Iqama number, or job title...",
+    "empty": "No residents matching the criteria.",
+    "count": "{count} residents"
   }
 }

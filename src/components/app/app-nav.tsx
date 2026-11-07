@@ -4,6 +4,7 @@ import {
   Banknote,
   CalendarDays,
   Clock,
+  FileText,
   HandCoins,
   House,
   ListChecks,
@@ -29,6 +30,7 @@ type Key =
   | "departments"
   | "branches"
   | "shifts"
+  | "reports"
   | "settings";
 
 type Item = { href: string; key: Key; icon: typeof House; tab: boolean };
@@ -76,6 +78,9 @@ function itemsFor(role: Role): Item[] {
       icon: HandCoins,
       tab: false,
     });
+  }
+  if (isLeader || role === "hr" || role === "manager") {
+    items.push({ href: "/reports", key: "reports", icon: FileText, tab: false });
   }
   if (isLeader || role === "hr") {
     items.push({ href: "/settings", key: "settings", icon: Settings, tab: false });
