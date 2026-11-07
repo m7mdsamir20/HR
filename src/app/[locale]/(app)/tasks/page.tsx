@@ -168,8 +168,6 @@ export default async function TasksPage({ params, searchParams }: PageProps<"/[l
               labels={{
                 all: t("employeeFilter.all"),
                 label: t("employeeFilter.label"),
-                choose: t("employeeFilter.choose"),
-                showingEmployee: t("employeeFilter.showingEmployee"),
                 clear: t("employeeFilter.clear"),
               }}
             />

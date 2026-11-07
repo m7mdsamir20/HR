@@ -650,8 +650,6 @@
     "employeeFilter": {
       "all": "جميع الموظفين",
       "label": "تصفية بالموظف",
-      "choose": "اختر موظفاً...",
-      "showingEmployee": "المكلف: {name}",
       "clear": "إلغاء تصفية الموظف"
     },
     "noDueDate": "بدون موعد إنجاز محدد",

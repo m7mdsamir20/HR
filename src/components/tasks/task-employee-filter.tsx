@@ -17,8 +17,6 @@ interface TaskEmployeeFilterProps {
   labels: {
     all: string;
     label: string;
-    choose: string;
-    showingEmployee: string;
     clear: string;
   };
   className?: string;

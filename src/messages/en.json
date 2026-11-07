@@ -649,8 +649,6 @@
     "employeeFilter": {
       "all": "All employees",
       "label": "Filter by employee",
-      "choose": "Choose employee...",
-      "showingEmployee": "Assignee: {name}",
       "clear": "Clear employee filter"
     },
     "noDueDate": "No due date specified",
