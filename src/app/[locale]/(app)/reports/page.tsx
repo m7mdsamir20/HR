@@ -165,6 +165,8 @@ export default async function ReportsResidentsPage({ params, searchParams }: Pag
                 ? `${t(`filters.${f}`)} (${kpi.expiringSoon})`
                 : f === "expired"
                 ? `${t(`filters.${f}`)} (${kpi.expired})`
+                : f === "valid"
+                ? `${t(`filters.${f}`)} (${kpi.valid})`
                 : t(`filters.${f}`)}
             </Link>
           ))}

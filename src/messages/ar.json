@@ -1469,6 +1469,7 @@
     },
     "filters": {
       "all": "الكل",
+      "expiring_soon": "أوشكت على الانتهاء",
       "expiringSoon": "أوشكت على الانتهاء",
       "expired": "منتهية",
       "valid": "سارية"
@@ -1486,8 +1487,10 @@
     "status": {
       "expired": "منتهية",
       "today": "تنتهي اليوم",
+      "expiring_soon": "أوشكت على الانتهاء",
       "expiringSoon": "أوشكت على الانتهاء",
       "valid": "سارية",
+      "not_set": "لم يسجل",
       "notSet": "لم يسجل"
     },
     "actions": {

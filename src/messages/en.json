@@ -1468,6 +1468,7 @@
     },
     "filters": {
       "all": "All",
+      "expiring_soon": "Expiring Soon",
       "expiringSoon": "Expiring Soon",
       "expired": "Expired",
       "valid": "Valid"
@@ -1485,8 +1486,10 @@
     "status": {
       "expired": "Expired",
       "today": "Expires Today",
+      "expiring_soon": "Expiring Soon",
       "expiringSoon": "Expiring Soon",
       "valid": "Valid",
+      "not_set": "Not Set",
       "notSet": "Not Set"
     },
     "actions": {
