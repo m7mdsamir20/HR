@@ -8,6 +8,7 @@ import { FormField } from "@/components/form-field";
 import { FormSection } from "@/components/form-section";
 import { Button } from "@/components/ui/button";
 import { suggestPassword } from "@/lib/password";
+import { normalizeNationalId } from "@/lib/auth/national-id";
 import type { CreateCompanyField } from "@/lib/validation/company";
 
 export function CreateCompanyForm({ minDate }: { minDate: string }) {
@@ -20,8 +21,8 @@ export function CreateCompanyForm({ minDate }: { minDate: string }) {
   const [, startTransition] = useTransition();
 
   const handleNidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    const clean = val.trim();
+    const clean = normalizeNationalId(e.target.value).replace(/\D/g, "").slice(0, 10);
+    e.target.value = clean;
     if (clean.length === 10 && /^[12]\d{9}$/.test(clean)) {
       startTransition(async () => {
         const res = await lookupOwner(clean);
@@ -104,7 +105,7 @@ export function CreateCompanyForm({ minDate }: { minDate: string }) {
           error={err("ownerNationalId")}
           required
           inputMode="numeric"
-          maxLength={14}
+          maxLength={10}
           dir="ltr"
           className="tabular-nums"
           onChange={handleNidChange}

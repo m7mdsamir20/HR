@@ -39,11 +39,11 @@ export function LoginForm() {
           name="nationalId"
           value={nationalId}
           // Arabic-Indic digits become 0-9 as they're typed (Latin digits everywhere, CLAUDE.md §6).
-          onChange={(e) => setNationalId(normalizeNationalId(e.target.value))}
+          onChange={(e) => setNationalId(normalizeNationalId(e.target.value).replace(/\D/g, "").slice(0, 10))}
           inputMode="numeric"
           autoComplete="username"
           dir="ltr"
-          maxLength={14}
+          maxLength={10}
           required
           aria-describedby="nationalId-meta"
           aria-invalid={state?.error === "invalid" || undefined}

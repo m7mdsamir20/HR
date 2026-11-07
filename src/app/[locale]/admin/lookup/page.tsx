@@ -63,7 +63,7 @@ export default async function LookupPage({ params, searchParams }: PageProps<"/[
             name="id"
             defaultValue={typed}
             inputMode="numeric"
-            maxLength={14}
+            maxLength={10}
             dir="ltr"
             className="tabular-nums"
             aria-invalid={searched && !valid ? true : undefined}

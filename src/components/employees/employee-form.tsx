@@ -109,7 +109,7 @@ export function EmployeeForm({ mode, action, departments, managers, nationalitie
             error={err("nationalId")}
             required
             inputMode="numeric"
-            maxLength={14}
+            maxLength={10}
             dir="ltr"
             className="tabular-nums"
           />
