@@ -29,7 +29,7 @@ export default async function AdvanceRequestsPage({ params }: PageProps<"/[local
       .from("employees")
       .select("id, full_name_ar, full_name_en, employee_number")
       .eq("status", "active")
-      .neq("role", "owner")
+      .not("role", "in", '("owner","admin")')
       .order("full_name_ar"),
   ]);
 

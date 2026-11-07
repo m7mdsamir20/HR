@@ -25,6 +25,7 @@ export async function assigneeOptions(locale: Locale, selfId: string) {
     .from("employees")
     .select("id, full_name_ar, full_name_en, job_title")
     .eq("status", "active")
+    .not("role", "in", '("owner","admin")')
     .neq("id", selfId)
     .order("full_name_ar");
   return (data ?? []).map((e) => ({

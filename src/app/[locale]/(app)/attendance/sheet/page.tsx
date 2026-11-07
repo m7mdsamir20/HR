@@ -33,7 +33,7 @@ export default async function AttendanceSheetPage({ params, searchParams }: Page
       .from("employees")
       .select("id, full_name_ar, full_name_en, employee_number, shift_id")
       .eq("status", "active")
-      .neq("role", "owner")
+      .not("role", "in", '("owner","admin")')
       .order("full_name_ar"),
     supabase.from("attendance_records").select(RECORD_COLUMNS).gte("work_date", from).lte("work_date", to).order("work_date", { ascending: false }),
     supabase.from("leave_requests").select("id, employee_id, type, start_date, end_date").eq("status", "approved").lte("start_date", to).gte("end_date", from),

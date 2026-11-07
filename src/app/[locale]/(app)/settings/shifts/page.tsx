@@ -30,7 +30,7 @@ export default async function SettingsShiftsPage({ params }: PageProps<"/[locale
   const branchNames = new Map((branches ?? []).map((b) => [b.id, pick(b.name_ar, b.name_en)]));
   // HR can't assign the owner or themself (the database says the same); the owner/admin can assign anyone.
   const isLeader = member.role === "owner" || member.role === "admin";
-  const assignable = (employees ?? []).filter((e) => isLeader || (e.role !== "owner" && e.role !== "hr"));
+  const assignable = (employees ?? []).filter((e) => e.role !== "owner" && e.role !== "admin" && (isLeader || e.role !== "hr"));
 
   return (
     <main className="flex flex-col gap-6">

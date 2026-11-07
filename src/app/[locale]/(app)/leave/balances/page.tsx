@@ -17,7 +17,7 @@ export default async function LeaveBalancesPage({ params }: PageProps<"/[locale]
     .from("employees")
     .select("id, full_name_ar, full_name_en, role, employee_number")
     .eq("status", "active")
-    .neq("role", "owner")
+    .not("role", "in", '("owner","admin")')
     .order("employee_number", { ascending: true, nullsFirst: false })
     .limit(200);
   const people = (employees ?? []).sort((a, b) => {
@@ -33,8 +33,9 @@ export default async function LeaveBalancesPage({ params }: PageProps<"/[locale]
     }),
   );
   const byId = new Map(balances);
-  // HR can't adjust the owner or themself (the database says the same); the owner can adjust anyone.
-  const adjustable = people.filter((e) => member.role === "owner" || (e.role !== "owner" && e.role !== "hr"));
+  // HR can't adjust the owner/admin or themself; the owner/admin can adjust anyone.
+  const isLeader = member.role === "owner" || member.role === "admin";
+  const adjustable = people.filter((e) => e.role !== "owner" && e.role !== "admin" && (isLeader || e.role !== "hr"));
   const cell = "px-4 py-3 tabular-nums";
 
   return (
