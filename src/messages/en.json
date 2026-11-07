@@ -291,6 +291,8 @@
       "code": "Employee Code",
       "name": "Name",
       "nationalId": "ID number",
+      "jobTitle": "Job Title",
+      "iqama": "Iqama / Residency",
       "role": "Role",
       "department": "Department",
       "manager": "Direct Manager",
