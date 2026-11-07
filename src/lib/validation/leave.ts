@@ -33,3 +33,14 @@ export const adjustmentSchema = z.object({
   ),
   reason: z.string().trim().min(3).max(300),
 });
+
+export const manualLeaveSchema = z
+  .object({
+    employeeId: z.uuid(),
+    type: z.enum(LEAVE_TYPES),
+    startDate: z.iso.date(),
+    endDate: z.iso.date(),
+    reason: optional(z.string().min(3).max(500)),
+    autoApprove: z.preprocess((v) => v === "true" || v === "on" || v === true, z.boolean()).default(true),
+  })
+  .refine((l) => l.endDate >= l.startDate, { path: ["endDate"] });

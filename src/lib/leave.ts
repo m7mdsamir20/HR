@@ -1,7 +1,7 @@
 import type { Tone } from "@/components/status-pill";
 import { toActionError, type ActionError } from "@/lib/errors";
 
-export const LEAVE_TYPES = ["annual", "sick", "marriage", "death", "newborn", "hajj", "maternity"] as const;
+export const LEAVE_TYPES = ["annual", "unpaid", "sick", "marriage", "death", "newborn", "hajj", "maternity"] as const;
 export type LeaveType = (typeof LEAVE_TYPES)[number];
 
 export const LEAVE_STATUSES = ["pending_manager", "pending_hr", "approved", "rejected", "cancelled"] as const;

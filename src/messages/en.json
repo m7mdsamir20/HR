@@ -1151,6 +1151,7 @@
     },
     "types": {
       "annual": "Annual leave",
+      "unpaid": "Unpaid leave",
       "sick": "Sick leave",
       "marriage": "Marriage leave",
       "death": "Bereavement leave",
@@ -1160,12 +1161,29 @@
     },
     "typeHints": {
       "annual": "Taken from your annual balance. Only your working days are counted, so weekly rest days and public holidays aren't charged.",
+      "unpaid": "Leave without pay. The days are counted and deducted from basic salary automatically in payroll.",
       "sick": "Up to 120 days a year: 30 on full pay, then 60 on three quarters, then 30 unpaid. Days are counted consecutively.",
       "marriage": "Up to 5 days on full pay.",
       "death": "Up to 5 days on full pay on the death of a spouse, parent or child.",
       "newborn": "Up to 3 days on full pay for a father when a baby is born.",
       "hajj": "10 to 15 days on full pay, once in your service and after two years of work.",
       "maternity": "Up to 12 weeks (84 days) for a female employee."
+    },
+    "manualLeave": {
+      "button": "Manual leave request",
+      "title": "Manual leave request for employee",
+      "intro": "Record a leave for an employee with direct approval, deduction calculation, and payroll integration.",
+      "employee": "Employee",
+      "type": "Leave type",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "reason": "Reason / Notes",
+      "reasonPlaceholder": "Leave reason or extra details...",
+      "autoApproveLabel": "Approve directly and apply to attendance & payroll immediately",
+      "submitting": "Recording...",
+      "submit": "Record leave",
+      "success": "Leave recorded successfully",
+      "invalidField": "Invalid field"
     },
     "status": {
       "pending_manager": "Waiting for the supervisor",

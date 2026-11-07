@@ -53,20 +53,25 @@ function itemsFor(role: Role): Item[] {
   // Tasks is under Employees & Departments
   items.push({ href: "/tasks", key: manages ? "tasks" : "myTasks", icon: ListChecks, tab: true });
 
-  // Attendance: owner goes directly to the attendance sheet
+  // Attendance: owner/admin goes directly to the attendance sheet
   items.push({
-    href: role === "owner" ? "/attendance/sheet" : "/attendance",
+    href: isLeader ? "/attendance/sheet" : "/attendance",
     key: "attendance",
     icon: Clock,
     tab: true,
   });
 
   // Sidebar-only management modules
-  items.push({ href: "/leave", key: "leave", icon: CalendarDays, tab: false });
+  items.push({
+    href: isLeader ? "/leave/requests" : "/leave",
+    key: "leave",
+    icon: CalendarDays,
+    tab: false,
+  });
   if (isLeader || role === "hr" || role === "employee") {
     items.push({ href: "/payroll", key: "payroll", icon: Banknote, tab: false });
     items.push({
-      href: role === "owner" ? "/advances/requests" : "/advances",
+      href: isLeader ? "/advances/requests" : "/advances",
       key: "advances",
       icon: HandCoins,
       tab: false,

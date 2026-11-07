@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { BalanceCards } from "@/components/leave/balance-cards";
 import { LeaveCancel } from "@/components/leave/leave-actions";
@@ -15,6 +16,9 @@ const addDays = (iso: string, days: number) => new Date(Date.parse(iso) + days *
 export default async function LeavePage({ params }: PageProps<"/[locale]/leave">) {
   const locale = (await params).locale as Locale;
   const member = await requireMember(locale);
+  if (member.role === "owner" || member.role === "admin") {
+    redirect(`/${locale}/leave/requests`);
+  }
   const t = await getTranslations({ locale, namespace: "leave" });
   const today = todayInRiyadh();
 

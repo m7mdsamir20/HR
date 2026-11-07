@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { LeaveCancel, LeaveDecision } from "@/components/leave/leave-actions";
 import { LeaveCard } from "@/components/leave/leave-card";
 import { LeaveTabs } from "@/components/leave/leave-tabs";
+import { ManualLeaveDialog } from "@/components/leave/manual-leave-dialog";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { requireMember } from "@/lib/auth/account";
@@ -32,21 +33,29 @@ export default async function LeaveRequestsPage({ params, searchParams }: PagePr
       .neq("employee_id", member.employee_id)
       .order("created_at", { ascending: false })
       .limit(300),
-    supabase.from("employees").select("id, full_name_ar, full_name_en, role, manager_id").neq("status", "deleted"),
+    supabase.from("employees").select("id, full_name_ar, full_name_en, role, manager_id, employee_number").neq("status", "deleted"),
   ]);
   const people = new Map((employees ?? []).map((e) => [e.id, e]));
+
+  const isLeader = member.role === "owner" || member.role === "admin";
+  const canCreateManual = isLeader || member.role === "hr" || member.role === "manager";
+  const manualCandidates = (employees ?? []).filter((e) => {
+    if (isLeader || member.role === "hr") return true;
+    if (member.role === "manager") return e.manager_id === member.employee_id;
+    return false;
+  });
 
   // The same rule the database applies; the buttons are only shown when it would say yes.
   const canDecide = (status: string, employeeId: string) => {
     const e = people.get(employeeId);
     if (!e) return false;
-    if (status === "pending_manager") return member.role === "owner" || (member.role === "manager" && e.manager_id === member.employee_id);
-    if (status === "pending_hr") return member.role === "owner" || (member.role === "hr" && (e.role === "manager" || e.role === "employee"));
+    if (status === "pending_manager") return isLeader || (member.role === "manager" && e.manager_id === member.employee_id);
+    if (status === "pending_hr") return isLeader || (member.role === "hr" && (e.role === "manager" || e.role === "employee"));
     return false;
   };
   const canCancel = (employeeId: string) => {
     const e = people.get(employeeId);
-    return !!e && (member.role === "owner" || (member.role === "hr" && (e.role === "manager" || e.role === "employee")));
+    return !!e && (isLeader || (member.role === "hr" && (e.role === "manager" || e.role === "employee")));
   };
 
   const rows = (requests ?? []).filter((r) => {
@@ -59,7 +68,12 @@ export default async function LeaveRequestsPage({ params, searchParams }: PagePr
 
   return (
     <main className="flex flex-col gap-6">
-      <h1 className="text-page">{t("title")}</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-page">{t("title")}</h1>
+        {canCreateManual && manualCandidates.length > 0 && (
+          <ManualLeaveDialog employees={manualCandidates} today={today} />
+        )}
+      </div>
       <LeaveTabs role={member.role} />
       <p className="max-w-prose text-secondary">{t("inbox.intro")}</p>
 

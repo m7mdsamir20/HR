@@ -8,7 +8,7 @@ import { routing } from "@/i18n/routing";
 import { requireMember } from "@/lib/auth/account";
 import { leaveError, type LeaveError } from "@/lib/leave";
 import { createClient } from "@/lib/supabase/server";
-import { adjustmentSchema, leaveCancelSchema, leaveDecisionSchema, leaveRequestSchema } from "@/lib/validation/leave";
+import { adjustmentSchema, leaveCancelSchema, leaveDecisionSchema, leaveRequestSchema, manualLeaveSchema } from "@/lib/validation/leave";
 
 const localeSchema = z.enum(routing.locales).catch(routing.defaultLocale);
 const fieldsOf = (error: z.ZodError) => [...new Set(error.issues.map((i) => String(i.path[0])))];
@@ -72,6 +72,33 @@ export async function adjustBalance(_prev: LeaveState, formData: FormData): Prom
   const supabase = await createClient();
   const { error } = await supabase.rpc("leave_adjust", { p_employee: parsed.data.employeeId, p_days: parsed.data.days, p_reason: parsed.data.reason });
   if (error) return { ok: false, error: leaveError(error, "adjustBalance") };
+  refresh();
+  return { ok: true };
+}
+
+export async function createManualLeave(_prev: LeaveState, formData: FormData): Promise<LeaveState> {
+  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin", "hr", "manager"]);
+  const parsed = manualLeaveSchema.safeParse({
+    employeeId: formData.get("employeeId"),
+    type: formData.get("type"),
+    startDate: formData.get("startDate"),
+    endDate: formData.get("endDate"),
+    reason: formData.get("reason"),
+    autoApprove: formData.get("autoApprove"),
+  });
+  if (!parsed.success) return { ok: false, error: "invalid", fields: fieldsOf(parsed.error) };
+  const d = parsed.data;
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("leave_manual_create", {
+    p_employee_id: d.employeeId,
+    p_type: d.type,
+    p_start_date: d.startDate,
+    p_end_date: d.endDate,
+    p_reason: d.reason ?? "",
+    p_auto_approve: d.autoApprove,
+  });
+  if (error) return { ok: false, error: leaveError(error, "createManualLeave") };
   refresh();
   return { ok: true };
 }
