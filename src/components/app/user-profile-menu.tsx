@@ -53,9 +53,9 @@ export function UserProfileMenu({ name, role, companyName }: UserProfileMenuProp
 
       <DropdownMenuContent align="end" className="w-64">
         {/* User Identity Header */}
-        <DropdownMenuLabel className="flex flex-col gap-1.5 p-3 font-normal">
-          <div className="flex items-center justify-between gap-2">
-            <span className="font-semibold text-ink truncate text-sm">{name}</span>
+        <DropdownMenuLabel className="flex flex-col gap-2 p-3 font-normal">
+          <span className="font-semibold text-ink text-sm truncate">{name}</span>
+          <div className="flex items-center">
             <StatusPill tone="indigo">{tRoles(role)}</StatusPill>
           </div>
           <span className="text-caption text-secondary truncate">{companyName}</span>
