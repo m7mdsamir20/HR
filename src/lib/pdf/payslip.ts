@@ -51,6 +51,7 @@ export async function buildPayslipPdf(
   const empName = (locale === "en" && emp?.full_name_en) || emp?.full_name_ar || "—";
   const docNumber = `PAY-${run.year}-${String(run.month).padStart(2, "0")}-${emp?.national_id?.slice(-4) || "0000"}`;
   const period = `${String(run.month).padStart(2, "0")} / ${run.year}`;
+  const currency = locale === "ar" ? "ر.س" : "SAR";
 
   const body = `
     <div class="card" style="margin-bottom: 8px;">
@@ -75,12 +76,12 @@ export async function buildPayslipPdf(
             <tr><th>البند</th><th style="text-align: end;">المبلغ</th></tr>
           </thead>
           <tbody>
-            <tr><td>${esc(t("basicSalary"))}</td><td style="text-align: end;">${ltr(`${Number(slip.basic_salary).toFixed(2)} SAR`)}</td></tr>
-            <tr><td>${esc(t("housingAllowance"))}</td><td style="text-align: end;">${ltr(`${Number(slip.housing_allowance).toFixed(2)} SAR`)}</td></tr>
-            <tr><td>${esc(t("transportAllowance"))}</td><td style="text-align: end;">${ltr(`${Number(slip.transport_allowance).toFixed(2)} SAR`)}</td></tr>
-            <tr><td>${esc(t("communicationAllowance"))}</td><td style="text-align: end;">${ltr(`${Number(slip.communication_allowance).toFixed(2)} SAR`)}</td></tr>
-            <tr><td>${esc(t("otherAllowancesField"))}</td><td style="text-align: end;">${ltr(`${Number(slip.other_allowances).toFixed(2)} SAR`)}</td></tr>
-            <tr style="font-weight: bold; background: #F6F7F9;"><td>${esc(t("totalGross"))}</td><td style="text-align: end;">${ltr(`${Number(slip.gross_salary).toFixed(2)} SAR`)}</td></tr>
+            <tr><td>${esc(t("basicSalary"))}</td><td style="text-align: end;">${ltr(`${Number(slip.basic_salary).toFixed(2)} ${currency}`)}</td></tr>
+            <tr><td>${esc(t("housingAllowance"))}</td><td style="text-align: end;">${ltr(`${Number(slip.housing_allowance).toFixed(2)} ${currency}`)}</td></tr>
+            <tr><td>${esc(t("transportAllowance"))}</td><td style="text-align: end;">${ltr(`${Number(slip.transport_allowance).toFixed(2)} ${currency}`)}</td></tr>
+            <tr><td>${esc(t("communicationAllowance"))}</td><td style="text-align: end;">${ltr(`${Number(slip.communication_allowance).toFixed(2)} ${currency}`)}</td></tr>
+            <tr><td>${esc(t("otherAllowancesField"))}</td><td style="text-align: end;">${ltr(`${Number(slip.other_allowances).toFixed(2)} ${currency}`)}</td></tr>
+            <tr style="font-weight: bold; background: #F6F7F9;"><td>${esc(t("totalGross"))}</td><td style="text-align: end;">${ltr(`${Number(slip.gross_salary).toFixed(2)} ${currency}`)}</td></tr>
           </tbody>
         </table>
       </div>
@@ -92,12 +93,12 @@ export async function buildPayslipPdf(
             <tr><th>البند</th><th style="text-align: end;">المبلغ</th></tr>
           </thead>
           <tbody>
-            <tr><td>${esc(t("gosiEmployee"))}</td><td style="text-align: end; color: #B23A2B;">${ltr(`${Number(slip.gosi_employee).toFixed(2)} SAR`)}</td></tr>
-            <tr><td>${esc(t("attendanceDeduction"))}</td><td style="text-align: end; color: #B23A2B;">${ltr(`${Number(slip.attendance_deduction).toFixed(2)} SAR`)}</td></tr>
-            <tr><td>${esc(t("leaveDeduction"))}</td><td style="text-align: end; color: #B23A2B;">${ltr(`${Number(slip.leave_deduction).toFixed(2)} SAR`)}</td></tr>
-            <tr><td>${esc(t("advanceDeduction"))}</td><td style="text-align: end; color: #B23A2B;">${ltr(`${Number(slip.advance_deduction).toFixed(2)} SAR`)}</td></tr>
-            <tr><td>${esc(t("otherDeductions"))}</td><td style="text-align: end; color: #B23A2B;">${ltr(`${Number(slip.other_deductions).toFixed(2)} SAR`)}</td></tr>
-            <tr style="font-weight: bold; background: #F6F7F9;"><td>${esc(t("totalDeductions"))}</td><td style="text-align: end; color: #B23A2B;">${ltr(`${Number(slip.total_deductions).toFixed(2)} SAR`)}</td></tr>
+            <tr><td>${esc(t("gosiEmployee"))}</td><td style="text-align: end; color: #B23A2B;">${ltr(`${Number(slip.gosi_employee).toFixed(2)} ${currency}`)}</td></tr>
+            <tr><td>${esc(t("attendanceDeduction"))}</td><td style="text-align: end; color: #B23A2B;">${ltr(`${Number(slip.attendance_deduction).toFixed(2)} ${currency}`)}</td></tr>
+            <tr><td>${esc(t("leaveDeduction"))}</td><td style="text-align: end; color: #B23A2B;">${ltr(`${Number(slip.leave_deduction).toFixed(2)} ${currency}`)}</td></tr>
+            <tr><td>${esc(t("advanceDeduction"))}</td><td style="text-align: end; color: #B23A2B;">${ltr(`${Number(slip.advance_deduction).toFixed(2)} ${currency}`)}</td></tr>
+            <tr><td>${esc(t("otherDeductions"))}</td><td style="text-align: end; color: #B23A2B;">${ltr(`${Number(slip.other_deductions).toFixed(2)} ${currency}`)}</td></tr>
+            <tr style="font-weight: bold; background: #F6F7F9;"><td>${esc(t("totalDeductions"))}</td><td style="text-align: end; color: #B23A2B;">${ltr(`${Number(slip.total_deductions).toFixed(2)} ${currency}`)}</td></tr>
           </tbody>
         </table>
       </div>
@@ -108,12 +109,12 @@ export async function buildPayslipPdf(
         <div>
           <span style="font-size: 14px; color: #55627A;">${esc(t("netSalary"))}</span>
           <div style="font-size: 22px; font-weight: 700; color: #2F4A9E;">
-            ${ltr(`${Number(slip.net_salary).toFixed(2)} SAR`)}
+            ${ltr(`${Number(slip.net_salary).toFixed(2)} ${currency}`)}
           </div>
         </div>
         <div style="text-align: end; font-size: 12px; color: #55627A;">
           <span>${esc(t("gosiEmployer"))}: </span>
-          <strong>${ltr(`${Number(slip.gosi_employer).toFixed(2)} SAR`)}</strong>
+          <strong>${ltr(`${Number(slip.gosi_employer).toFixed(2)} ${currency}`)}</strong>
         </div>
       </div>
     </div>

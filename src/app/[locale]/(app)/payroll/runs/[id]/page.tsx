@@ -98,17 +98,23 @@ export default async function PayrollRunDetailPage({
 
         <div className="rounded-card border border-line bg-surface p-4">
           <span className="text-secondary text-caption">{t("totalGross")}</span>
-          <p className="text-card font-bold tabular-nums mt-1">{run.total_gross} SAR</p>
+          <p className="text-card font-bold tabular-nums mt-1">
+            {run.total_gross} <span className="text-xs font-normal text-secondary">ر.س</span>
+          </p>
         </div>
 
         <div className="rounded-card border border-line bg-surface p-4">
           <span className="text-secondary text-caption">{t("totalDeductions")}</span>
-          <p className="text-card font-bold tabular-nums mt-1 text-brick">{run.total_deductions} SAR</p>
+          <p className="text-card font-bold tabular-nums mt-1 text-brick">
+            {run.total_deductions} <span className="text-xs font-normal text-secondary">ر.س</span>
+          </p>
         </div>
 
         <div className="rounded-card border border-line bg-surface p-4 border-indigo/30 bg-indigo/5">
           <span className="text-secondary text-caption">{t("totalNet")}</span>
-          <p className="text-card font-bold tabular-nums mt-1 text-indigo">{run.total_net} SAR</p>
+          <p className="text-card font-bold tabular-nums mt-1 text-indigo">
+            {run.total_net} <span className="text-xs font-normal text-secondary">ر.س</span>
+          </p>
         </div>
       </div>
 
@@ -127,13 +133,14 @@ export default async function PayrollRunDetailPage({
             <table className="w-full text-start text-sm">
               <thead className="border-b border-line bg-paper text-secondary">
                 <tr>
-                  <th className="px-4 py-3 text-start font-medium">{t("employeeCount")}</th>
+                  <th className="px-4 py-3 text-start font-medium">الموظف</th>
                   <th className="px-4 py-3 text-start font-medium">{t("basicSalary")}</th>
                   <th className="px-4 py-3 text-start font-medium">{t("housingAllowance")}</th>
                   <th className="px-4 py-3 text-start font-medium">{t("gosiEmployee")}</th>
                   <th className="px-4 py-3 text-start font-medium">{t("attendanceDeduction")}</th>
                   <th className="px-4 py-3 text-start font-medium">{t("advanceDeduction")}</th>
                   <th className="px-4 py-3 text-start font-medium">{t("otherAllowances")}</th>
+                  <th className="px-4 py-3 text-start font-medium">{t("otherDeductions")}</th>
                   <th className="px-4 py-3 text-start font-medium">{t("netSalary")}</th>
                   <th className="px-4 py-3 text-end font-medium">الإجراء</th>
                 </tr>
@@ -147,8 +154,15 @@ export default async function PayrollRunDetailPage({
                     <td className="px-4 py-3 tabular-nums text-brick">{s.gosi_employee}</td>
                     <td className="px-4 py-3 tabular-nums text-brick">{s.attendance_deduction}</td>
                     <td className="px-4 py-3 tabular-nums text-brick">{s.advance_deduction}</td>
-                    <td className="px-4 py-3 tabular-nums text-stamp">{s.other_allowances}</td>
-                    <td className="px-4 py-3 font-bold tabular-nums text-indigo">{s.net_salary} SAR</td>
+                    <td className="px-4 py-3 tabular-nums text-stamp">
+                      {Number(s.other_allowances) > 0 ? `+${s.other_allowances}` : (s.other_allowances || 0)}
+                    </td>
+                    <td className="px-4 py-3 tabular-nums text-brick">
+                      {Number(s.other_deductions) > 0 ? `-${s.other_deductions}` : (s.other_deductions || 0)}
+                    </td>
+                    <td className="px-4 py-3 font-bold tabular-nums text-indigo whitespace-nowrap">
+                      {s.net_salary} <span className="text-xs font-normal text-secondary">ر.س</span>
+                    </td>
                     <td className="px-4 py-3 text-end">
                       <div className="flex items-center justify-end gap-1">
                         <Link
@@ -161,6 +175,7 @@ export default async function PayrollRunDetailPage({
                         {isDraft && (
                           <PayrollSlipAdjustDialog
                             slipId={s.id}
+                            employeeName={names.get(s.employee_id)}
                             currentOtherAllowances={Number(s.other_allowances)}
                             currentOtherDeductions={Number(s.other_deductions)}
                             currentNotes={s.notes}
@@ -178,4 +193,3 @@ export default async function PayrollRunDetailPage({
     </main>
   );
 }
-

@@ -51,12 +51,16 @@ export function AdvanceCard({
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm py-1">
           <div className="flex flex-col">
             <span className="text-caption text-secondary">{t("amount")}</span>
-            <span className="text-label font-semibold tabular-nums">{row.amount} SAR</span>
+            <span className="text-label font-semibold tabular-nums">
+              {row.amount} <span className="text-xs font-normal text-secondary">{locale === "ar" ? "ر.س" : "SAR"}</span>
+            </span>
           </div>
 
           <div className="flex flex-col">
             <span className="text-caption text-secondary">{t("monthlyInstallment")}</span>
-            <span className="text-label font-semibold tabular-nums text-indigo">{row.monthlyInstallment} SAR</span>
+            <span className="text-label font-semibold tabular-nums text-indigo">
+              {row.monthlyInstallment} <span className="text-xs font-normal text-secondary">{locale === "ar" ? "ر.س" : "SAR"}</span>
+            </span>
           </div>
 
           <div className="flex flex-col">
@@ -66,12 +70,16 @@ export function AdvanceCard({
 
           <div className="flex flex-col">
             <span className="text-caption text-secondary">{t("paid")}</span>
-            <span className="text-label font-semibold tabular-nums text-stamp">{row.paidAmount} SAR</span>
+            <span className="text-label font-semibold tabular-nums text-stamp">
+              {row.paidAmount} <span className="text-xs font-normal text-secondary">{locale === "ar" ? "ر.س" : "SAR"}</span>
+            </span>
           </div>
 
           <div className="flex flex-col">
             <span className="text-caption text-secondary">{t("remaining")}</span>
-            <span className="text-label font-semibold tabular-nums text-brick">{row.remainingAmount} SAR</span>
+            <span className="text-label font-semibold tabular-nums text-brick">
+              {row.remainingAmount} <span className="text-xs font-normal text-secondary">{locale === "ar" ? "ر.س" : "SAR"}</span>
+            </span>
           </div>
         </div>
 

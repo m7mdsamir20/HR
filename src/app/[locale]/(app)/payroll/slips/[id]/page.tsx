@@ -42,6 +42,7 @@ export default async function PayslipDetailPage({
   const run = slip.run as any;
   const names = await loadNames(locale, [slip.employee_id]);
   const empName = names.get(slip.employee_id) ?? "—";
+  const currency = locale === "ar" ? "ر.س" : "SAR";
 
   return (
     <main className="flex flex-col gap-6">
@@ -83,7 +84,7 @@ export default async function PayslipDetailPage({
         <div>
           <span className="text-secondary text-label">{t("netSalary")}</span>
           <p className="text-3xl font-extrabold tabular-nums text-indigo mt-1">
-            {slip.net_salary} <span className="text-sm font-normal">SAR</span>
+            {slip.net_salary} <span className="text-sm font-normal text-secondary">{currency}</span>
           </p>
         </div>
 
@@ -102,24 +103,24 @@ export default async function PayslipDetailPage({
         <FactsSection
           title={t("earnings")}
           items={[
-            { label: t("basicSalary"), value: `${slip.basic_salary} SAR` },
-            { label: t("housingAllowance"), value: `${slip.housing_allowance} SAR` },
-            { label: t("transportAllowance"), value: `${slip.transport_allowance} SAR` },
-            { label: t("communicationAllowance"), value: `${slip.communication_allowance} SAR` },
-            { label: t("otherAllowancesField"), value: `${slip.other_allowances} SAR` },
-            { label: t("totalGross"), value: `${slip.gross_salary} SAR` },
+            { label: t("basicSalary"), value: `${slip.basic_salary} ${currency}` },
+            { label: t("housingAllowance"), value: `${slip.housing_allowance} ${currency}` },
+            { label: t("transportAllowance"), value: `${slip.transport_allowance} ${currency}` },
+            { label: t("communicationAllowance"), value: `${slip.communication_allowance} ${currency}` },
+            { label: t("otherAllowancesField"), value: `${slip.other_allowances} ${currency}` },
+            { label: t("totalGross"), value: `${slip.gross_salary} ${currency}` },
           ]}
         />
 
         <FactsSection
           title={t("deductions")}
           items={[
-            { label: t("gosiEmployee"), value: `${slip.gosi_employee} SAR` },
-            { label: t("attendanceDeduction"), value: `${slip.attendance_deduction} SAR` },
-            { label: t("leaveDeduction"), value: `${slip.leave_deduction} SAR` },
-            { label: t("advanceDeduction"), value: `${slip.advance_deduction} SAR` },
-            { label: t("otherDeductions"), value: `${slip.other_deductions} SAR` },
-            { label: t("totalDeductions"), value: `${slip.total_deductions} SAR` },
+            { label: t("gosiEmployee"), value: `${slip.gosi_employee} ${currency}` },
+            { label: t("attendanceDeduction"), value: `${slip.attendance_deduction} ${currency}` },
+            { label: t("leaveDeduction"), value: `${slip.leave_deduction} ${currency}` },
+            { label: t("advanceDeduction"), value: `${slip.advance_deduction} ${currency}` },
+            { label: t("otherDeductions"), value: `${slip.other_deductions} ${currency}` },
+            { label: t("totalDeductions"), value: `${slip.total_deductions} ${currency}` },
           ]}
         />
       </div>

@@ -111,7 +111,7 @@ export function AdvanceRepayment({
         <div className="flex items-center justify-between border-b border-line pb-2">
           <span className="text-label font-medium">{t("repayTitle")}</span>
           <span className="text-caption font-semibold tabular-nums text-indigo">
-            {t("remaining")}: {remainingAmount} SAR
+            {t("remaining")}: {remainingAmount} {locale === "ar" ? "ر.س" : "SAR"}
           </span>
         </div>
 

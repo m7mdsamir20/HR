@@ -73,9 +73,9 @@ export default async function PayrollRunsPage({ params }: PageProps<"/[locale]">
                       </StatusPill>
                     </td>
                     <td className="px-4 py-3 tabular-nums">{r.employee_count}</td>
-                    <td className="px-4 py-3 tabular-nums">{r.total_gross} SAR</td>
-                    <td className="px-4 py-3 tabular-nums text-brick">{r.total_deductions} SAR</td>
-                    <td className="px-4 py-3 font-bold tabular-nums text-indigo">{r.total_net} SAR</td>
+                    <td className="px-4 py-3 tabular-nums">{r.total_gross} <span className="text-xs font-normal text-secondary">ر.س</span></td>
+                    <td className="px-4 py-3 tabular-nums text-brick">{r.total_deductions} <span className="text-xs font-normal text-secondary">ر.س</span></td>
+                    <td className="px-4 py-3 font-bold tabular-nums text-indigo">{r.total_net} <span className="text-xs font-normal text-secondary">ر.س</span></td>
                     <td className="px-4 py-3 text-end">
                       <Link
                         href={`/payroll/runs/${r.id}`}

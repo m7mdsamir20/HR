@@ -90,7 +90,7 @@ export default async function PayrollPage({ params }: PageProps<"/[locale]">) {
                 </div>
                 <div className="flex justify-between text-caption py-1">
                   <span className="text-secondary">{t("totalNet")}:</span>
-                  <span className="font-semibold tabular-nums text-indigo">{r.total_net} SAR</span>
+                  <span className="font-semibold tabular-nums text-indigo">{r.total_net} <span className="text-xs font-normal text-secondary">ر.س</span></span>
                 </div>
                 <Link
                   href={`/payroll/runs/${r.id}`}
@@ -140,18 +140,18 @@ export default async function PayrollPage({ params }: PageProps<"/[locale]">) {
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="flex flex-col">
                         <span className="text-caption text-secondary">{t("totalGross")}</span>
-                        <span className="tabular-nums font-medium">{s.gross_salary} SAR</span>
+                        <span className="tabular-nums font-medium">{s.gross_salary} <span className="text-xs font-normal text-secondary">ر.س</span></span>
                       </div>
                       <div className="flex flex-col">
                         <span className="text-caption text-secondary">{t("totalDeductions")}</span>
-                        <span className="tabular-nums font-medium text-brick">{s.total_deductions} SAR</span>
+                        <span className="tabular-nums font-medium text-brick">{s.total_deductions} <span className="text-xs font-normal text-secondary">ر.س</span></span>
                       </div>
                     </div>
 
                     <div className="rounded-control bg-paper p-3 flex items-baseline justify-between">
                       <span className="text-caption text-secondary font-medium">{t("netSalary")}:</span>
                       <span className="text-card font-bold tabular-nums text-indigo">
-                        {s.net_salary} <span className="text-caption font-normal">SAR</span>
+                        {s.net_salary} <span className="text-caption font-normal">ر.س</span>
                       </span>
                     </div>
                   </div>
