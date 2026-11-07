@@ -157,18 +157,20 @@ export default async function EmployeeViewPage({ params }: PageProps<"/[locale]/
       />
 
       {/* 3. بيانات العقد */}
-      <FactsSection
-        title={t("form.sections.contract")}
-        items={[
-          { label: t("form.contractType"), value: e.contract_type ? t(`options.contractType.${e.contract_type as "fixed"}`) : null },
-          { label: t("form.contractStart"), value: date(e.contract_start) },
-          { label: t("form.contractEnd"), value: date(e.contract_end) },
-          { label: t("form.probationDays"), value: e.probation_days !== null ? `${e.probation_days} ${locale === "ar" ? "يوم" : "days"}` : null },
-        ]}
-      />
+      {e.role !== "owner" && e.role !== "admin" && (
+        <FactsSection
+          title={t("form.sections.contract")}
+          items={[
+            { label: t("form.contractType"), value: e.contract_type ? t(`options.contractType.${e.contract_type as "fixed"}`) : null },
+            { label: t("form.contractStart"), value: date(e.contract_start) },
+            { label: t("form.contractEnd"), value: date(e.contract_end) },
+            { label: t("form.probationDays"), value: e.probation_days !== null ? `${e.probation_days} ${locale === "ar" ? "يوم" : "days"}` : null },
+          ]}
+        />
+      )}
 
       {/* 4. الراتب والبدلات والبيانات المالية (لمن يدير الملف فقط) */}
-      {canManage && pay && (
+      {canManage && pay && e.role !== "owner" && e.role !== "admin" && (
         <FactsSection
           title={t("form.sections.pay")}
           items={[

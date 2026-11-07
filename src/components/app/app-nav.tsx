@@ -71,7 +71,12 @@ function itemsFor(role: Role): Item[] {
     tab: false,
   });
   if (isLeader || role === "hr" || role === "employee") {
-    items.push({ href: "/payroll", key: "payroll", icon: Banknote, tab: false });
+    items.push({
+      href: isLeader ? "/payroll/runs" : "/payroll",
+      key: "payroll",
+      icon: Banknote,
+      tab: false,
+    });
     items.push({
       href: isLeader ? "/advances/requests" : "/advances",
       key: "advances",

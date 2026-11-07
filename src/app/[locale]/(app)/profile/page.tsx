@@ -50,6 +50,8 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
     ? pay.basic_salary + pay.housing_allowance + pay.transport_allowance + pay.communication_allowance + pay.other_allowances
     : 0;
 
+  const isStaff = member.role !== "owner" && member.role !== "admin";
+
   return (
     <main className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
@@ -72,42 +74,46 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
           { label: te("form.email"), value: ltr(str("email")) },
         ]}
       />
-      <FactsSection
-        title={te("form.sections.work")}
-        items={[
-          { label: te("form.employeeNumber"), value: ltr(str("employee_number")) },
-          { label: te("columns.department"), value: str("department_ar") ? localName(locale, str("department_ar")!, str("department_en")) : null },
-          { label: te("columns.manager"), value: str("manager_ar") ? localName(locale, str("manager_ar")!, str("manager_en")) : null },
-          { label: te("form.occupation"), value: str("occupation") },
-          { label: te("form.hireDate"), value: date("hire_date") },
-        ]}
-      />
-      <FactsSection
-        title={te("form.sections.contract")}
-        items={[
-          { label: te("form.contractType"), value: opt("contractType", "contract_type") },
-          { label: te("form.contractStart"), value: date("contract_start") },
-          { label: te("form.contractEnd"), value: date("contract_end") },
-          { label: te("form.probationDays"), value: str("probation_days") },
-        ]}
-      />
-      {pay && (
-        <FactsSection
-          title={te("form.sections.pay")}
-          items={[
-            { label: te("form.basicSalary"), value: amount(pay.basic_salary) },
-            { label: te("form.housingAllowance"), value: amount(pay.housing_allowance) },
-            { label: te("form.transportAllowance"), value: amount(pay.transport_allowance) },
-            { label: te("form.communicationAllowance"), value: amount(pay.communication_allowance) },
-            { label: te("form.otherAllowances"), value: amount(pay.other_allowances) },
-            { label: te("form.totalSalary"), value: amount(total) },
-            { label: te("form.bankName"), value: pay.bank_name },
-            { label: te("form.iban"), value: ltr(pay.iban) },
-          ]}
-        />
+      {isStaff && (
+        <>
+          <FactsSection
+            title={te("form.sections.work")}
+            items={[
+              { label: te("form.employeeNumber"), value: ltr(str("employee_number")) },
+              { label: te("columns.department"), value: str("department_ar") ? localName(locale, str("department_ar")!, str("department_en")) : null },
+              { label: te("columns.manager"), value: str("manager_ar") ? localName(locale, str("manager_ar")!, str("manager_en")) : null },
+              { label: te("form.occupation"), value: str("occupation") },
+              { label: te("form.hireDate"), value: date("hire_date") },
+            ]}
+          />
+          <FactsSection
+            title={te("form.sections.contract")}
+            items={[
+              { label: te("form.contractType"), value: opt("contractType", "contract_type") },
+              { label: te("form.contractStart"), value: date("contract_start") },
+              { label: te("form.contractEnd"), value: date("contract_end") },
+              { label: te("form.probationDays"), value: str("probation_days") },
+            ]}
+          />
+          {pay && (
+            <FactsSection
+              title={te("form.sections.pay")}
+              items={[
+                { label: te("form.basicSalary"), value: amount(pay.basic_salary) },
+                { label: te("form.housingAllowance"), value: amount(pay.housing_allowance) },
+                { label: te("form.transportAllowance"), value: amount(pay.transport_allowance) },
+                { label: te("form.communicationAllowance"), value: amount(pay.communication_allowance) },
+                { label: te("form.otherAllowances"), value: amount(pay.other_allowances) },
+                { label: te("form.totalSalary"), value: amount(total) },
+                { label: te("form.bankName"), value: pay.bank_name },
+                { label: te("form.iban"), value: ltr(pay.iban) },
+              ]}
+            />
+          )}
+          <DocumentsPanel employeeId={member.employee_id} documents={documents} canManage={false} />
+          <p className="text-secondary">{t("detailsNote")}</p>
+        </>
       )}
-      <DocumentsPanel employeeId={member.employee_id} documents={documents} canManage={false} />
-      <p className="text-secondary">{t("detailsNote")}</p>
 
       <ChangePasswordForm />
       <LanguageForm current={str("locale") === "en" ? "en" : "ar"} />

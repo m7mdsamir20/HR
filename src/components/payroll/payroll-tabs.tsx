@@ -8,16 +8,15 @@ import { cn } from "@/lib/utils";
 export function PayrollTabs({ role }: { role: Role }) {
   const t = useTranslations("payroll");
   const pathname = usePathname();
-  const canManage = role === "owner" || role === "admin" || role === "hr";
+  const isEmployer = role === "owner" || role === "admin";
+  const canManage = isEmployer || role === "hr";
 
   const tabs = [
-    { href: "/payroll", label: t("mySlips") },
-    ...(canManage
-      ? [
-          { href: "/payroll/runs", label: t("allRuns") },
-        ]
-      : []),
+    ...(!isEmployer ? [{ href: "/payroll", label: t("mySlips") }] : []),
+    ...(canManage ? [{ href: "/payroll/runs", label: t("allRuns") }] : []),
   ];
+
+  if (tabs.length < 2) return null;
 
   return (
     <div className="flex border-b border-line gap-2 overflow-x-auto pb-1">

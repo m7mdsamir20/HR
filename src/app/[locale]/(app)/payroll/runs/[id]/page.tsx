@@ -17,7 +17,7 @@ export default async function PayrollRunDetailPage({
   const { id } = await params;
   const locale = "ar" as Locale;
   const member = await requireMember(locale);
-  if (member.role !== "owner" && member.role !== "hr") {
+  if (member.role !== "owner" && member.role !== "admin" && member.role !== "hr") {
     notFound();
   }
 

@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { PayrollRunCreateForm } from "@/components/payroll/payroll-run-create-form";
 import { PayrollTabs } from "@/components/payroll/payroll-tabs";
 import { StatusPill } from "@/components/status-pill";
-import { Link } from "@/i18n/navigation";
+import { Link, redirect } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { requireMember } from "@/lib/auth/account";
 import { payrollTone, type PayrollStatus } from "@/lib/payroll";
@@ -12,6 +12,9 @@ import { createClient } from "@/lib/supabase/server";
 export default async function PayrollPage({ params }: PageProps<"/[locale]">) {
   const locale = (await params).locale as Locale;
   const member = await requireMember(locale);
+  if (member.role === "owner" || member.role === "admin") {
+    redirect({ href: "/payroll/runs", locale });
+  }
   const t = await getTranslations({ locale, namespace: "payroll" });
   const isOwnerOrHr = member.role === "owner" || member.role === "admin" || member.role === "hr";
 
