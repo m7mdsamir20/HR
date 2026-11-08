@@ -12,7 +12,7 @@ export function buildCsp(nonce: string) {
     "style-src 'self' 'unsafe-inline'",
     `img-src 'self' blob: data: ${supabase}`.trim(),
     "font-src 'self'",
-    `connect-src 'self' ${supabase} ${supabaseWs}`.trim(),
+    `connect-src 'self' ${supabase} ${supabaseWs} https://vitals.vercel-insights.com`.trim(),
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
