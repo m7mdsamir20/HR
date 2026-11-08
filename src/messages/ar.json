@@ -156,6 +156,7 @@
         "company_insert": "إنشاء الشركة",
         "company_update": "تعديل بيانات الشركة",
         "company_delete": "حذف الشركة",
+        "owner_insert": "تعيين مدير الشركة",
         "employee_insert": "إضافة موظف",
         "employee_update": "تعديل بيانات موظف",
         "employee_delete": "حذف موظف",

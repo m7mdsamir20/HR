@@ -16,6 +16,7 @@ const AUDIT_ACTIONS = [
   "company_insert",
   "company_update",
   "company_delete",
+  "owner_insert",
   "employee_insert",
   "employee_update",
   "employee_delete",
@@ -106,7 +107,7 @@ export default async function CompanyPage({ params }: PageProps<"/[locale]/admin
       .neq("role", "owner"),
     supabase
       .from("audit_logs")
-      .select("id, action, created_at")
+      .select("id, action, meta, created_at")
       .eq("company_id", id.data)
       .order("created_at", { ascending: false })
       .limit(20),
@@ -183,7 +184,11 @@ export default async function CompanyPage({ params }: PageProps<"/[locale]/admin
         {activity && activity.length > 0 ? (
           <ol className="flex flex-col divide-y divide-line rounded-card border border-line bg-surface">
             {activity.map((a) => {
-              const key = a.action.replace(/\./g, "_");
+              const metaRole = (a.meta as { role?: string } | null)?.role;
+              let key = a.action.replace(/\./g, "_");
+              if (key === "employee_insert" && metaRole === "owner") {
+                key = "owner_insert";
+              }
               const label = isKnownAction(key) ? t(`company.actions.${key}`) : a.action.replace(/[._]/g, " ");
               return (
                 <li key={a.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">

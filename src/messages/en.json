@@ -156,6 +156,7 @@
         "company_insert": "Company created",
         "company_update": "Company details updated",
         "company_delete": "Company deleted",
+        "owner_insert": "Assign Company Manager",
         "employee_insert": "Employee added",
         "employee_update": "Employee updated",
         "employee_delete": "Employee deleted",
