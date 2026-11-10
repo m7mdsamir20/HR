@@ -17,7 +17,7 @@ import { formatAmount } from "@/lib/money";
 import { createClient } from "@/lib/supabase/server";
 
 const EMPLOYEE_COLUMNS =
-  "id, national_id, id_type, iqama_start, iqama_end, full_name_ar, full_name_en, phone, email, employee_number, job_title, occupation, role, status, department_id, manager_id, nationality, gender, birth_date, marital_status, hire_date, employment_type, contract_type, contract_start, contract_end, probation_days, termination_type, termination_date, termination_reason, created_at, department:departments(name_ar, name_en), manager:manager_id(full_name_ar, full_name_en)";
+  "id, national_id, id_type, iqama_start, iqama_end, full_name_ar, full_name_en, phone, email, employee_number, job_title, occupation, role, status, department_id, manager_id, nationality, gender, birth_date, marital_status, hire_date, employment_type, contract_type, contract_renewal, contract_start, contract_end, probation_days, termination_type, termination_date, termination_reason, created_at, department:departments(name_ar, name_en), manager:manager_id(full_name_ar, full_name_en)";
 
 export default async function EmployeeViewPage({ params }: PageProps<"/[locale]/employees/[id]">) {
   const { locale: rawLocale, id: rawId } = await params;
@@ -157,12 +157,13 @@ export default async function EmployeeViewPage({ params }: PageProps<"/[locale]/
       />
 
       {/* 3. بيانات العقد */}
-      {e.role !== "owner" && e.role !== "admin" && (
+      {(e.role !== "owner" && e.role !== "admin" || e.contract_type !== null) && (
         <FactsSection
           title={t("form.sections.contract")}
           items={[
             { label: t("form.employmentType"), value: e.employment_type ? t(`options.employmentType.${e.employment_type as "full_time"}`) : null },
             { label: t("form.contractType"), value: e.contract_type ? t(`options.contractType.${e.contract_type as "fixed"}`) : null },
+            { label: t("form.contractRenewal"), value: e.contract_renewal ? t(`options.contractRenewal.${e.contract_renewal as "auto_renew"}`) : null },
             { label: t("form.contractStart"), value: date(e.contract_start) },
             { label: t("form.contractEnd"), value: date(e.contract_end) },
             { label: t("form.probationDays"), value: e.probation_days !== null ? `${e.probation_days} ${locale === "ar" ? "يوم" : "days"}` : null },
@@ -171,7 +172,7 @@ export default async function EmployeeViewPage({ params }: PageProps<"/[locale]/
       )}
 
       {/* 4. الراتب والبدلات والبيانات المالية (لمن يدير الملف فقط) */}
-      {canManage && pay && e.role !== "owner" && e.role !== "admin" && (
+      {canManage && pay && (e.role !== "owner" && e.role !== "admin" || Number(pay.basic_salary) > 0) && (
         <FactsSection
           title={t("form.sections.pay")}
           items={[

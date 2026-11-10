@@ -10,7 +10,7 @@ import { FormSection } from "@/components/form-section";
 import { SelectField } from "@/components/select-field";
 import { Button } from "@/components/ui/button";
 import { formatAmount, normalizeAmount } from "@/lib/money";
-import { CONTRACT_TYPES, EMPLOYMENT_TYPES, GENDERS, MARITAL_STATUSES, type EmployeeField } from "@/lib/validation/employee";
+import { CONTRACT_RENEWAL_TYPES, CONTRACT_TYPES, EMPLOYMENT_TYPES, GENDERS, MARITAL_STATUSES, type EmployeeField } from "@/lib/validation/employee";
 
 export type Option = { value: string; label: string };
 
@@ -269,6 +269,16 @@ export function EmployeeForm({ mode, action, departments, managers, nationalitie
           defaultValue={v("contractType")}
           error={err("contractType")}
           options={[choose, ...CONTRACT_TYPES.map((c) => ({ value: c, label: t(`options.contractType.${c}`) }))]}
+        />
+        <SelectField
+          name="contractRenewal"
+          label={t("form.contractRenewal")}
+          defaultValue={v("contractRenewal") || "auto_renew"}
+          error={err("contractRenewal")}
+          options={CONTRACT_RENEWAL_TYPES.map((r) => ({
+            value: r,
+            label: t(`options.contractRenewal.${r}`),
+          }))}
         />
         <FormField name="contractStart" label={t("form.contractStart")} type="date" defaultValue={v("contractStart")} error={err("contractStart")} dir="ltr" />
         <FormField name="contractEnd" label={t("form.contractEnd")} hint={t("form.contractEndHint")} type="date" defaultValue={v("contractEnd")} error={err("contractEnd")} dir="ltr" />

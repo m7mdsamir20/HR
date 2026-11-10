@@ -15,6 +15,7 @@ const money = z.preprocess(
 export const GENDERS = ["male", "female"] as const;
 export const MARITAL_STATUSES = ["single", "married", "divorced", "widowed"] as const;
 export const CONTRACT_TYPES = ["fixed", "unlimited"] as const;
+export const CONTRACT_RENEWAL_TYPES = ["auto_renew", "ends_on_expiry"] as const;
 export const EMPLOYMENT_TYPES = ["full_time", "part_time", "remote", "flexible"] as const;
 
 const fileFields = {
@@ -35,6 +36,7 @@ const fileFields = {
   hireDate: optionalDate,
   employmentType: optional(z.enum(EMPLOYMENT_TYPES)),
   contractType: optional(z.enum(CONTRACT_TYPES)),
+  contractRenewal: optional(z.enum(CONTRACT_RENEWAL_TYPES)),
   contractStart: optionalDate,
   contractEnd: optionalDate,
   iqamaStart: optionalDate,
@@ -120,6 +122,7 @@ export function toRpcPayload(d: EmployeeInput, locale?: string) {
     hire_date: d.hireDate ?? "",
     employment_type: d.employmentType ?? "full_time",
     contract_type: d.contractType ?? "",
+    contract_renewal: d.contractRenewal ?? "auto_renew",
     contract_start: d.contractStart ?? "",
     contract_end: d.contractEnd ?? "",
     iqama_start: d.iqamaStart ?? "",

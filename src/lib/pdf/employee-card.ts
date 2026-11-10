@@ -20,7 +20,7 @@ export async function buildEmployeeCardPdf(locale: Locale, member: Member, emplo
     supabase
       .from("employees")
       .select(
-        "id, national_id, id_type, iqama_start, iqama_end, full_name_ar, full_name_en, phone, email, employee_number, job_title, occupation, role, status, nationality, gender, birth_date, marital_status, hire_date, employment_type, contract_type, contract_start, contract_end, probation_days, department:departments(name_ar, name_en), manager:manager_id(full_name_ar, full_name_en)",
+        "id, national_id, id_type, iqama_start, iqama_end, full_name_ar, full_name_en, phone, email, employee_number, job_title, occupation, role, status, nationality, gender, birth_date, marital_status, hire_date, employment_type, contract_type, contract_renewal, contract_start, contract_end, probation_days, department:departments(name_ar, name_en), manager:manager_id(full_name_ar, full_name_en)",
       )
       .eq("id", employeeId)
       .neq("status", "deleted")
@@ -106,6 +106,7 @@ export async function buildEmployeeCardPdf(locale: Locale, member: Member, emplo
     ${grid([
       { label: te("form.employmentType"), value: e.employment_type ? esc(te(`options.employmentType.${e.employment_type as "full_time"}`)) : "—" },
       { label: te("form.contractType"), value: e.contract_type ? esc(te(`options.contractType.${e.contract_type as "fixed"}`)) : "—" },
+      { label: te("form.contractRenewal"), value: e.contract_renewal ? esc(te(`options.contractRenewal.${e.contract_renewal as "auto_renew"}`)) : "—" },
       { label: te("form.contractStart"), value: date(e.contract_start) },
       { label: te("form.contractEnd"), value: date(e.contract_end) },
       { label: te("form.probationDays"), value: e.probation_days !== null ? `${ltr(e.probation_days)} ${locale === "ar" ? "يوم" : "days"}` : "—" },

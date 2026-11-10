@@ -14,7 +14,7 @@ import { employeeFormOptions, localName } from "@/lib/employees";
 import { createClient } from "@/lib/supabase/server";
 
 const EMPLOYEE_COLUMNS =
-  "id, national_id, id_type, iqama_start, iqama_end, full_name_ar, full_name_en, phone, email, employee_number, job_title, occupation, role, status, department_id, manager_id, nationality, gender, birth_date, marital_status, hire_date, employment_type, contract_type, contract_start, contract_end, probation_days, created_at";
+  "id, national_id, id_type, iqama_start, iqama_end, full_name_ar, full_name_en, phone, email, employee_number, job_title, occupation, role, status, department_id, manager_id, nationality, gender, birth_date, marital_status, hire_date, employment_type, contract_type, contract_renewal, contract_start, contract_end, probation_days, created_at";
 
 export default async function EmployeeEditPage({ params }: PageProps<"/[locale]/employees/[id]">) {
   const { locale: rawLocale, id: rawId } = await params;
@@ -98,6 +98,7 @@ export default async function EmployeeEditPage({ params }: PageProps<"/[locale]/
           hireDate: s(e.hire_date),
           employmentType: s(e.employment_type),
           contractType: s(e.contract_type),
+          contractRenewal: s(e.contract_renewal),
           contractStart: s(e.contract_start),
           contractEnd: s(e.contract_end),
           probationDays: s(e.probation_days),

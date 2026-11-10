@@ -34,7 +34,7 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
       "id, full_name_ar, full_name_en, national_id, employee_number, role, status, job_title, employment_type",
     )
     .neq("status", "deleted")
-    .not("role", "in", '("owner","admin")')
+    .or("job_title.not.is.null,role.not.in.(owner,admin)")
     .order("employee_number", { ascending: true, nullsFirst: false })
     .order("created_at", { ascending: true })
     .limit(500);

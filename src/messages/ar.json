@@ -373,6 +373,7 @@
       "occupationHint": "كما في الإقامة أو التأمينات الاجتماعية.",
       "hireDate": "تاريخ المباشرة",
       "contractType": "نوع العقد",
+      "contractRenewal": "تجديد العقد",
       "contractStart": "بداية العقد",
       "contractEnd": "نهاية العقد",
       "contractEndHint": "مطلوب للعقد محدد المدة.",
@@ -498,6 +499,10 @@
       "contractType": {
         "fixed": "محدد المدة",
         "unlimited": "غير محدد المدة"
+      },
+      "contractRenewal": {
+        "auto_renew": "يتجدد تلقائياً بنفس المدة",
+        "ends_on_expiry": "ينتهي بنهاية مدته"
       }
     }
   },

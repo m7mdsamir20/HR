@@ -372,6 +372,7 @@
       "occupationHint": "As on the Iqama or GOSI record.",
       "hireDate": "Start date",
       "contractType": "Contract type",
+      "contractRenewal": "Contract renewal",
       "contractStart": "Contract start",
       "contractEnd": "Contract end",
       "contractEndHint": "Required for a fixed-term contract.",
@@ -497,6 +498,10 @@
       "contractType": {
         "fixed": "Fixed term",
         "unlimited": "Open-ended"
+      },
+      "contractRenewal": {
+        "auto_renew": "Auto-renews for same duration",
+        "ends_on_expiry": "Expires at end of term"
       }
     }
   },
