@@ -20,7 +20,7 @@ describe("normalizeNationalId", () => {
 });
 
 describe("isValidNationalId", () => {
-  it.each(["1023456789", "2012345678"])("accepts %s", (id) => {
+  it.each(["1023456789", "2012345678", "7036509532"])("accepts %s", (id) => {
     expect(isValidNationalId(id)).toBe(true);
   });
 

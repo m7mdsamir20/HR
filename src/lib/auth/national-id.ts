@@ -21,11 +21,11 @@ export function normalizeNationalId(input: string): string {
 }
 
 export function isValidNationalId(id: string): boolean {
-  return /^[12]\d{9}$/.test(id);
+  return /^[127]\d{9}$/.test(id);
 }
 
 export function idTypeOf(id: string): IdType {
-  return id.startsWith("1") ? "citizen" : "resident";
+  return id.startsWith("2") ? "resident" : "citizen";
 }
 
 /**
