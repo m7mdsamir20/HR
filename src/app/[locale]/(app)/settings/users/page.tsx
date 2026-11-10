@@ -51,7 +51,7 @@ export default async function SettingsUsersPage({ params }: PageProps<"/[locale]
       <SettingsTabs />
 
       <div className="pt-2">
-        <UsersManager employees={employees} canManage={member.role === "owner" || member.role === "hr"} />
+        <UsersManager employees={employees} canManage={member.role === "owner" || member.role === "admin" || member.role === "hr"} />
       </div>
     </main>
   );

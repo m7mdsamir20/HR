@@ -19,7 +19,7 @@ export default async function SettingsPage({ params }: PageProps<"/[locale]/sett
     .eq("id", member.company.id)
     .single();
   const logoUrl = await signedUrl(company?.logo_path ?? null, 600);
-  const isOwner = member.role === "owner";
+  const canEdit = member.role === "owner" || member.role === "admin";
 
   return (
     <main className="flex flex-col gap-6">
@@ -42,7 +42,7 @@ export default async function SettingsPage({ params }: PageProps<"/[locale]/sett
               address: company.address ?? "",
             }}
             logoUrl={logoUrl}
-            canEdit={isOwner}
+            canEdit={canEdit}
           />
         </div>
       )}

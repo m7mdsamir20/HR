@@ -514,7 +514,7 @@
       "shifts": "Shifts",
       "users": "System Users"
     },
-    "ownerOnlyNotice": "Only the company owner can modify company details and logo.",
+    "ownerOnlyNotice": "Only the company owner or system administrator can modify company details and logo.",
     "company": {
       "title": "Company details",
       "nameAr": "Company name (Arabic)",

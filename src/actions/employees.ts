@@ -88,7 +88,7 @@ export async function createUserAccount(
   formData: FormData
 ): Promise<UserAccountState> {
   const locale = localeSchema.parse(formData.get("uiLocale"));
-  await requireMember(locale, ["owner", "hr"]);
+  await requireMember(locale, ["owner", "admin", "hr"]);
 
   const employeeId = String(formData.get("employeeId") ?? "");
   const role = String(formData.get("role") ?? "");
@@ -96,7 +96,7 @@ export async function createUserAccount(
   const password = String(formData.get("password") ?? "");
 
   const idParsed = z.uuid().safeParse(employeeId);
-  const roleParsed = z.enum(["hr", "manager", "employee"]).safeParse(role);
+  const roleParsed = z.enum(["admin", "hr", "manager", "employee"]).safeParse(role);
   const localeParsed = z.enum(["ar", "en"]).safeParse(userLocale);
   const passParsed = passwordSchema.safeParse(password);
 
