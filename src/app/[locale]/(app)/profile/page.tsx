@@ -37,7 +37,7 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
   const str = (k: string) => (me[k] === null || me[k] === undefined ? null : String(me[k]));
   const date = (k: string) => (str(k) ? formatDate(locale, str(k)!) : null);
   const ltr = (v: string | null) => (v ? <bdi dir="ltr">{v}</bdi> : null);
-  const opt = (group: "gender" | "maritalStatus" | "contractType", k: string) =>
+  const opt = (group: "gender" | "maritalStatus" | "contractType" | "employmentType", k: string) =>
     str(k) ? te(`options.${group}.${str(k)}` as "options.gender.male") : null;
   const amount = (v: number | undefined) => (
     <>
@@ -89,6 +89,7 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
           <FactsSection
             title={te("form.sections.contract")}
             items={[
+              { label: te("form.employmentType"), value: opt("employmentType", "employment_type") },
               { label: te("form.contractType"), value: opt("contractType", "contract_type") },
               { label: te("form.contractStart"), value: date("contract_start") },
               { label: te("form.contractEnd"), value: date("contract_end") },

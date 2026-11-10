@@ -10,7 +10,7 @@ import { FormSection } from "@/components/form-section";
 import { SelectField } from "@/components/select-field";
 import { Button } from "@/components/ui/button";
 import { formatAmount, normalizeAmount } from "@/lib/money";
-import { CONTRACT_TYPES, GENDERS, MARITAL_STATUSES, type EmployeeField } from "@/lib/validation/employee";
+import { CONTRACT_TYPES, EMPLOYMENT_TYPES, GENDERS, MARITAL_STATUSES, type EmployeeField } from "@/lib/validation/employee";
 
 export type Option = { value: string; label: string };
 
@@ -256,6 +256,13 @@ export function EmployeeForm({ mode, action, departments, managers, nationalitie
 
       {/* 3. بيانات العقد */}
       <FormSection title={t("form.sections.contract")} description={t("form.sections.contractHint")}>
+        <SelectField
+          name="employmentType"
+          label={t("form.employmentType")}
+          defaultValue={v("employmentType") || "full_time"}
+          error={err("employmentType")}
+          options={EMPLOYMENT_TYPES.map((e) => ({ value: e, label: t(`options.employmentType.${e}`) }))}
+        />
         <SelectField
           name="contractType"
           label={t("form.contractType")}

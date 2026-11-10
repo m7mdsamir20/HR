@@ -31,7 +31,7 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
   let query = supabase
     .from("employees")
     .select(
-      "id, full_name_ar, full_name_en, national_id, employee_number, role, status, job_title",
+      "id, full_name_ar, full_name_en, national_id, employee_number, role, status, job_title, employment_type",
     )
     .neq("status", "deleted")
     .not("role", "in", '("owner","admin")')
@@ -55,6 +55,7 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
       name: localName(locale, e.full_name_ar, e.full_name_en),
       nationalId: e.national_id,
       jobTitle: e.job_title || "—",
+      employmentType: (e.employment_type as "full_time" | "part_time" | "remote" | "flexible") || "full_time",
       status: e.status as "active" | "disabled" | "terminated",
     };
   });
@@ -137,7 +138,12 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
                     </div>
 
                     <div className="flex items-center justify-between text-caption text-secondary">
-                      <span className="font-medium text-ink">{r.jobTitle}</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-medium text-ink">{r.jobTitle}</span>
+                        <span className="rounded bg-paper px-1.5 py-0.2 text-[10px] text-secondary border border-line">
+                          {t(`options.employmentType.${r.employmentType}`)}
+                        </span>
+                      </div>
                       <bdi dir="ltr" className="tabular-nums font-mono">{r.nationalId}</bdi>
                     </div>
 
@@ -191,7 +197,10 @@ export default async function EmployeesPage({ params, searchParams }: PageProps<
                         <bdi dir="ltr">{r.nationalId}</bdi>
                       </TableCell>
                       <TableCell className="font-medium text-ink">
-                        {r.jobTitle}
+                        <div>{r.jobTitle}</div>
+                        <div className="text-[11px] text-secondary font-normal">
+                          {t(`options.employmentType.${r.employmentType}`)}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <StatusPill tone={tone}>{t(`status.${r.status}`)}</StatusPill>

@@ -20,7 +20,7 @@ export async function buildEmployeeCardPdf(locale: Locale, member: Member, emplo
     supabase
       .from("employees")
       .select(
-        "id, national_id, id_type, iqama_start, iqama_end, full_name_ar, full_name_en, phone, email, employee_number, job_title, occupation, role, status, nationality, gender, birth_date, marital_status, hire_date, contract_type, contract_start, contract_end, probation_days, department:departments(name_ar, name_en), manager:manager_id(full_name_ar, full_name_en)",
+        "id, national_id, id_type, iqama_start, iqama_end, full_name_ar, full_name_en, phone, email, employee_number, job_title, occupation, role, status, nationality, gender, birth_date, marital_status, hire_date, employment_type, contract_type, contract_start, contract_end, probation_days, department:departments(name_ar, name_en), manager:manager_id(full_name_ar, full_name_en)",
       )
       .eq("id", employeeId)
       .neq("status", "deleted")
@@ -104,6 +104,7 @@ export async function buildEmployeeCardPdf(locale: Locale, member: Member, emplo
     <!-- 3. Contract Details -->
     <h2>${esc(te("form.sections.contract"))}</h2>
     ${grid([
+      { label: te("form.employmentType"), value: e.employment_type ? esc(te(`options.employmentType.${e.employment_type as "full_time"}`)) : "—" },
       { label: te("form.contractType"), value: e.contract_type ? esc(te(`options.contractType.${e.contract_type as "fixed"}`)) : "—" },
       { label: te("form.contractStart"), value: date(e.contract_start) },
       { label: te("form.contractEnd"), value: date(e.contract_end) },

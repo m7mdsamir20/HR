@@ -294,6 +294,7 @@
       "name": "Name",
       "nationalId": "ID number",
       "jobTitle": "Job Title",
+      "employmentType": "Employment Type",
       "iqama": "Iqama / Residency",
       "role": "Role",
       "department": "Department",
@@ -331,6 +332,7 @@
       "phone": "Mobile",
       "phoneHint": "Starts with 05",
       "jobTitle": "Job title",
+      "employmentType": "Employment Type",
       "role": "Role",
       "roleHint": "Decides what this person can see and manage.",
       "department": "Department",
@@ -485,6 +487,12 @@
         "married": "Married",
         "divorced": "Divorced",
         "widowed": "Widowed"
+      },
+      "employmentType": {
+        "full_time": "Full-time",
+        "part_time": "Part-time",
+        "remote": "Remote",
+        "flexible": "Flexible"
       },
       "contractType": {
         "fixed": "Fixed term",
@@ -1487,6 +1495,7 @@
       "name": "Resident Name",
       "iqamaNumber": "Iqama Number",
       "jobTitle": "Job Title",
+      "employmentType": "Employment Type",
       "expiryDate": "Expiry Date",
       "daysLeft": "Days Remaining",
       "status": "Status",

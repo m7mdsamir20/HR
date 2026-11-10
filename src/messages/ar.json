@@ -294,6 +294,7 @@
       "name": "الاسم",
       "nationalId": "رقم الهوية",
       "jobTitle": "المسمى الوظيفي",
+      "employmentType": "نوع التوظيف",
       "iqama": "الإقامة",
       "role": "الدور",
       "department": "القسم",
@@ -332,6 +333,7 @@
       "phone": "رقم الجوال",
       "phoneHint": "يبدأ بـ 05",
       "jobTitle": "المسمى الوظيفي",
+      "employmentType": "نوع التوظيف",
       "role": "الدور",
       "roleHint": "يحدد ما يستطيع الموظف رؤيته وإدارته.",
       "department": "القسم",
@@ -486,6 +488,12 @@
         "married": "متزوج",
         "divorced": "مطلق",
         "widowed": "أرمل"
+      },
+      "employmentType": {
+        "full_time": "دوام كامل",
+        "part_time": "دوام جزئي",
+        "remote": "عمل عن بُعد",
+        "flexible": "عمل مرن"
       },
       "contractType": {
         "fixed": "محدد المدة",
@@ -1488,6 +1496,7 @@
       "name": "اسم المقيم",
       "iqamaNumber": "رقم الإقامة",
       "jobTitle": "المسمى الوظيفي",
+      "employmentType": "نوع التوظيف",
       "expiryDate": "تاريخ الانتهاء",
       "daysLeft": "المتبقي على الانتهاء",
       "status": "حالة الإقامة",

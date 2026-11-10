@@ -15,6 +15,7 @@ const money = z.preprocess(
 export const GENDERS = ["male", "female"] as const;
 export const MARITAL_STATUSES = ["single", "married", "divorced", "widowed"] as const;
 export const CONTRACT_TYPES = ["fixed", "unlimited"] as const;
+export const EMPLOYMENT_TYPES = ["full_time", "part_time", "remote", "flexible"] as const;
 
 const fileFields = {
   fullNameAr: z.string().trim().min(2).max(120),
@@ -32,6 +33,7 @@ const fileFields = {
   departmentId: optional(z.uuid()),
   managerId: optional(z.uuid()),
   hireDate: optionalDate,
+  employmentType: optional(z.enum(EMPLOYMENT_TYPES)),
   contractType: optional(z.enum(CONTRACT_TYPES)),
   contractStart: optionalDate,
   contractEnd: optionalDate,
@@ -116,6 +118,7 @@ export function toRpcPayload(d: EmployeeInput, locale?: string) {
     department_id: d.departmentId ?? "",
     manager_id: d.managerId ?? "",
     hire_date: d.hireDate ?? "",
+    employment_type: d.employmentType ?? "full_time",
     contract_type: d.contractType ?? "",
     contract_start: d.contractStart ?? "",
     contract_end: d.contractEnd ?? "",
