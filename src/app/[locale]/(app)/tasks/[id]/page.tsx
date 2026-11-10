@@ -30,13 +30,15 @@ export default async function TaskPage({ params }: PageProps<"/[locale]/tasks/[i
   const supabase = await createClient();
   const { data: task } = await supabase.from("tasks").select("*").eq("id", id.data).maybeSingle();
   if (!task) notFound();
-  const [{ data: reports }, { data: attachments }] = await Promise.all([
+  const [{ data: reports }, { data: attachments }, { data: assignee }] = await Promise.all([
     supabase.from("task_reports").select("*").eq("task_id", id.data).order("round", { ascending: false }),
     supabase.from("report_attachments").select("id, report_id, file_name").eq("task_id", id.data).order("created_at"),
+    supabase.from("employees").select("id, national_id, job_title").eq("id", task.assignee_id).maybeSingle(),
   ]);
   const names = await loadNames(locale, [task.created_by, task.assignee_id, ...(reports ?? []).map((r) => r.reviewed_by)]);
 
   const t = await getTranslations({ locale, namespace: "tasks" });
+  const te = await getTranslations({ locale, namespace: "employees" });
   const tPdf = await getTranslations({ locale, namespace: "pdf" });
   const status = task.status as TaskStatus;
   const isAssignee = task.assignee_id === member.employee_id;
@@ -82,6 +84,8 @@ export default async function TaskPage({ params }: PageProps<"/[locale]/tasks/[i
         title={t("form.sections.task")}
         items={[
           { label: t("detail.assignee"), value: names.get(task.assignee_id) ?? "—" },
+          ...(assignee?.job_title ? [{ label: te("table.columns.jobTitle"), value: assignee.job_title }] : []),
+          ...(assignee?.national_id ? [{ label: te("table.columns.nationalId"), value: assignee.national_id }] : []),
           {
             label: t("detail.due"),
             value: (

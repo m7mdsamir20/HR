@@ -7,7 +7,7 @@ import { loadNames } from "@/lib/task-data";
 import { isOverdue, statusTone, type TaskStatus } from "@/lib/tasks";
 import { createClient } from "@/lib/supabase/server";
 import { imageDataUri, issuedNow, loadBrand } from "./data";
-import { documentHtml, dt, esc, grid, pill, stampBoxHtml, txt } from "./html";
+import { documentHtml, dt, esc, grid, ltr, pill, stampBoxHtml, txt } from "./html";
 import { renderPdf } from "./render";
 
 const MAX_PHOTOS = 9;
@@ -19,14 +19,16 @@ export async function buildTaskReportPdf(locale: Locale, member: Member, taskId:
   // RLS: a task the caller can't see simply isn't returned.
   const { data: task } = await supabase.from("tasks").select("*").eq("id", taskId).maybeSingle();
   if (!task) return null;
-  const [{ data: reports }, { data: files }] = await Promise.all([
+  const [{ data: reports }, { data: files }, { data: assignee }] = await Promise.all([
     supabase.from("task_reports").select("*").eq("task_id", taskId).order("round"),
     supabase.from("report_attachments").select("id, report_id, file_path, file_name, mime_type").eq("task_id", taskId).order("created_at"),
+    supabase.from("employees").select("id, national_id, job_title").eq("id", task.assignee_id).maybeSingle(),
   ]);
   const names = await loadNames(locale, [task.created_by, task.assignee_id, ...(reports ?? []).map((r) => r.reviewed_by)]);
   const brand = await loadBrand(locale, member);
 
   const t = await getTranslations({ locale, namespace: "tasks" });
+  const te = await getTranslations({ locale, namespace: "employees" });
   const tp = await getTranslations({ locale, namespace: "pdf" });
   const status = task.status as TaskStatus;
   const overdue = isOverdue(status, task.due_date);
@@ -72,6 +74,8 @@ export async function buildTaskReportPdf(locale: Locale, member: Member, taskId:
     <div class="card" style="margin-bottom:8px"><strong style="font-size:11.5pt">${txt(task.title)}</strong> ${pill(statusTone[status], t(`status.${status}`))}</div>
     ${grid([
       { label: t("detail.assignee"), value: txt(names.get(task.assignee_id)) },
+      { label: te("table.columns.jobTitle"), value: txt(assignee?.job_title) },
+      { label: te("table.columns.nationalId"), value: assignee?.national_id ? ltr(assignee.national_id) : "—" },
       { label: t("form.priority"), value: esc(t(`priority.${task.priority}`)) },
       {
         label: t("detail.due"),
