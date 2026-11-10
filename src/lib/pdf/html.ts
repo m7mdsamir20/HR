@@ -145,11 +145,12 @@ export function documentHtml(opts: {
   issued: string;
   body: string;
   hideNumber?: boolean;
+  landscape?: boolean;
 }): string {
-  const { locale, brand } = opts;
+  const { locale, brand, landscape } = opts;
   return `<!doctype html>
 <html lang="${locale}" dir="${locale === "ar" ? "rtl" : "ltr"}">
-<head><meta charset="utf-8"><title>${esc(opts.title)}</title><style>${fontCss()}${CSS}</style></head>
+<head><meta charset="utf-8"><title>${esc(opts.title)}</title><style>${fontCss()}${CSS}${landscape ? " @page{size:A4 landscape}" : ""}</style></head>
 <body class="${locale}">
   <header class="doc-head">
     <div class="brand-info">

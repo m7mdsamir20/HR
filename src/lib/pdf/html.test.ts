@@ -46,6 +46,19 @@ describe("documentHtml", () => {
     expect(html).not.toMatch(/url\((?!data:)/);
     expect(html).not.toMatch(/<(link|script)\b/);
   });
+
+  it("applies landscape page size when landscape is true", () => {
+    const landscapeHtml = documentHtml({
+      locale: "ar",
+      brand,
+      title: "t",
+      issuedLabel: "i",
+      issued: "now",
+      body: "<p>ok</p>",
+      landscape: true,
+    });
+    expect(landscapeHtml).toContain("@page{size:A4 landscape}");
+  });
 });
 
 describe("stampSvg", () => {

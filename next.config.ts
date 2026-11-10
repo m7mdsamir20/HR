@@ -33,6 +33,8 @@ const nextConfig: NextConfig = {
     "/[locale]/(app)/payroll/slips/[id]/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**/*"],
     "/[locale]/attendance/sheet/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**/*"],
     "/[locale]/(app)/attendance/sheet/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**/*"],
+    "/[locale]/payroll/runs/[id]/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**/*"],
+    "/[locale]/(app)/payroll/runs/[id]/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**/*"],
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

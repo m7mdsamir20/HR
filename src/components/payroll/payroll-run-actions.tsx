@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Download, Trash2 } from "lucide-react";
+import { Check, Download, Printer, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useActionState } from "react";
 import { approvePayrollRun, deletePayrollRun, type PayrollState } from "@/actions/payroll";
@@ -35,6 +35,16 @@ export function PayrollRunActions({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center gap-2">
+        <a
+          href={`${locale === "en" ? "/en" : ""}/payroll/runs/${runId}/pdf`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex h-9 items-center justify-center gap-1.5 rounded-control border border-line bg-surface px-3 text-label text-ink hover:bg-paper focus-visible:outline-2 focus-visible:outline-indigo"
+        >
+          <Printer className="size-4" aria-hidden />
+          {isDraft ? t("printDraft") : t("printApproved")}
+        </a>
+
         <a
           href={`/api/payroll/runs/${runId}/wps`}
           download

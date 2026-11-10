@@ -47,7 +47,10 @@ const RENDER_TIMEOUT_MS = 30_000;
  * is refused, so a value can't make the renderer fetch anything (no SSRF) and nothing depends on
  * fonts installed on the server.
  */
-export async function renderPdf(html: string, opts: { locale: Locale; footerLabel: string; pageLabel: string; ofLabel: string }): Promise<Buffer> {
+export async function renderPdf(
+  html: string,
+  opts: { locale: Locale; footerLabel: string; pageLabel: string; ofLabel: string; landscape?: boolean }
+): Promise<Buffer> {
   const { default: puppeteer } = await import("puppeteer-core");
   const browser = await puppeteer.launch(await launchOptions());
   try {
@@ -63,11 +66,16 @@ export async function renderPdf(html: string, opts: { locale: Locale; footerLabe
     await page.setContent(html, { waitUntil: "load" });
     await page.evaluateHandle("document.fonts.ready");
 
-    const footerStyle = "font-family:Arial,sans-serif;font-size:8px;color:#4a5875;width:100%;padding:0 14mm;display:flex;justify-content:space-between";
+    const isLandscape = opts.landscape ?? false;
+    const padding = isLandscape ? "10mm" : "14mm";
+    const footerStyle = `font-family:Arial,sans-serif;font-size:8px;color:#4a5875;width:100%;padding:0 ${padding};display:flex;justify-content:space-between`;
     const pdf = await page.pdf({
       format: "A4",
+      landscape: isLandscape,
       printBackground: true,
-      margin: { top: "14mm", bottom: "16mm", left: "14mm", right: "14mm" },
+      margin: isLandscape
+        ? { top: "10mm", bottom: "12mm", left: "10mm", right: "10mm" }
+        : { top: "14mm", bottom: "16mm", left: "14mm", right: "14mm" },
       displayHeaderFooter: true,
       headerTemplate: "<span></span>",
       footerTemplate: `<div style="${footerStyle}" dir="${opts.locale === "ar" ? "rtl" : "ltr"}"><span>${esc(opts.footerLabel)}</span><span>${esc(opts.pageLabel)} <span class="pageNumber"></span> ${esc(opts.ofLabel)} <span class="totalPages"></span></span></div>`,
