@@ -166,7 +166,7 @@ export default async function PayrollPage({ params }: PageProps<"/[locale]">) {
                     </Link>
 
                     <a
-                      href={`/payroll/slips/${s.id}/pdf`}
+                      href={`${locale === "en" ? "/en" : ""}/payroll/slips/${s.id}/pdf`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex h-9 items-center gap-1.5 rounded-control border border-line bg-surface px-3 text-caption font-medium text-ink hover:bg-paper"

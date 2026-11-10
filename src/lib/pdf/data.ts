@@ -53,12 +53,21 @@ export function issuedNow(locale: Locale): string {
   return formatDateTime(locale, new Date().toISOString());
 }
 
-/** Served inline: the browser's PDF viewer opens it, with its own print and save buttons. */
+/** Served inline: the browser's PDF viewer opens it, or styled printable HTML if chromium is unavailable. */
 export function pdfResponse(pdf: Buffer, filename: string): Response {
-  return new Response(new Uint8Array(pdf), {
+  const isRealPdf = pdf.length >= 5 && pdf.subarray(0, 5).toString("ascii") === "%PDF-";
+  if (isRealPdf) {
+    return new Response(new Uint8Array(pdf), {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `inline; filename="${filename}"`,
+        "Cache-Control": "private, no-store",
+      },
+    });
+  }
+  return new Response(pdf.toString("utf-8"), {
     headers: {
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename="${filename}"`,
+      "Content-Type": "text/html; charset=utf-8",
       "Cache-Control": "private, no-store",
     },
   });

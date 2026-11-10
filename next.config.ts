@@ -20,11 +20,14 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   productionBrowserSourceMaps: false,
   // PDF generation (CLAUDE.md §6.1): the Chromium build is loaded at runtime, not bundled, and the
-  // committed fonts must ship with the two PDF routes on Vercel.
+  // committed fonts and chromium binaries must ship with the PDF routes on Vercel.
   serverExternalPackages: ["@sparticuz/chromium", "puppeteer-core"],
   outputFileTracingIncludes: {
-    "/[locale]/tasks/[id]/pdf": ["./src/assets/fonts/**"],
-    "/[locale]/employees/[id]/pdf": ["./src/assets/fonts/**"],
+    "/[locale]/tasks/[id]/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**"],
+    "/[locale]/employees/[id]/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**"],
+    "/[locale]/leave/[id]/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**"],
+    "/[locale]/payroll/slips/[id]/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**"],
+    "/[locale]/attendance/sheet/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**"],
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

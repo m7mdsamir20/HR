@@ -113,7 +113,7 @@ export default async function AttendanceSheetPage({ params, searchParams }: Page
             <>
               <ManualAttendanceDialog employees={employees ?? []} today={today} />
               <Button asChild variant="secondary">
-                <a href={`/${locale === "en" ? "en/" : ""}attendance/sheet/pdf?month=${month}`} target="_blank" rel="noopener noreferrer">
+                <a href={`${locale === "en" ? "/en" : ""}/attendance/sheet/pdf?month=${month}`} target="_blank" rel="noopener noreferrer">
                   <FileText aria-hidden />
                   {t("sheet.pdf")}
                 </a>

@@ -69,7 +69,7 @@ export default async function PayslipDetailPage({
         </div>
 
         <a
-          href={`/payroll/slips/${slip.id}/pdf`}
+          href={`${locale === "en" ? "/en" : ""}/payroll/slips/${slip.id}/pdf`}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex h-10 items-center justify-center gap-2 rounded-control bg-indigo px-4 text-sm font-semibold text-white shadow-xs hover:bg-indigo/90 focus-visible:outline-2 focus-visible:outline-indigo"
