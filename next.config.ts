@@ -23,11 +23,16 @@ const nextConfig: NextConfig = {
   // committed fonts and chromium binaries must ship with the PDF routes on Vercel.
   serverExternalPackages: ["@sparticuz/chromium", "puppeteer-core"],
   outputFileTracingIncludes: {
-    "/[locale]/tasks/[id]/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**"],
-    "/[locale]/employees/[id]/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**"],
-    "/[locale]/leave/[id]/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**"],
-    "/[locale]/payroll/slips/[id]/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**"],
-    "/[locale]/attendance/sheet/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**"],
+    "/[locale]/tasks/[id]/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**/*"],
+    "/[locale]/(app)/tasks/[id]/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**/*"],
+    "/[locale]/employees/[id]/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**/*"],
+    "/[locale]/(app)/employees/[id]/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**/*"],
+    "/[locale]/leave/[id]/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**/*"],
+    "/[locale]/(app)/leave/[id]/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**/*"],
+    "/[locale]/payroll/slips/[id]/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**/*"],
+    "/[locale]/(app)/payroll/slips/[id]/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**/*"],
+    "/[locale]/attendance/sheet/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**/*"],
+    "/[locale]/(app)/attendance/sheet/pdf": ["./src/assets/fonts/**", "./node_modules/@sparticuz/chromium/bin/**/*"],
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

@@ -12,19 +12,28 @@ export const maxDuration = 60;
 // Monthly attendance sheet (owner and HR). Authorized by the database (record_export), rate limited
 // and audited before anything is built; any refusal is a plain 404.
 export async function GET(request: Request, ctx: RouteContext<"/[locale]/attendance/sheet/pdf">) {
-  const { locale } = await ctx.params;
-  const member = await pdfMember();
-  if (!hasLocale(routing.locales, locale) || !member || !(member.role === "owner" || member.role === "hr")) {
-    return new Response(null, { status: 404 });
+  try {
+    const { locale } = await ctx.params;
+    const member = await pdfMember();
+    if (!hasLocale(routing.locales, locale) || !member || !(member.role === "owner" || member.role === "hr")) {
+      return new Response(null, { status: 404 });
+    }
+    const requested = new URL(request.url).searchParams.get("month");
+    const month = requested === null ? todayInRiyadh().slice(0, 7) : monthSchema.safeParse(requested).data;
+    if (!month) return new Response(null, { status: 404 });
+
+    const supabase = await createClient();
+    const { error } = await supabase.rpc("record_export", { p_kind: "attendance_sheet", p_target: member.company.id });
+    if (error) return new Response(null, { status: error.message === "rate_limited" ? 429 : 404 });
+
+    const built = await buildAttendanceSheetPdf(locale, member, month);
+    return built ? pdfResponse(built.pdf, built.filename) : new Response(null, { status: 404 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? `${err.message}\n${err.stack}` : String(err);
+    console.error("Attendance PDF generation error:", message);
+    return new Response(`PDF generation error: ${message}`, {
+      status: 500,
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
+    });
   }
-  const requested = new URL(request.url).searchParams.get("month");
-  const month = requested === null ? todayInRiyadh().slice(0, 7) : monthSchema.safeParse(requested).data;
-  if (!month) return new Response(null, { status: 404 });
-
-  const supabase = await createClient();
-  const { error } = await supabase.rpc("record_export", { p_kind: "attendance_sheet", p_target: member.company.id });
-  if (error) return new Response(null, { status: error.message === "rate_limited" ? 429 : 404 });
-
-  const built = await buildAttendanceSheetPdf(locale, member, month);
-  return built ? pdfResponse(built.pdf, built.filename) : new Response(null, { status: 404 });
 }

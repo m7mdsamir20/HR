@@ -1,5 +1,6 @@
 import "server-only";
 import { existsSync } from "node:fs";
+import path from "node:path";
 import type { Locale } from "@/i18n/routing";
 import { esc } from "./html";
 
@@ -22,7 +23,16 @@ const LOCAL_BROWSERS = [
 async function launchOptions() {
   if (process.env.VERCEL) {
     const { default: chromium } = await import("@sparticuz/chromium");
-    return { executablePath: await chromium.executablePath(), args: chromium.args, headless: true as const };
+    chromium.setGraphicsMode = false;
+    const binPath = path.join(process.cwd(), "node_modules/@sparticuz/chromium/bin");
+    const executablePath = existsSync(binPath)
+      ? await chromium.executablePath(binPath)
+      : await chromium.executablePath();
+    return {
+      executablePath,
+      args: [...chromium.args, "--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--single-process"],
+      headless: "shell" as const,
+    };
   }
   const executablePath = LOCAL_BROWSERS.find((p) => p && existsSync(p));
   if (!executablePath) throw new Error("No Chrome found for PDF rendering; set CHROME_PATH");
