@@ -84,8 +84,8 @@ export default async function TaskPage({ params }: PageProps<"/[locale]/tasks/[i
         title={t("form.sections.task")}
         items={[
           { label: t("detail.assignee"), value: names.get(task.assignee_id) ?? "—" },
-          ...(assignee?.job_title ? [{ label: te("table.columns.jobTitle"), value: assignee.job_title }] : []),
-          ...(assignee?.national_id ? [{ label: te("table.columns.nationalId"), value: assignee.national_id }] : []),
+          ...(assignee?.national_id ? [{ label: te("columns.nationalId"), value: assignee.national_id }] : []),
+          ...(assignee?.job_title ? [{ label: te("columns.jobTitle"), value: assignee.job_title }] : []),
           {
             label: t("detail.due"),
             value: (

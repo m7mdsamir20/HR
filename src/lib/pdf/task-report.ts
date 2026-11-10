@@ -74,8 +74,8 @@ export async function buildTaskReportPdf(locale: Locale, member: Member, taskId:
     <div class="card" style="margin-bottom:8px"><strong style="font-size:11.5pt">${txt(task.title)}</strong> ${pill(statusTone[status], t(`status.${status}`))}</div>
     ${grid([
       { label: t("detail.assignee"), value: txt(names.get(task.assignee_id)) },
-      { label: te("table.columns.jobTitle"), value: txt(assignee?.job_title) },
-      { label: te("table.columns.nationalId"), value: assignee?.national_id ? ltr(assignee.national_id) : "—" },
+      { label: te("columns.nationalId"), value: assignee?.national_id ? ltr(assignee.national_id) : "—" },
+      { label: te("columns.jobTitle"), value: txt(assignee?.job_title) },
       { label: t("form.priority"), value: esc(t(`priority.${task.priority}`)) },
       {
         label: t("detail.due"),
