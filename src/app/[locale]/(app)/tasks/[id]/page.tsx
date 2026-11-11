@@ -5,7 +5,6 @@ import { z } from "zod";
 import { updateTask } from "@/actions/tasks";
 import { FactsSection } from "@/components/form-section";
 import { StatusPill } from "@/components/status-pill";
-import { ApprovalStamp } from "@/components/tasks/approval-stamp";
 import { ReportForm } from "@/components/tasks/report-form";
 import { TaskForm } from "@/components/tasks/task-form";
 import { AttachmentLinks, DeleteTaskButton, ReviewForm, StartButton } from "@/components/tasks/task-controls";
@@ -69,16 +68,6 @@ export default async function TaskPage({ params }: PageProps<"/[locale]/tasks/[i
         </div>
         <p className="text-secondary">{t("detail.createdBy", { name: names.get(task.created_by) ?? "—" })}</p>
       </div>
-
-      {status === "approved" && task.rating && task.approved_at && (
-        <ApprovalStamp
-          label={t("stamp.label")}
-          rating={task.rating}
-          by={t("stamp.by", { name: names.get(latest?.reviewed_by ?? "") ?? "—" })}
-          on={t("stamp.on", { date: formatDate(locale, task.approved_at.slice(0, 10)) })}
-          className="rounded-card border border-stamp/30 bg-stamp/5 p-4 md:p-6"
-        />
-      )}
 
       <FactsSection
         title={t("form.sections.task")}

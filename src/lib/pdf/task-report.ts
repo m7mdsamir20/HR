@@ -67,7 +67,11 @@ export async function buildTaskReportPdf(locale: Locale, member: Member, taskId:
     </div>`);
   }
 
-  const verdict = status === "approved" ? stampBoxHtml(t("stamp.label")) : "";
+  const approvalDate =
+    status === "approved" && task.approved_at
+      ? formatDate(locale, task.approved_at.slice(0, 10))
+      : undefined;
+  const verdict = status === "approved" ? stampBoxHtml(t("stamp.label"), approvalDate) : "";
 
   const body = `
     <h2>${esc(tp("taskDetails"))}</h2>

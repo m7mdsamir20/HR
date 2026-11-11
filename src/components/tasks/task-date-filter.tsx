@@ -7,21 +7,19 @@ import { usePathname, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 interface TaskDateFilterProps {
-  todayStr: string;
-  tomorrowStr: string;
+  currentMonth?: string;
   labels: {
     all: string;
-    today: string;
-    tomorrow: string;
-    pickDate: string;
+    monthSeptember: string;
+    monthOctober: string;
+    monthNovember: string;
+    pickMonth: string;
     clear: string;
   };
   className?: string;
 }
 
 export function TaskDateFilter({
-  todayStr,
-  tomorrowStr,
   labels,
   className,
 }: TaskDateFilterProps) {
@@ -30,83 +28,110 @@ export function TaskDateFilter({
   const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
 
+  const currentMonth = searchParams.get("month") ?? "";
   const currentDate = searchParams.get("date") ?? "";
 
-  const setDate = (dateVal: string | null) => {
+  const setMonth = (monthVal: string | null) => {
     const sp = new URLSearchParams(searchParams.toString());
-    if (dateVal) {
-      sp.set("date", dateVal);
+    sp.delete("date"); // clear specific date when switching month
+    if (monthVal) {
+      sp.set("month", monthVal);
     } else {
-      sp.delete("date");
+      sp.delete("month");
     }
     startTransition(() => {
       router.replace(`${pathname}?${sp.toString()}`, { scroll: false });
     });
   };
 
-  const isToday = currentDate === todayStr;
-  const isTomorrow = currentDate === tomorrowStr;
-  const isCustom = Boolean(currentDate && !isToday && !isTomorrow);
+  const clearAllDates = () => {
+    const sp = new URLSearchParams(searchParams.toString());
+    sp.delete("month");
+    sp.delete("date");
+    startTransition(() => {
+      router.replace(`${pathname}?${sp.toString()}`, { scroll: false });
+    });
+  };
+
+  const isAll = !currentMonth && !currentDate;
+  const isSep = currentMonth === "2026-09";
+  const isOct = currentMonth === "2026-10";
+  const isNov = currentMonth === "2026-11";
+  const isCustomMonth = Boolean(currentMonth && !isSep && !isOct && !isNov);
 
   return (
     <div className={cn("flex flex-wrap items-center gap-2", className)}>
-      <div className="flex items-center gap-1 rounded-control border border-line bg-surface p-1">
-        {/* Preset: All Dates */}
+      <div className="flex flex-wrap items-center gap-1 rounded-control border border-line bg-surface p-1">
+        {/* Preset: All Months */}
         <button
           type="button"
-          onClick={() => setDate(null)}
+          onClick={clearAllDates}
           className={cn(
             "flex min-h-8 items-center rounded-[6px] px-3 text-label text-ink-soft transition-colors hover:text-ink",
-            !currentDate && "bg-indigo/10 font-semibold text-indigo"
+            isAll && "bg-indigo/10 font-semibold text-indigo"
           )}
         >
           {labels.all}
         </button>
 
-        {/* Preset: Today */}
+        {/* Preset: September 2026 */}
         <button
           type="button"
-          onClick={() => setDate(todayStr)}
+          onClick={() => setMonth("2026-09")}
           className={cn(
             "flex min-h-8 items-center rounded-[6px] px-3 text-label text-ink-soft transition-colors hover:text-ink",
-            isToday && "bg-indigo/10 font-semibold text-indigo"
+            isSep && "bg-indigo/10 font-semibold text-indigo"
           )}
         >
-          {labels.today}
+          {labels.monthSeptember}
         </button>
 
-        {/* Preset: Tomorrow */}
+        {/* Preset: October 2026 */}
         <button
           type="button"
-          onClick={() => setDate(tomorrowStr)}
+          onClick={() => setMonth("2026-10")}
           className={cn(
             "flex min-h-8 items-center rounded-[6px] px-3 text-label text-ink-soft transition-colors hover:text-ink",
-            isTomorrow && "bg-indigo/10 font-semibold text-indigo"
+            isOct && "bg-indigo/10 font-semibold text-indigo"
           )}
         >
-          {labels.tomorrow}
+          {labels.monthOctober}
+        </button>
+
+        {/* Preset: November 2026 */}
+        <button
+          type="button"
+          onClick={() => setMonth("2026-11")}
+          className={cn(
+            "flex min-h-8 items-center rounded-[6px] px-3 text-label text-ink-soft transition-colors hover:text-ink",
+            isNov && "bg-indigo/10 font-semibold text-indigo"
+          )}
+        >
+          {labels.monthNovember}
         </button>
       </div>
 
-      {/* Date Picker Input */}
+      {/* Month Picker Input */}
       <div
         className={cn(
           "relative flex items-center rounded-control border bg-surface px-2.5 py-1 text-label transition-colors",
-          currentDate ? "border-indigo bg-indigo/5 text-indigo font-semibold" : "border-line text-ink-soft hover:text-ink"
+          currentMonth
+            ? "border-indigo bg-indigo/5 text-indigo font-semibold"
+            : "border-line text-ink-soft hover:text-ink"
         )}
       >
         <Calendar className="size-4 shrink-0 me-1.5" aria-hidden />
-        <span className="text-caption me-1.5 hidden sm:inline">{labels.pickDate}:</span>
+        <span className="text-caption me-1.5 hidden sm:inline">{labels.pickMonth}:</span>
         <input
-          type="date"
-          value={currentDate}
-          onChange={(e) => setDate(e.target.value || null)}
+          type="month"
+          value={currentMonth}
+          onChange={(e) => setMonth(e.target.value || null)}
           className="bg-transparent text-label font-sans outline-none cursor-pointer"
         />
-        {currentDate && (
+        {currentMonth && (
           <button
             type="button"
-            onClick={() => setDate(null)}
+            onClick={clearAllDates}
             title={labels.clear}
             className="ms-1.5 rounded-full p-0.5 text-ink-soft hover:bg-paper hover:text-ink transition-colors"
           >
@@ -115,10 +140,9 @@ export function TaskDateFilter({
         )}
       </div>
 
-      {/* Notice if custom date selected */}
-      {isCustom && (
+      {isCustomMonth && (
         <span className="text-caption text-secondary">
-          <bdi dir="ltr">{currentDate}</bdi>
+          <bdi dir="ltr">{currentMonth}</bdi>
         </span>
       )}
     </div>

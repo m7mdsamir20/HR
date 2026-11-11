@@ -22,20 +22,31 @@ export async function buildPayrollRunPdf(
 
   if (!run) return null;
 
-  const { data: slips } = await supabase
+  const { data: rawSlips } = await supabase
     .from("payroll_slips")
-    .select(`
-      *,
-      employee:employee_id (
-        id,
-        national_id,
-        id_type,
-        full_name_ar,
-        full_name_en,
-        job_title
-      )
-    `)
+    .select("*")
     .eq("payroll_run_id", runId);
+
+  const empIds = (rawSlips ?? []).map((s) => s.employee_id);
+  const { data: employees } = empIds.length > 0
+    ? await supabase
+        .from("employees")
+        .select("id, national_id, id_type, full_name_ar, full_name_en, job_title, employee_number")
+        .in("id", empIds)
+    : { data: [] };
+
+  const empMap = new Map((employees ?? []).map((e) => [e.id, e]));
+
+  const slips = (rawSlips ?? [])
+    .map((s) => ({
+      ...s,
+      employee: empMap.get(s.employee_id) ?? null,
+    }))
+    .sort((a, b) => {
+      const numA = a.employee?.employee_number || a.employee?.national_id || "";
+      const numB = b.employee?.employee_number || b.employee?.national_id || "";
+      return numA.localeCompare(numB, undefined, { numeric: true });
+    });
 
   let approverName: string | null = null;
   if (run.approved_by) {
@@ -115,20 +126,7 @@ export async function buildPayrollRunPdf(
         <span style="font-size: 8pt; color: #7a4e05;">${locale === "ar" ? "بانتظار اعتماد الإدارة" : "Pending Approval"}</span>
       </div>
     `
-    : `
-      <div style="border: 1.5px solid #1f7a55; background: #1f7a5510; color: #0d4a32; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; break-inside: avoid;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          ${pill("stamp", locale === "ar" ? "مسير معتمد ومقفل" : "Approved & Locked")}
-          <span style="font-size: 8.8pt; font-weight: 600;">
-            ${locale === "ar" ? "كشف مسير رواتب معتمد رسمياً ومقفل للصرف والتحويل البنكي لشهر " + period : "Officially approved and locked payroll run for " + period}
-          </span>
-        </div>
-        <div style="font-size: 8pt; color: #0d4a32; text-align: end;">
-          <span>${locale === "ar" ? "تاريخ الاعتماد: " : "Approved: "}${dt(run.approved_at?.slice(0, 10) ?? "—")}</span>
-          ${approverName ? `<br><span>${locale === "ar" ? "المعتمد: " : "By: "}${esc(approverName)}</span>` : ""}
-        </div>
-      </div>
-    `;
+    : "";
 
   const kpisHtml = `
     <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 14px; break-inside: avoid;">

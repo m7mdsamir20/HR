@@ -29,6 +29,7 @@ export default async function TasksPage({ params, searchParams }: PageProps<"/[l
   const filters = manages ? FILTERS : (["all", "open"] as const);
   const filter: Filter = (filters as readonly string[]).includes(String(sp.status)) ? (sp.status as Filter) : "all";
   const q = cleanSearch(typeof sp.q === "string" ? sp.q : "");
+  const monthParam = typeof sp.month === "string" && /^\d{4}-\d{2}$/.test(sp.month) ? sp.month : "";
   const dateParam = typeof sp.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(sp.date) ? sp.date : "";
   const employeeParam = typeof sp.employee === "string" && sp.employee ? sp.employee : "";
 
@@ -53,7 +54,17 @@ export default async function TasksPage({ params, searchParams }: PageProps<"/[l
         query = query.eq("assignee_id", member.employee_id);
       }
       if (q) query = query.ilike("title", `%${q}%`);
-      if (dateParam) query = query.eq("due_date", dateParam);
+      if (monthParam) {
+        const [yStr, mStr] = monthParam.split("-");
+        const y = Number(yStr);
+        const m = Number(mStr);
+        const lastDay = new Date(y, m, 0).getDate();
+        query = query
+          .gte("due_date", `${monthParam}-01`)
+          .lte("due_date", `${monthParam}-${String(lastDay).padStart(2, "0")}`);
+      } else if (dateParam) {
+        query = query.eq("due_date", dateParam);
+      }
       return query;
     })(),
     manages
@@ -106,6 +117,7 @@ export default async function TasksPage({ params, searchParams }: PageProps<"/[l
     pathname: "/tasks",
     query: {
       ...(q ? { q } : {}),
+      ...(monthParam ? { month: monthParam } : {}),
       ...(dateParam ? { date: dateParam } : {}),
       ...(employeeParam ? { employee: employeeParam } : {}),
       ...(f !== "all" ? { status: f } : {}),
@@ -152,13 +164,12 @@ export default async function TasksPage({ params, searchParams }: PageProps<"/[l
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
         <div className="flex flex-wrap items-center gap-3">
           <TaskDateFilter
-            todayStr={today}
-            tomorrowStr={tomorrow}
             labels={{
-              all: t("dateFilter.all"),
-              today: t("dateFilter.today"),
-              tomorrow: t("dateFilter.tomorrow"),
-              pickDate: t("dateFilter.pickDate"),
+              all: locale === "ar" ? "كل الأشهر" : "All Months",
+              monthSeptember: locale === "ar" ? "سبتمبر 2026" : "Sep 2026",
+              monthOctober: locale === "ar" ? "أكتوبر 2026" : "Oct 2026",
+              monthNovember: locale === "ar" ? "نوفمبر 2026" : "Nov 2026",
+              pickMonth: locale === "ar" ? "اختر الشهر" : "Pick Month",
               clear: t("dateFilter.clear"),
             }}
           />
@@ -175,7 +186,17 @@ export default async function TasksPage({ params, searchParams }: PageProps<"/[l
           )}
         </div>
 
-        {dateParam && (
+        {monthParam && (
+          <div className="flex items-center gap-2 text-label text-indigo bg-indigo/10 px-3 py-1.5 rounded-[6px]">
+            <Calendar className="size-4" aria-hidden />
+            <span>
+              {locale === "ar"
+                ? `مهام شهر: ${monthParam === "2026-09" ? "سبتمبر 2026" : monthParam === "2026-10" ? "أكتوبر 2026" : monthParam === "2026-11" ? "نوفمبر 2026" : monthParam}`
+                : `Tasks for: ${monthParam}`}
+            </span>
+          </div>
+        )}
+        {dateParam && !monthParam && (
           <div className="flex items-center gap-2 text-label text-indigo bg-indigo/10 px-3 py-1.5 rounded-[6px]">
             <Calendar className="size-4" aria-hidden />
             <span>{t("dateFilter.showingDate", { date: formatDayFull(locale, dateParam) })}</span>
@@ -185,8 +206,8 @@ export default async function TasksPage({ params, searchParams }: PageProps<"/[l
 
       {rows.length === 0 ? (
         <div className="flex flex-col items-start gap-4 rounded-card border border-dashed border-line bg-surface p-6">
-          <p>{q || dateParam || employeeParam || filter !== "all" ? t("noResults") : manages ? t("empty") : t("emptyMine")}</p>
-          {manages && !q && !dateParam && !employeeParam && filter === "all" && (
+          <p>{q || monthParam || dateParam || employeeParam || filter !== "all" ? t("noResults") : manages ? t("empty") : t("emptyMine")}</p>
+          {manages && !q && !monthParam && !dateParam && !employeeParam && filter === "all" && (
             <Button asChild variant="outline">
               <Link href="/tasks/new">{t("add")}</Link>
             </Button>

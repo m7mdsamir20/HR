@@ -195,7 +195,7 @@ export function stampSvg(label: string, rating: number): string {
   </svg>`;
 }
 
-/** Rectangular approval stamp without rating or circular frame */
-export function stampBoxHtml(label: string): string {
-  return `<div class="stamp-footer"><div class="stamp-box"><div class="stamp-box-inner">${esc(label)}</div></div></div>`;
+/** Rectangular approval stamp with optional approval date underneath */
+export function stampBoxHtml(label: string, date?: string): string {
+  return `<div class="stamp-footer"><div class="stamp-box"><div class="stamp-box-inner"><div>${esc(label)}</div>${date ? `<div style="font-size: 8pt; font-weight: 600; margin-top: 4px; letter-spacing: 0;">${esc(date)}</div>` : ""}</div></div></div>`;
 }

@@ -1,4 +1,4 @@
-import { Eye, Printer } from "lucide-react";
+import { Eye } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { PayrollRunCreateForm } from "@/components/payroll/payroll-run-create-form";
@@ -77,25 +77,13 @@ export default async function PayrollRunsPage({ params }: PageProps<"/[locale]">
                     <td className="px-4 py-3 tabular-nums text-brick">{r.total_deductions} <span className="text-xs font-normal text-secondary">ر.س</span></td>
                     <td className="px-4 py-3 font-bold tabular-nums text-indigo">{r.total_net} <span className="text-xs font-normal text-secondary">ر.س</span></td>
                     <td className="px-4 py-3 text-end">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <a
-                          href={`${locale === "en" ? "/en" : ""}/payroll/runs/${r.id}/pdf`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          title={r.status === "draft" ? t("printDraft") : t("printApproved")}
-                          className="inline-flex h-8 items-center gap-1 rounded-control bg-paper px-2.5 text-xs font-semibold text-ink hover:bg-line"
-                        >
-                          <Printer className="size-3.5" aria-hidden />
-                          <span>{r.status === "draft" ? t("printDraftShort") : t("printApprovedShort")}</span>
-                        </a>
-                        <Link
-                          href={`/payroll/runs/${r.id}`}
-                          className="inline-flex h-8 items-center gap-1 rounded-control bg-paper px-2.5 text-xs font-semibold text-ink hover:bg-line"
-                        >
-                          <Eye className="size-3.5" aria-hidden />
-                          {t("viewRun")}
-                        </Link>
-                      </div>
+                      <Link
+                        href={`/payroll/runs/${r.id}`}
+                        className="inline-flex h-8 items-center gap-1.5 rounded-control bg-paper px-3 text-xs font-semibold text-ink hover:bg-line transition-colors"
+                      >
+                        <Eye className="size-3.5" aria-hidden />
+                        {t("viewRun")}
+                      </Link>
                     </td>
                   </tr>
                 ))}
