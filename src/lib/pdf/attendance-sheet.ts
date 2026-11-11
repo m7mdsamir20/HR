@@ -339,14 +339,9 @@ export async function buildAttendanceSheetPdf(
       }).join("");
 
       const approved = approvedDays.get(e.id) ?? 0;
-      const empShift = e.shift_id ? shiftMap.get(e.shift_id) : undefined;
-      const shiftIn = empShift?.start_time ? formatTimeString(locale, empShift.start_time) : "—";
-      const shiftOut = empShift?.end_time ? formatTimeString(locale, empShift.end_time) : "—";
 
       return `<tr>
         <th class="n" scope="row">${txt(localName(locale, e.full_name_ar, e.full_name_en))}</th>
-        <td class="st"><bdi dir="ltr">${esc(shiftIn)}</bdi></td>
-        <td class="st"><bdi dir="ltr">${esc(shiftOut)}</bdi></td>
         ${cells}
         <td class="t">${ltr(presentDays)}</td>
         <td class="t">${ltr(absentDays)}</td>
@@ -366,8 +361,7 @@ export async function buildAttendanceSheetPdf(
       table.sheet th { background: #f6f7f9; color: #4a5875; }
       table.sheet th.t { font-size: 6pt; line-height: 1.2; width: 9mm; }
       table.sheet td.d { font-size: 7.5pt; font-weight: 700; width: 3.5mm; }
-      table.sheet th.n { width: 38mm; text-align: start; padding-inline: 4px; font-weight: 600; font-size: 7pt; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-      table.sheet th.st, table.sheet td.st { width: 15mm; font-size: 6pt; color: #2f4a9e; font-family: 'InterEmbedded', monospace; }
+      table.sheet th.n { width: 44mm; text-align: start; padding-inline: 4px; font-weight: 600; font-size: 7pt; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
       table.sheet .t { width: 9mm; font-weight: 600; }
       .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; font-size: 7pt; }
     </style>
@@ -376,8 +370,6 @@ export async function buildAttendanceSheetPdf(
       <thead>
         <tr>
           <th class="n">${esc(tr("employee"))}</th>
-          <th class="st">${locale === "ar" ? "وقت الحضور" : "Check-in"}</th>
-          <th class="st">${locale === "ar" ? "وقت الانصراف" : "Check-out"}</th>
           ${dayHeads}
           <th class="t">${esc(tp("sheetPresent"))}</th>
           <th class="t">${esc(tp("sheetAbsent"))}</th>

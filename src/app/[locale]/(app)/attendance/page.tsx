@@ -25,7 +25,7 @@ export default async function AttendancePage({ params, searchParams }: PageProps
   const locale = (await params).locale as Locale;
   const member = await requireMember(locale);
   if (member.role === "owner" || member.role === "admin") {
-    redirect({ href: "/attendance/sheet", locale });
+    redirect({ href: "/attendance/daily", locale });
   }
   const t = await getTranslations({ locale, namespace: "attendance" });
   const month = monthParam((await searchParams).month);

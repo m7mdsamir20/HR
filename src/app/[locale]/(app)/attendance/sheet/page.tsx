@@ -107,10 +107,7 @@ export default async function AttendanceSheetPage({ params, searchParams }: Page
     const x = totals.get(e.id) ?? { present: 0, absent: 0, leave: 0, lateCount: 0, lateMinutes: 0, earlyMinutes: 0, outside: 0, missing: 0 };
     const recorded = new Set((records ?? []).filter((r) => r.employee_id === e.id).map((r) => r.work_date));
     const leaveDays = leaveDates((leaves ?? []).filter((l) => l.employee_id === e.id), { from, to }, workDaysOf.get(e.shift_id ?? "") ?? [], recorded).length;
-    const empShift = e.shift_id ? shiftMap.get(e.shift_id) : undefined;
-    const checkInTime = empShift?.start_time ? formatTimeString(locale, empShift.start_time) : "—";
-    const checkOutTime = empShift?.end_time ? formatTimeString(locale, empShift.end_time) : "—";
-    return { e, x: { ...x, leave: leaveDays }, checkInTime, checkOutTime };
+    return { e, x: { ...x, leave: leaveDays } };
   });
   const cell = "px-4 py-3 tabular-nums";
 
@@ -145,8 +142,6 @@ export default async function AttendanceSheetPage({ params, searchParams }: Page
               <thead>
                 <tr className="border-b border-line text-label text-ink-soft">
                   <th scope="col" className="px-4 py-3 text-start font-medium">{t("sheet.employee")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("sheet.checkIn")}</th>
-                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("sheet.checkOut")}</th>
                   <th scope="col" className="px-4 py-3 text-start font-medium">{t("sheet.present")}</th>
                   <th scope="col" className="px-4 py-3 text-start font-medium">{t("sheet.absent")}</th>
                   <th scope="col" className="px-4 py-3 text-start font-medium">{t("sheet.leave")}</th>
@@ -156,15 +151,13 @@ export default async function AttendanceSheetPage({ params, searchParams }: Page
                 </tr>
               </thead>
               <tbody>
-                {rows.map(({ e, x, checkInTime, checkOutTime }) => (
+                {rows.map(({ e, x }) => (
                   <tr key={e.id} className="border-b border-line last:border-0">
                     <th scope="row" className="px-4 py-3 text-start font-medium">
                       <Link href={{ pathname: "/attendance/sheet", query: { month, employee: e.id } }} className="hover:underline focus-visible:outline-2 focus-visible:outline-indigo">
                         {nameOf(e)}
                       </Link>
                     </th>
-                    <td className={cell}><bdi dir="ltr">{checkInTime}</bdi></td>
-                    <td className={cell}><bdi dir="ltr">{checkOutTime}</bdi></td>
                     <td className={cell}>{x.present}</td>
                     <td className={`${cell} ${x.absent ? "text-brick" : ""}`}>{x.absent}</td>
                     <td className={cell}>{x.leave || "—"}</td>
@@ -178,7 +171,7 @@ export default async function AttendanceSheetPage({ params, searchParams }: Page
           </div>
 
           <ul className="flex flex-col gap-3 md:hidden">
-            {rows.map(({ e, x, checkInTime, checkOutTime }) => (
+            {rows.map(({ e, x }) => (
               <li key={e.id}>
                 <Link
                   href={{ pathname: "/attendance/sheet", query: { month, employee: e.id } }}
@@ -186,13 +179,12 @@ export default async function AttendanceSheetPage({ params, searchParams }: Page
                 >
                   <span className="text-card">{nameOf(e)}</span>
                   <span className="grid grid-cols-2 gap-x-4 gap-y-1 text-secondary tabular-nums">
-                    <span>{t("sheet.checkIn")}: <bdi dir="ltr">{checkInTime}</bdi></span>
-                    <span>{t("sheet.checkOut")}: <bdi dir="ltr">{checkOutTime}</bdi></span>
                     <span>{t("sheet.present")}: {x.present}</span>
                     <span className={x.absent ? "text-brick" : ""}>{t("sheet.absent")}: {x.absent}</span>
                     <span>{t("sheet.leave")}: {x.leave || "—"}</span>
                     <span>{t("sheet.late")}: {x.lateCount ? `${x.lateCount} · ${formatDuration(x.lateMinutes)}` : "—"}</span>
-                    <span>{t("sheet.flagged")}: {x.outside + x.missing || "—"}</span>
+                    <span>{t("sheet.early")}: {x.earlyMinutes ? formatDuration(x.earlyMinutes) : "—"}</span>
+                    <span className={x.outside || x.missing ? "text-saffron" : ""}>{t("sheet.flagged")}: {x.outside + x.missing || "—"}</span>
                   </span>
                 </Link>
               </li>

@@ -10,8 +10,9 @@ export function AttendanceTabs({ role }: { role: Role }) {
   const t = useTranslations("attendance.tabs");
   const pathname = usePathname();
   const tabs = [
-    { href: "/attendance", key: "mine" as const, show: role !== "owner" },
+    { href: "/attendance/daily", key: "daily" as const, show: role !== "employee" },
     { href: "/attendance/sheet", key: "sheet" as const, show: role !== "employee" },
+    { href: "/attendance", key: "mine" as const, show: role !== "owner" },
     { href: "/attendance/deductions", key: "deductions" as const, show: role === "owner" || role === "admin" || role === "hr" },
   ].filter((x) => x.show);
   if (tabs.length < 2) return null;
