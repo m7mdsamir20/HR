@@ -94,18 +94,18 @@ export async function buildPayrollRunPdf(
     return `
       <tr>
         <td style="text-align: center; color: #4a5875;">${idx + 1}</td>
-        <td style="font-weight: 600;">${esc(empName)}</td>
+        <td style="font-weight: 600; text-align: right; padding-right: 8px;">${esc(empName)}</td>
         <td style="text-align: center;">${ltr(natId)}</td>
-        <td>${esc(jobTitle)}</td>
-        <td style="text-align: end; font-family: 'InterEmbedded', monospace;">${ltr(num(s.basic_salary))}</td>
-        <td style="text-align: end; font-family: 'InterEmbedded', monospace;">${ltr(num(s.housing_allowance))}</td>
-        <td style="text-align: end; font-family: 'InterEmbedded', monospace;">${ltr(num(otherAllowancesTotal))}</td>
-        <td style="text-align: end; font-weight: 700; font-family: 'InterEmbedded', monospace; background: #f8fafc;">${ltr(num(s.gross_salary))}</td>
-        <td style="text-align: end; color: #b23a2b; font-family: 'InterEmbedded', monospace;">${ltr(num(s.gosi_employee))}</td>
-        <td style="text-align: end; color: #b23a2b; font-family: 'InterEmbedded', monospace;">${ltr(num(attendanceDedTotal))}</td>
-        <td style="text-align: end; color: #b23a2b; font-family: 'InterEmbedded', monospace;">${ltr(num(advanceAndOtherDedTotal))}</td>
-        <td style="text-align: end; font-weight: 600; color: #b23a2b; font-family: 'InterEmbedded', monospace; background: #fff5f5;">${ltr(num(s.total_deductions))}</td>
-        <td style="text-align: end; font-weight: 700; color: #2f4a9e; font-family: 'InterEmbedded', monospace; background: #f0f4fc;">${ltr(num(s.net_salary))}</td>
+        <td style="text-align: right; padding-right: 8px;">${esc(jobTitle)}</td>
+        <td style="text-align: right; padding-right: 6px; font-family: 'InterEmbedded', monospace;">${ltr(num(s.basic_salary))}</td>
+        <td style="text-align: right; padding-right: 6px; font-family: 'InterEmbedded', monospace;">${ltr(num(s.housing_allowance))}</td>
+        <td style="text-align: right; padding-right: 6px; font-family: 'InterEmbedded', monospace;">${ltr(num(otherAllowancesTotal))}</td>
+        <td style="text-align: right; padding-right: 6px; font-weight: 700; font-family: 'InterEmbedded', monospace; background: #f8fafc;">${ltr(num(s.gross_salary))}</td>
+        <td style="text-align: right; padding-right: 6px; color: #b23a2b; font-family: 'InterEmbedded', monospace;">${ltr(num(s.gosi_employee))}</td>
+        <td style="text-align: right; padding-right: 6px; color: #b23a2b; font-family: 'InterEmbedded', monospace;">${ltr(num(attendanceDedTotal))}</td>
+        <td style="text-align: right; padding-right: 6px; color: #b23a2b; font-family: 'InterEmbedded', monospace;">${ltr(num(advanceAndOtherDedTotal))}</td>
+        <td style="text-align: right; padding-right: 6px; font-weight: 600; color: #b23a2b; font-family: 'InterEmbedded', monospace; background: #fff5f5;">${ltr(num(s.total_deductions))}</td>
+        <td style="text-align: right; padding-right: 6px; font-weight: 700; color: #2f4a9e; font-family: 'InterEmbedded', monospace; background: #f0f4fc;">${ltr(num(s.net_salary))}</td>
       </tr>
     `;
   });
@@ -247,35 +247,35 @@ export async function buildPayrollRunPdf(
       <thead>
         <tr>
           <th style="width: 24px; text-align: center;">#</th>
-          <th style="min-width: 130px; text-align: start;">${locale === "ar" ? "اسم الموظف" : "Employee"}</th>
+          <th style="min-width: 130px; text-align: right; padding-right: 8px;">${locale === "ar" ? "اسم الموظف" : "Employee"}</th>
           <th style="width: 80px; text-align: center;">${locale === "ar" ? "رقم الهوية" : "National ID"}</th>
-          <th style="min-width: 100px; text-align: start;">${locale === "ar" ? "المسمى الوظيفي" : "Job Title"}</th>
-          <th style="width: 65px; text-align: end;">${esc(t("basicSalary"))}</th>
-          <th style="width: 60px; text-align: end;">${esc(t("housingAllowance"))}</th>
-          <th style="width: 65px; text-align: end;">${locale === "ar" ? "بدلات أخرى" : "Other Allow."}</th>
-          <th style="width: 72px; text-align: end; background: #edf2f7;">${esc(t("totalGross"))}</th>
-          <th style="width: 60px; text-align: end; color: #b23a2b;">${locale === "ar" ? "التأمينات" : "GOSI"}</th>
-          <th style="width: 65px; text-align: end; color: #b23a2b;">${locale === "ar" ? "خصم حضور" : "Att. Ded."}</th>
-          <th style="width: 65px; text-align: end; color: #b23a2b;">${locale === "ar" ? "سلف وأخرى" : "Adv/Other"}</th>
-          <th style="width: 70px; text-align: end; color: #b23a2b; background: #fee2e2;">${esc(t("totalDeductions"))}</th>
-          <th style="width: 78px; text-align: end; color: #2f4a9e; background: #e0e7ff;">${esc(t("totalNet"))}</th>
+          <th style="min-width: 100px; text-align: right; padding-right: 8px;">${locale === "ar" ? "المسمى الوظيفي" : "Job Title"}</th>
+          <th style="width: 65px; text-align: right; padding-right: 6px;">${esc(t("basicSalary"))}</th>
+          <th style="width: 60px; text-align: right; padding-right: 6px;">${esc(t("housingAllowance"))}</th>
+          <th style="width: 65px; text-align: right; padding-right: 6px;">${locale === "ar" ? "بدلات أخرى" : "Other Allow."}</th>
+          <th style="width: 72px; text-align: right; padding-right: 6px; background: #edf2f7;">${esc(t("totalGross"))}</th>
+          <th style="width: 60px; text-align: right; padding-right: 6px; color: #b23a2b;">${locale === "ar" ? "التأمينات" : "GOSI"}</th>
+          <th style="width: 65px; text-align: right; padding-right: 6px; color: #b23a2b;">${locale === "ar" ? "خصم حضور" : "Att. Ded."}</th>
+          <th style="width: 65px; text-align: right; padding-right: 6px; color: #b23a2b;">${locale === "ar" ? "سلف وأخرى" : "Adv/Other"}</th>
+          <th style="width: 70px; text-align: right; padding-right: 6px; color: #b23a2b; background: #fee2e2;">${esc(t("totalDeductions"))}</th>
+          <th style="width: 78px; text-align: right; padding-right: 6px; color: #2f4a9e; background: #e0e7ff;">${esc(t("totalNet"))}</th>
         </tr>
       </thead>
       <tbody>
         ${slipRows.join("")}
         <tr class="total-row">
-          <td colspan="4" style="text-align: start; padding-inline-start: 10px;">
+          <td colspan="4" style="text-align: right; padding-right: 12px; font-weight: 700;">
             ${locale === "ar" ? "الإجمالي العام (" + (slips?.length ?? 0) + " موظف)" : "Total (" + (slips?.length ?? 0) + " employees)"}
           </td>
-          <td style="text-align: end; font-family: 'InterEmbedded', monospace;">${ltr(num(run.total_basic))}</td>
-          <td style="text-align: end; font-family: 'InterEmbedded', monospace;">${ltr(num(run.total_housing))}</td>
-          <td style="text-align: end; font-family: 'InterEmbedded', monospace;">${ltr(num(totalOtherAllowances))}</td>
-          <td style="text-align: end; font-family: 'InterEmbedded', monospace; font-weight: 800; background: #e2e8f0 !important;">${ltr(num(run.total_gross))}</td>
-          <td style="text-align: end; font-family: 'InterEmbedded', monospace; color: #b23a2b;">${ltr(num(run.total_gosi_employee))}</td>
-          <td style="text-align: end; font-family: 'InterEmbedded', monospace; color: #b23a2b;">${ltr(num(totalAttendanceDeductions))}</td>
-          <td style="text-align: end; font-family: 'InterEmbedded', monospace; color: #b23a2b;">${ltr(num(totalAdvanceAndOtherDeductions))}</td>
-          <td style="text-align: end; font-family: 'InterEmbedded', monospace; font-weight: 800; color: #b23a2b; background: #fecaca !important;">${ltr(num(run.total_deductions))}</td>
-          <td style="text-align: end; font-family: 'InterEmbedded', monospace; font-weight: 800; color: #2f4a9e; background: #c7d2fe !important;">${ltr(num(run.total_net))}</td>
+          <td style="text-align: right; padding-right: 6px; font-family: 'InterEmbedded', monospace;">${ltr(num(run.total_basic))}</td>
+          <td style="text-align: right; padding-right: 6px; font-family: 'InterEmbedded', monospace;">${ltr(num(run.total_housing))}</td>
+          <td style="text-align: right; padding-right: 6px; font-family: 'InterEmbedded', monospace;">${ltr(num(totalOtherAllowances))}</td>
+          <td style="text-align: right; padding-right: 6px; font-family: 'InterEmbedded', monospace; font-weight: 800; background: #e2e8f0 !important;">${ltr(num(run.total_gross))}</td>
+          <td style="text-align: right; padding-right: 6px; font-family: 'InterEmbedded', monospace; color: #b23a2b;">${ltr(num(run.total_gosi_employee))}</td>
+          <td style="text-align: right; padding-right: 6px; font-family: 'InterEmbedded', monospace; color: #b23a2b;">${ltr(num(totalAttendanceDeductions))}</td>
+          <td style="text-align: right; padding-right: 6px; font-family: 'InterEmbedded', monospace; color: #b23a2b;">${ltr(num(totalAdvanceAndOtherDeductions))}</td>
+          <td style="text-align: right; padding-right: 6px; font-family: 'InterEmbedded', monospace; font-weight: 800; color: #b23a2b; background: #fecaca !important;">${ltr(num(run.total_deductions))}</td>
+          <td style="text-align: right; padding-right: 6px; font-family: 'InterEmbedded', monospace; font-weight: 800; color: #2f4a9e; background: #c7d2fe !important;">${ltr(num(run.total_net))}</td>
         </tr>
       </tbody>
     </table>

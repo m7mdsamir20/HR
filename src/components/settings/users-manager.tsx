@@ -179,20 +179,6 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
             إدارة حسابات الدخول للموظفين، تعيين الصلاحيات (موارد بشرية / مشرف / موظف)، وتعيين كلمات المرور ولغة الواجهة.
           </p>
         </div>
-
-        {canManage && employeesWithoutAccount.length > 0 && (
-          <Button
-            type="button"
-            onClick={() => {
-              const firstId = employeesWithoutAccount[0]?.id ?? "";
-              openForEmployee(firstId);
-            }}
-            className="shrink-0"
-          >
-            <UserPlus className="size-4" aria-hidden />
-            إنشاء حساب لموظف
-          </Button>
-        )}
       </div>
 
       {/* Account Creation / Edit Modal Dialog */}
@@ -219,8 +205,8 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
             <input type="hidden" name="employeeId" value={selectedEmpId} />
             <input type="hidden" name="role" value={selectedRole} />
 
-            {/* Scrollable Body */}
-            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+            {/* Scrollable Body with safe margins and rounded scrollbar */}
+            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4 [scrollbar-width:thin] [scrollbar-color:#cbd5e1_transparent] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-slate-400">
               {/* Employee Summary Card */}
               {selectedEmp && (
                 <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-card bg-paper border border-line">
