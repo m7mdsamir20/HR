@@ -2,7 +2,7 @@ import "server-only";
 import { getTranslations } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import type { Member } from "@/lib/auth/account";
-import { formatDate, formatDateTime } from "@/lib/format";
+import { formatDate, formatDateTime, formatTimeString } from "@/lib/format";
 import { loadNames } from "@/lib/task-data";
 import { isOverdue, statusTone, type TaskStatus } from "@/lib/tasks";
 import { createClient } from "@/lib/supabase/server";
@@ -83,7 +83,7 @@ export async function buildTaskReportPdf(locale: Locale, member: Member, taskId:
       { label: t("form.priority"), value: esc(t(`priority.${task.priority}`)) },
       {
         label: t("detail.due"),
-        value: `${dt(formatDate(locale, task.due_date))}${task.due_time ? ` · ${esc(t("dueAt", { time: task.due_time.slice(0, 5) }))}` : ""}${overdue ? ` ${pill("brick", t("overdue"))}` : ""}`,
+        value: `${dt(formatDate(locale, task.due_date))}${task.due_time ? ` · ${esc(t("dueAt", { time: formatTimeString(locale, task.due_time) }))}` : ""}${overdue ? ` ${pill("brick", t("overdue"))}` : ""}`,
       },
       { label: t("detail.expectedHours"), value: task.expected_hours ? dt(t("detail.hours", { count: Number(task.expected_hours) })) : "—" },
       { label: t("detail.location"), value: txt(task.location) },

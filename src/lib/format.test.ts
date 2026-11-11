@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { daysBetween, formatDate, formatDateTime, todayInRiyadh } from "./format";
+import { daysBetween, formatDate, formatDateTime, formatTime, formatTimeString, todayInRiyadh } from "./format";
 
 describe("formatDate", () => {
   it("uses Latin digits and the Gregorian calendar in Arabic", () => {
@@ -26,7 +26,24 @@ describe("daysBetween", () => {
 });
 
 describe("formatDateTime", () => {
-  it("shows the month name and Riyadh time", () => {
-    expect(formatDateTime("en", "2026-11-02T12:44:00Z")).toBe("2 November 2026 at 15:44");
+  it("shows the month name and Riyadh time in 12-hour format", () => {
+    expect(formatDateTime("en", "2026-11-02T12:44:00Z")).toContain("03:44 pm");
+    expect(formatDateTime("ar", "2026-11-02T12:44:00Z")).toContain("3:44 م");
+  });
+});
+
+describe("formatTime", () => {
+  it("formats timestamps in 12-hour format", () => {
+    expect(formatTime("ar", "2026-11-02T05:00:00Z")).toBe("8:00 ص");
+    expect(formatTime("ar", "2026-11-02T14:00:00Z")).toBe("5:00 م");
+    expect(formatTime("en", "2026-11-02T14:00:00Z")).toBe("5:00 pm");
+  });
+});
+
+describe("formatTimeString", () => {
+  it("formats time-only strings in 12-hour format", () => {
+    expect(formatTimeString("ar", "08:00:00")).toBe("8:00 ص");
+    expect(formatTimeString("ar", "17:00:00")).toBe("5:00 م");
+    expect(formatTimeString("en", "17:00:00")).toBe("5:00 pm");
   });
 });

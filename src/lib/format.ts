@@ -9,11 +9,12 @@ export function formatDate(locale: Locale, isoDate: string): string {
   return new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "long", timeZone: "UTC" }).format(new Date(isoDate));
 }
 
-/** Date and time in Riyadh for a timestamp. */
+/** Date and time in Riyadh for a timestamp (12-hour format, Latin digits). */
 export function formatDateTime(locale: Locale, isoTimestamp: string): string {
   return new Intl.DateTimeFormat(intlLocale(locale), {
     dateStyle: "long",
     timeStyle: "short",
+    hour12: true,
     timeZone: "Asia/Riyadh",
   }).format(new Date(isoTimestamp));
 }
@@ -35,11 +36,31 @@ export function addDays(isoDate: string, days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-/** "08:15" in Riyadh for a timestamp (24-hour, Latin digits). */
+/** "8:15 ص" / "5:00 م" in Riyadh for a timestamp (12-hour format, Latin digits). */
 export function formatTime(locale: Locale, isoTimestamp: string): string {
-  return new Intl.DateTimeFormat(intlLocale(locale), { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "Asia/Riyadh" }).format(
-    new Date(isoTimestamp),
-  );
+  return new Intl.DateTimeFormat(intlLocale(locale), {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "Asia/Riyadh",
+  }).format(new Date(isoTimestamp));
+}
+
+/** "5:00 م" / "5:00 pm" for a time string like "17:00" or "17:00:00" (12-hour format, Latin digits). */
+export function formatTimeString(locale: Locale, timeStr: string): string {
+  if (!timeStr) return "";
+  const [hStr, mStr] = timeStr.slice(0, 5).split(":");
+  const h = Number(hStr);
+  const m = Number(mStr);
+  if (Number.isNaN(h) || Number.isNaN(m)) return timeStr;
+
+  const dummy = new Date(Date.UTC(2026, 0, 1, h, m));
+  return new Intl.DateTimeFormat(intlLocale(locale), {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "UTC",
+  }).format(dummy);
 }
 
 /** "الأحد 3 نوفمبر" for a date-only ISO string. */

@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { StatusPill } from "@/components/status-pill";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatTimeString } from "@/lib/format";
 import { isOverdue, statusBar, statusTone, type Priority, type TaskStatus } from "@/lib/tasks";
 import { cn } from "@/lib/utils";
 
@@ -35,7 +35,7 @@ export async function TaskCard({ task, locale, showAssignee }: { task: TaskRow; 
         <span className={cn("tabular-nums", overdue && "font-semibold text-brick")}>
           {overdue && `${t("overdue")} · `}
           {formatDate(locale, task.dueDate)}
-          {task.dueTime && ` · ${t("dueAt", { time: task.dueTime.slice(0, 5) })}`}
+          {task.dueTime && ` · ${t("dueAt", { time: formatTimeString(locale, task.dueTime) })}`}
         </span>
         <span>{t(`priority.${task.priority}`)}</span>
         {showAssignee && task.assignee && <span>{task.assignee}</span>}

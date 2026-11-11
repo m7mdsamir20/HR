@@ -12,7 +12,7 @@ import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { requireMember } from "@/lib/auth/account";
 import { Button } from "@/components/ui/button";
-import { formatDate, formatDateTime, todayInRiyadh } from "@/lib/format";
+import { formatDate, formatDateTime, formatTimeString, todayInRiyadh } from "@/lib/format";
 import { assigneeOptions, loadNames } from "@/lib/task-data";
 import { isOverdue, statusTone, type TaskStatus } from "@/lib/tasks";
 import { createClient } from "@/lib/supabase/server";
@@ -81,7 +81,7 @@ export default async function TaskPage({ params }: PageProps<"/[locale]/tasks/[i
               <span className={cn(overdue && "text-brick")}>
                 {overdue && `${t("overdue")} · `}
                 {date(task.due_date)}
-                {task.due_time && ` · ${t("dueAt", { time: task.due_time.slice(0, 5) })}`}
+                {task.due_time && ` · ${t("dueAt", { time: formatTimeString(locale, task.due_time) })}`}
               </span>
             ),
           },

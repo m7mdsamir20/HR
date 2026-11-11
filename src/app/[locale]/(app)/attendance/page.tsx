@@ -8,7 +8,7 @@ import type { Locale } from "@/i18n/routing";
 import { requireMember } from "@/lib/auth/account";
 import { hhmm, monthRange } from "@/lib/attendance";
 import { leaveDayRows, monthParam, RECORD_COLUMNS, toDayRow } from "@/lib/attendance-data";
-import { formatTime, todayInRiyadh } from "@/lib/format";
+import { formatTime, formatTimeString, todayInRiyadh } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 
 /** Current time in Riyadh as "HH:MM", to compare with the shift's end. */
@@ -86,7 +86,7 @@ export default async function AttendancePage({ params, searchParams }: PageProps
         holidayName={holiday ? pick(holiday.name_ar, holiday.name_en) : undefined}
         shiftName={shift ? pick(shift.name_ar, shift.name_en) : undefined}
         branchName={branch ? pick(branch.name_ar, branch.name_en) : undefined}
-        windowText={shift ? `${hhmm(shift.start_time)} – ${endTime}` : undefined}
+        windowText={shift ? `${formatTimeString(locale, shift.start_time)} – ${formatTimeString(locale, endTime)}` : undefined}
         ramadanHours={shift && ramadan ? Number(shift.ramadan_hours) : undefined}
         checkInTime={record?.check_in_at ? formatTime(locale, record.check_in_at) : undefined}
         checkOutTime={record?.check_out_at ? formatTime(locale, record.check_out_at) : undefined}

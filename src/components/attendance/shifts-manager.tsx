@@ -8,7 +8,8 @@ import { deleteShift, saveShift } from "@/actions/attendance-setup";
 import { FormField } from "@/components/form-field";
 import { Button } from "@/components/ui/button";
 import type { Locale } from "@/i18n/routing";
-import { weekdayName } from "@/lib/format";
+import { hhmm } from "@/lib/attendance";
+import { formatTimeString, weekdayName } from "@/lib/format";
 
 type Shift = {
   id: string;
@@ -46,8 +47,8 @@ function ShiftFields({ shift, state, idPrefix }: { shift?: Shift; state: Attenda
     <>
       <FormField name="nameAr" id={`${idPrefix}-ar`} label={t("nameAr")} defaultValue={shift?.nameAr} required dir="rtl" error={bad("nameAr")} />
       <FormField name="nameEn" id={`${idPrefix}-en`} label={t("nameEn")} optionalLabel={tCommon("optional")} defaultValue={shift?.nameEn} dir="ltr" />
-      <FormField name="startTime" id={`${idPrefix}-start`} type="time" label={t("startTime")} defaultValue={shift?.startTime ?? "08:00"} required dir="ltr" error={bad("startTime")} />
-      <FormField name="endTime" id={`${idPrefix}-end`} type="time" label={t("endTime")} defaultValue={shift?.endTime ?? "16:00"} required dir="ltr" error={bad("endTime")} />
+      <FormField name="startTime" id={`${idPrefix}-start`} type="time" label={t("startTime")} defaultValue={shift ? hhmm(shift.startTime) : "08:00"} required dir="ltr" error={bad("startTime")} />
+      <FormField name="endTime" id={`${idPrefix}-end`} type="time" label={t("endTime")} defaultValue={shift ? hhmm(shift.endTime) : "16:00"} required dir="ltr" error={bad("endTime")} />
       <FormField name="graceMinutes" id={`${idPrefix}-grace`} label={t("grace")} hint={t("graceHint")} defaultValue={shift?.graceMinutes ?? 15} inputMode="numeric" required dir="ltr" error={bad("graceMinutes")} />
       <FormField name="ramadanHours" id={`${idPrefix}-ramadan`} label={t("ramadanHours")} hint={t("ramadanHint")} defaultValue={shift?.ramadanHours ?? 6} inputMode="decimal" required dir="ltr" error={bad("ramadanHours")} />
       <fieldset className="flex flex-col gap-2 sm:col-span-2 lg:col-span-3 2xl:col-span-4">
@@ -159,7 +160,7 @@ function ShiftCard({ shift: s }: { shift: Shift }) {
             <span className="text-card">{name}</span>
             <span className="text-secondary tabular-nums">
               <bdi dir="ltr">
-                {s.startTime} – {s.endTime}
+                {formatTimeString(locale, s.startTime)} – {formatTimeString(locale, s.endTime)}
               </bdi>{" "}
               · {t("graceValue", { minutes: s.graceMinutes })}
             </span>
