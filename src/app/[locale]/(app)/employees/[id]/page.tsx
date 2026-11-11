@@ -1,4 +1,4 @@
-import { ArrowRight, KeyRound, Pencil, Printer, ShieldAlert } from "lucide-react";
+import { ArrowRight, Pencil, Printer, ShieldAlert } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { z } from "zod";
@@ -86,15 +86,6 @@ export default async function EmployeeViewPage({ params }: PageProps<"/[locale]/
 
             {canManage && (
               <>
-                {e.role !== "owner" && (
-                  <Button asChild variant="outline" size="sm">
-                    <Link href={`/settings/users?employeeId=${e.id}`}>
-                      <KeyRound className="size-4" aria-hidden />
-                      {e.user_id ? "تعديل الصلاحية" : "إنشاء حساب دخول"}
-                    </Link>
-                  </Button>
-                )}
-
                 <Button asChild variant="default" size="sm">
                   <Link href={`/employees/${e.id}/edit`}>
                     <Pencil className="size-4" aria-hidden />

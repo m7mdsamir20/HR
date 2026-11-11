@@ -5,7 +5,6 @@ import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import { createUserAccount, type UserAccountState } from "@/actions/employees";
-import { FormField } from "@/components/form-field";
 import { SelectField } from "@/components/select-field";
 import { StatusPill, type Tone } from "@/components/status-pill";
 import { Button } from "@/components/ui/button";
@@ -198,192 +197,209 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
 
       {/* Account Creation / Edit Modal Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <div className="flex items-center gap-2">
-              <KeyRound className="size-5 text-indigo" aria-hidden />
-              <DialogTitle>
-                {selectedEmp?.hasUserAccount ? "تحديث حساب الدخول والصلاحية" : "إنشاء حساب دخول جديد"}
-              </DialogTitle>
-            </div>
-            <DialogDescription>
-              قم بتعيين الصلاحية وكلمة المرور للموظف لتفعيل إمكانية تسجيل دخوله للنظام.
-            </DialogDescription>
-          </DialogHeader>
-
-          {selectedEmp && (
-            <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-card bg-paper border border-line my-1">
-              <div className="flex flex-col gap-0.5">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-ink">{selectedEmp.name}</span>
-                  {selectedEmp.employeeNumber && (
-                    <span className="font-mono text-2xs px-2 py-0.5 rounded bg-surface border border-line font-medium text-secondary">
-                      {selectedEmp.employeeNumber}
-                    </span>
-                  )}
-                </div>
-                <span className="text-caption text-secondary">
-                  هوية: {selectedEmp.nationalId} {selectedEmp.jobTitle && `· ${selectedEmp.jobTitle}`} {selectedEmp.departmentName && `(${selectedEmp.departmentName})`}
-                </span>
+        <DialogContent className="max-w-3xl max-h-[88vh] p-0 gap-0 overflow-hidden rounded-2xl flex flex-col shadow-2xl border border-line bg-surface">
+          {/* Fixed Header */}
+          <div className="shrink-0 px-6 py-5 border-b border-line bg-surface">
+            <DialogHeader className="pe-8">
+              <div className="flex items-center gap-2">
+                <KeyRound className="size-5 text-indigo" aria-hidden />
+                <DialogTitle className="text-lg font-bold text-ink">
+                  {selectedEmp?.hasUserAccount ? "تحديث حساب الدخول والصلاحية" : "إنشاء حساب دخول جديد"}
+                </DialogTitle>
               </div>
-              <StatusPill tone={selectedEmp.hasUserAccount ? "stamp" : "neutral"}>
-                {selectedEmp.hasUserAccount ? "حساب مفعل حالياً" : "بدون حساب دخول"}
-              </StatusPill>
-            </div>
-          )}
+              <DialogDescription className="text-caption text-secondary mt-1">
+                قم بتعيين الصلاحية وكلمة المرور للموظف لتفعيل إمكانية تسجيل دخوله للنظام.
+              </DialogDescription>
+            </DialogHeader>
+          </div>
 
-          <form action={action} className="grid gap-4 sm:grid-cols-2 pt-2">
+          {/* Form wrapping Scrollable Body and Fixed Footer */}
+          <form action={action} className="flex flex-col flex-1 min-h-0 overflow-hidden">
             <input type="hidden" name="uiLocale" value={uiLocale} />
             <input type="hidden" name="employeeId" value={selectedEmpId} />
             <input type="hidden" name="role" value={selectedRole} />
 
-            <div className="sm:col-span-2">
-              <SelectField
-                name="employeeSelect"
-                label="الموظف المستهدف"
-                value={selectedEmpId}
-                onChange={(e) => handleSelectEmployee(e.target.value)}
-                options={employees
-                  .filter((e) => e.role !== "owner")
-                  .map((e) => ({
-                    value: e.id,
-                    label: `${e.name} (${e.nationalId}) — ${e.hasUserAccount ? "لديه حساب (" + tRoles(e.role) + ")" : "بدون حساب"}`,
-                  }))}
-              />
-            </div>
-
-            {/* Categorized Role Selection with Clear Permissions and Visible Screens */}
-            <div className="sm:col-span-2 flex flex-col gap-2.5">
-              <span className="text-label font-medium text-ink">
-                الدور والصلاحية في النظام
-              </span>
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                {ROLE_DEFINITIONS.map((r) => {
-                  const isSelected = selectedRole === r.id;
-                  return (
-                    <div
-                      key={r.id}
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => setSelectedRole(r.id)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          setSelectedRole(r.id);
-                        }
-                      }}
-                      className={cn(
-                        "flex flex-col justify-between gap-3 p-4 rounded-card border-2 cursor-pointer transition-all select-none text-start",
-                        isSelected
-                          ? "border-indigo bg-indigo/5 shadow-sm ring-1 ring-indigo/30"
-                          : "border-line bg-surface hover:border-line-hover hover:bg-paper/40",
-                        "focus-visible:outline-2 focus-visible:outline-indigo"
+            {/* Scrollable Body */}
+            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+              {/* Employee Summary Card */}
+              {selectedEmp && (
+                <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-card bg-paper border border-line">
+                  <div className="flex flex-col gap-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-ink">{selectedEmp.name}</span>
+                      {selectedEmp.employeeNumber && (
+                        <span className="font-mono text-2xs px-2 py-0.5 rounded bg-surface border border-line font-medium text-secondary">
+                          {selectedEmp.employeeNumber}
+                        </span>
                       )}
-                    >
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-start justify-between gap-2">
-                          <span className="font-semibold text-sm text-ink leading-tight">
-                            {r.title}
-                          </span>
-                          <div
-                            className={cn(
-                              "size-4 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5",
-                              isSelected
-                                ? "border-indigo bg-indigo text-white"
-                                : "border-line bg-surface"
-                            )}
-                          >
-                            {isSelected && <div className="size-1.5 rounded-full bg-white" />}
-                          </div>
-                        </div>
-
-                        <StatusPill tone={r.tone}>{r.badge}</StatusPill>
-
-                        <p className="text-caption text-secondary leading-normal">
-                          {r.summary}
-                        </p>
-                      </div>
-
-                      <div className="flex flex-col gap-2 border-t border-line/60 pt-2 text-caption">
-                        <div>
-                          <span className="font-semibold text-ink-soft text-2xs block mb-1">
-                            ما سيظهر له في القائمة:
-                          </span>
-                          <div className="flex flex-wrap gap-1">
-                            {r.visibleScreens.map((s) => (
-                              <span
-                                key={s}
-                                className="inline-block px-1.5 py-0.5 rounded-[4px] bg-paper text-ink text-2xs border border-line"
-                              >
-                                {s}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <SelectField
-              name="locale"
-              label="لغة الواجهة الافتراضية"
-              defaultValue={selectedEmp?.locale || "ar"}
-              options={[
-                { value: "ar", label: "العربية" },
-                { value: "en", label: "English" },
-              ]}
-            />
-
-            <div className="flex flex-col gap-2">
-              <label htmlFor="user-password-input" className="text-label font-medium text-ink">
-                كلمة المرور الجديدة <span className="text-brick">*</span>
-              </label>
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <input
-                    id="user-password-input"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    autoComplete="off"
-                    dir="ltr"
-                    className="flex h-11 w-full rounded-control border border-input bg-surface px-3 pe-10 text-base text-ink outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((p) => !p)}
-                    className="absolute end-2.5 top-1/2 -translate-y-1/2 text-secondary hover:text-ink"
-                    tabIndex={-1}
-                    aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
-                  >
-                    {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                  </button>
+                    <span className="text-caption text-secondary">
+                      هوية: {selectedEmp.nationalId} {selectedEmp.jobTitle && `· ${selectedEmp.jobTitle}`} {selectedEmp.departmentName && `(${selectedEmp.departmentName})`}
+                    </span>
+                  </div>
+                  <StatusPill tone={selectedEmp.hasUserAccount ? "stamp" : "neutral"}>
+                    {selectedEmp.hasUserAccount ? "حساب مفعل حالياً" : "بدون حساب دخول"}
+                  </StatusPill>
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setPassword(suggestPassword());
-                    setShowPassword(true);
-                  }}
-                  className="shrink-0"
-                >
-                  <Sparkles className="size-4" aria-hidden />
-                  توليد كلمة مرور
-                </Button>
+              )}
+
+              {/* Target Employee selector */}
+              <div>
+                <SelectField
+                  name="employeeSelect"
+                  label="الموظف المستهدف"
+                  value={selectedEmpId}
+                  onChange={(e) => handleSelectEmployee(e.target.value)}
+                  options={employees
+                    .filter((e) => e.role !== "owner")
+                    .map((e) => ({
+                      value: e.id,
+                      label: `${e.name} (${e.nationalId}) — ${e.hasUserAccount ? "لديه حساب (" + tRoles(e.role) + ")" : "بدون حساب"}`,
+                    }))}
+                />
               </div>
-              <p className="text-caption text-secondary">
-                8 خانات على الأقل. أبلغ الموظف بها بعد الحفظ.
-              </p>
+
+              {/* Categorized Role Selection */}
+              <div className="flex flex-col gap-2.5">
+                <span className="text-label font-medium text-ink">
+                  الدور والصلاحية في النظام
+                </span>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {ROLE_DEFINITIONS.map((r) => {
+                    const isSelected = selectedRole === r.id;
+                    return (
+                      <div
+                        key={r.id}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => setSelectedRole(r.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            setSelectedRole(r.id);
+                          }
+                        }}
+                        className={cn(
+                          "flex flex-col justify-between gap-3 p-4 rounded-card border-2 cursor-pointer transition-all select-none text-start",
+                          isSelected
+                            ? "border-indigo bg-indigo/5 shadow-sm ring-1 ring-indigo/30"
+                            : "border-line bg-surface hover:border-line-hover hover:bg-paper/40",
+                          "focus-visible:outline-2 focus-visible:outline-indigo"
+                        )}
+                      >
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <span className="font-semibold text-sm text-ink leading-tight">
+                              {r.title}
+                            </span>
+                            <div
+                              className={cn(
+                                "size-4 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5",
+                                isSelected
+                                  ? "border-indigo bg-indigo text-white"
+                                  : "border-line bg-surface"
+                              )}
+                            >
+                              {isSelected && <div className="size-1.5 rounded-full bg-white" />}
+                            </div>
+                          </div>
+
+                          <StatusPill tone={r.tone}>{r.badge}</StatusPill>
+
+                          <p className="text-caption text-secondary leading-normal">
+                            {r.summary}
+                          </p>
+                        </div>
+
+                        <div className="flex flex-col gap-2 border-t border-line/60 pt-2 text-caption">
+                          <div>
+                            <span className="font-semibold text-ink-soft text-2xs block mb-1">
+                              ما سيظهر له في القائمة:
+                            </span>
+                            <div className="flex flex-wrap gap-1">
+                              {r.visibleScreens.map((s) => (
+                                <span
+                                  key={s}
+                                  className="inline-block px-1.5 py-0.5 rounded-[4px] bg-paper text-ink text-2xs border border-line"
+                                >
+                                  {s}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Language Selector */}
+              <SelectField
+                name="locale"
+                label="لغة الواجهة الافتراضية"
+                defaultValue={selectedEmp?.locale || "ar"}
+                options={[
+                  { value: "ar", label: "العربية" },
+                  { value: "en", label: "English" },
+                ]}
+              />
+
+              {/* Password Input with perfectly separated eye button and clear padding */}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="user-password-input" className="text-label font-medium text-ink">
+                  كلمة المرور الجديدة <span className="text-brick">*</span>
+                </label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      id="user-password-input"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      autoComplete="off"
+                      className="flex h-11 w-full rounded-control border border-input bg-surface text-base text-ink outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 font-mono"
+                      style={{
+                        direction: "ltr",
+                        textAlign: "left",
+                        paddingLeft: "14px",
+                        paddingRight: "44px",
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((p) => !p)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-ink flex items-center justify-center size-7 rounded-md hover:bg-paper transition-colors"
+                      tabIndex={-1}
+                      aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+                    >
+                      {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                    </button>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setPassword(suggestPassword());
+                      setShowPassword(true);
+                    }}
+                    className="shrink-0"
+                  >
+                    <Sparkles className="size-4" aria-hidden />
+                    توليد كلمة مرور
+                  </Button>
+                </div>
+                <p className="text-caption text-secondary">
+                  8 خانات على الأقل. أبلغ الموظف بها بعد الحفظ.
+                </p>
+              </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-4 sm:col-span-2 border-t border-line">
+            {/* Fixed Footer (always visible!) */}
+            <div className="shrink-0 px-6 py-4 border-t border-line bg-paper/60 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <Button type="submit" disabled={pending} className="min-w-36">
                   {pending ? (
@@ -411,7 +427,7 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
               {state && !state.ok && (
                 <p role="alert" className="inline-flex items-center gap-1.5 text-label text-brick font-medium">
                   <ShieldAlert className="size-4" aria-hidden />
-                  حدث خطأ أثناء حفظ الحساب، تأكد من صحة البيانات والمحاولة مجدداً.
+                  حدث خطأ أثناء حفظ الحساب، تأكد من صحة البيانات.
                 </p>
               )}
             </div>
@@ -465,10 +481,10 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
                   {canManage && emp.role !== "owner" && (
                     <Button
                       type="button"
-                      variant={emp.hasUserAccount ? "ghost" : "default"}
+                      variant="ghost"
                       size="sm"
                       onClick={() => openForEmployee(emp.id)}
-                      className={emp.hasUserAccount ? "text-ink-soft hover:text-ink" : "bg-indigo text-white hover:bg-indigo-hover font-semibold"}
+                      className={emp.hasUserAccount ? "text-ink-soft hover:text-ink" : "text-indigo font-semibold"}
                     >
                       {emp.hasUserAccount ? "تعديل الصلاحية" : "إنشاء حساب"}
                     </Button>
