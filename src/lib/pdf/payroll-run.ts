@@ -106,10 +106,6 @@ export async function buildPayrollRunPdf(
         <td style="text-align: end; color: #b23a2b; font-family: 'InterEmbedded', monospace;">${ltr(num(advanceAndOtherDedTotal))}</td>
         <td style="text-align: end; font-weight: 600; color: #b23a2b; font-family: 'InterEmbedded', monospace; background: #fff5f5;">${ltr(num(s.total_deductions))}</td>
         <td style="text-align: end; font-weight: 700; color: #2f4a9e; font-family: 'InterEmbedded', monospace; background: #f0f4fc;">${ltr(num(s.net_salary))}</td>
-        <td style="font-size: 7.2pt; color: #4a5875; max-width: 140px; word-break: break-all;">
-          ${s.bank_name ? `<span>${esc(s.bank_name)}</span><br>` : ""}
-          ${s.iban ? `<span>${ltr(s.iban)}</span>` : "—"}
-        </td>
       </tr>
     `;
   });
@@ -263,7 +259,6 @@ export async function buildPayrollRunPdf(
           <th style="width: 65px; text-align: end; color: #b23a2b;">${locale === "ar" ? "سلف وأخرى" : "Adv/Other"}</th>
           <th style="width: 70px; text-align: end; color: #b23a2b; background: #fee2e2;">${esc(t("totalDeductions"))}</th>
           <th style="width: 78px; text-align: end; color: #2f4a9e; background: #e0e7ff;">${esc(t("totalNet"))}</th>
-          <th style="min-width: 120px; text-align: start;">${locale === "ar" ? "البنك والآيبان" : "Bank & IBAN"}</th>
         </tr>
       </thead>
       <tbody>
@@ -281,7 +276,6 @@ export async function buildPayrollRunPdf(
           <td style="text-align: end; font-family: 'InterEmbedded', monospace; color: #b23a2b;">${ltr(num(totalAdvanceAndOtherDeductions))}</td>
           <td style="text-align: end; font-family: 'InterEmbedded', monospace; font-weight: 800; color: #b23a2b; background: #fecaca !important;">${ltr(num(run.total_deductions))}</td>
           <td style="text-align: end; font-family: 'InterEmbedded', monospace; font-weight: 800; color: #2f4a9e; background: #c7d2fe !important;">${ltr(num(run.total_net))}</td>
-          <td style="font-size: 7pt; color: #4a5875;">${currency}</td>
         </tr>
       </tbody>
     </table>

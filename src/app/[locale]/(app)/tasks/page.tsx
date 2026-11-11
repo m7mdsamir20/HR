@@ -72,7 +72,7 @@ export default async function TasksPage({ params, searchParams }: PageProps<"/[l
           .from("employees")
           .select("id, full_name_ar, full_name_en, job_title")
           .eq("status", "active")
-          .not("role", "in", '("owner","admin")')
+          .neq("role", "owner")
           .order("full_name_ar")
       : Promise.resolve({ data: [] }),
   ]);

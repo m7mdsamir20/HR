@@ -11,7 +11,7 @@ import type { Locale } from "@/i18n/routing";
 import { requireMember } from "@/lib/auth/account";
 import { monthRange } from "@/lib/attendance";
 import { leaveDates, leaveDayRows, monthParam, RECORD_COLUMNS, toDayRow } from "@/lib/attendance-data";
-import { formatDuration, todayInRiyadh } from "@/lib/format";
+import { formatDuration, formatTimeString, todayInRiyadh } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 
 type Totals = { present: number; absent: number; leave: number; lateCount: number; lateMinutes: number; earlyMinutes: number; outside: number; missing: number };
@@ -33,12 +33,13 @@ export default async function AttendanceSheetPage({ params, searchParams }: Page
       .from("employees")
       .select("id, full_name_ar, full_name_en, employee_number, shift_id")
       .eq("status", "active")
-      .not("role", "in", '("owner","admin")')
+      .neq("role", "owner")
       .order("full_name_ar"),
     supabase.from("attendance_records").select(RECORD_COLUMNS).gte("work_date", from).lte("work_date", to).order("work_date", { ascending: false }),
     supabase.from("leave_requests").select("id, employee_id, type, start_date, end_date").eq("status", "approved").lte("start_date", to).gte("end_date", from),
-    supabase.from("shifts").select("id, work_days"),
+    supabase.from("shifts").select("id, name_ar, name_en, start_time, end_time, work_days"),
   ]);
+  const shiftMap = new Map((shifts ?? []).map((x) => [x.id, x]));
   const workDaysOf = new Map((shifts ?? []).map((x) => [x.id, x.work_days]));
 
   const nameOf = (e: { full_name_ar: string; full_name_en: string | null }) => (locale === "en" && e.full_name_en) || e.full_name_ar;
@@ -67,11 +68,19 @@ export default async function AttendanceSheetPage({ params, searchParams }: Page
           </div>
           <div className="flex flex-wrap items-center gap-3">
             {canCorrect && (
-              <ManualAttendanceDialog
-                employees={employees ?? []}
-                today={today}
-                defaultEmployeeId={selected.id}
-              />
+              <>
+                <ManualAttendanceDialog
+                  employees={employees ?? []}
+                  today={today}
+                  defaultEmployeeId={selected.id}
+                />
+                <Button asChild variant="secondary">
+                  <a href={`${locale === "en" ? "/en" : ""}/attendance/sheet/pdf?month=${month}&employee=${selected.id}`} target="_blank" rel="noopener noreferrer">
+                    <FileText aria-hidden />
+                    {t("sheet.employeePdf")}
+                  </a>
+                </Button>
+              </>
             )}
             <MonthNav pathname="/attendance/sheet" month={month} query={{ employee: selected.id }} latest={today.slice(0, 7)} />
           </div>
@@ -98,7 +107,10 @@ export default async function AttendanceSheetPage({ params, searchParams }: Page
     const x = totals.get(e.id) ?? { present: 0, absent: 0, leave: 0, lateCount: 0, lateMinutes: 0, earlyMinutes: 0, outside: 0, missing: 0 };
     const recorded = new Set((records ?? []).filter((r) => r.employee_id === e.id).map((r) => r.work_date));
     const leaveDays = leaveDates((leaves ?? []).filter((l) => l.employee_id === e.id), { from, to }, workDaysOf.get(e.shift_id ?? "") ?? [], recorded).length;
-    return { e, x: { ...x, leave: leaveDays } };
+    const empShift = e.shift_id ? shiftMap.get(e.shift_id) : undefined;
+    const checkInTime = empShift?.start_time ? formatTimeString(locale, empShift.start_time) : "—";
+    const checkOutTime = empShift?.end_time ? formatTimeString(locale, empShift.end_time) : "—";
+    return { e, x: { ...x, leave: leaveDays }, checkInTime, checkOutTime };
   });
   const cell = "px-4 py-3 tabular-nums";
 
@@ -133,6 +145,8 @@ export default async function AttendanceSheetPage({ params, searchParams }: Page
               <thead>
                 <tr className="border-b border-line text-label text-ink-soft">
                   <th scope="col" className="px-4 py-3 text-start font-medium">{t("sheet.employee")}</th>
+                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("sheet.checkIn")}</th>
+                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("sheet.checkOut")}</th>
                   <th scope="col" className="px-4 py-3 text-start font-medium">{t("sheet.present")}</th>
                   <th scope="col" className="px-4 py-3 text-start font-medium">{t("sheet.absent")}</th>
                   <th scope="col" className="px-4 py-3 text-start font-medium">{t("sheet.leave")}</th>
@@ -142,13 +156,15 @@ export default async function AttendanceSheetPage({ params, searchParams }: Page
                 </tr>
               </thead>
               <tbody>
-                {rows.map(({ e, x }) => (
+                {rows.map(({ e, x, checkInTime, checkOutTime }) => (
                   <tr key={e.id} className="border-b border-line last:border-0">
                     <th scope="row" className="px-4 py-3 text-start font-medium">
                       <Link href={{ pathname: "/attendance/sheet", query: { month, employee: e.id } }} className="hover:underline focus-visible:outline-2 focus-visible:outline-indigo">
                         {nameOf(e)}
                       </Link>
                     </th>
+                    <td className={cell}><bdi dir="ltr">{checkInTime}</bdi></td>
+                    <td className={cell}><bdi dir="ltr">{checkOutTime}</bdi></td>
                     <td className={cell}>{x.present}</td>
                     <td className={`${cell} ${x.absent ? "text-brick" : ""}`}>{x.absent}</td>
                     <td className={cell}>{x.leave || "—"}</td>
@@ -162,7 +178,7 @@ export default async function AttendanceSheetPage({ params, searchParams }: Page
           </div>
 
           <ul className="flex flex-col gap-3 md:hidden">
-            {rows.map(({ e, x }) => (
+            {rows.map(({ e, x, checkInTime, checkOutTime }) => (
               <li key={e.id}>
                 <Link
                   href={{ pathname: "/attendance/sheet", query: { month, employee: e.id } }}
@@ -170,6 +186,8 @@ export default async function AttendanceSheetPage({ params, searchParams }: Page
                 >
                   <span className="text-card">{nameOf(e)}</span>
                   <span className="grid grid-cols-2 gap-x-4 gap-y-1 text-secondary tabular-nums">
+                    <span>{t("sheet.checkIn")}: <bdi dir="ltr">{checkInTime}</bdi></span>
+                    <span>{t("sheet.checkOut")}: <bdi dir="ltr">{checkOutTime}</bdi></span>
                     <span>{t("sheet.present")}: {x.present}</span>
                     <span className={x.absent ? "text-brick" : ""}>{t("sheet.absent")}: {x.absent}</span>
                     <span>{t("sheet.leave")}: {x.leave || "—"}</span>
