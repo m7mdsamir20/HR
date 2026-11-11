@@ -24,7 +24,7 @@ function addHours(time: string, hours: number): string {
 export default async function AttendancePage({ params, searchParams }: PageProps<"/[locale]/attendance">) {
   const locale = (await params).locale as Locale;
   const member = await requireMember(locale);
-  if (member.role === "owner" || member.role === "admin") {
+  if (member.role === "owner") {
     redirect({ href: "/attendance/daily", locale });
   }
   const t = await getTranslations({ locale, namespace: "attendance" });

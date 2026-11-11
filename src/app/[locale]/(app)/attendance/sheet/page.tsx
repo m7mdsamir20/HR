@@ -3,7 +3,6 @@ import { getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { AttendanceDetail } from "@/components/attendance/attendance-detail";
 import { AttendanceTabs } from "@/components/attendance/attendance-tabs";
-import { ManualAttendanceDialog } from "@/components/attendance/manual-attendance-dialog";
 import { MonthNav } from "@/components/attendance/month-nav";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -68,19 +67,12 @@ export default async function AttendanceSheetPage({ params, searchParams }: Page
           </div>
           <div className="flex flex-wrap items-center gap-3">
             {canCorrect && (
-              <>
-                <ManualAttendanceDialog
-                  employees={employees ?? []}
-                  today={today}
-                  defaultEmployeeId={selected.id}
-                />
-                <Button asChild variant="secondary">
-                  <a href={`${locale === "en" ? "/en" : ""}/attendance/sheet/pdf?month=${month}&employee=${selected.id}`} target="_blank" rel="noopener noreferrer">
-                    <FileText aria-hidden />
-                    {t("sheet.employeePdf")}
-                  </a>
-                </Button>
-              </>
+              <Button asChild variant="secondary">
+                <a href={`${locale === "en" ? "/en" : ""}/attendance/sheet/pdf?month=${month}&employee=${selected.id}`} target="_blank" rel="noopener noreferrer">
+                  <FileText aria-hidden />
+                  {t("sheet.employeePdf")}
+                </a>
+              </Button>
             )}
             <MonthNav pathname="/attendance/sheet" month={month} query={{ employee: selected.id }} latest={today.slice(0, 7)} />
           </div>
@@ -119,15 +111,12 @@ export default async function AttendanceSheetPage({ params, searchParams }: Page
         <p className="text-secondary">{t("sheet.intro")}</p>
         <div className="flex flex-wrap items-center gap-3">
           {canCorrect && (
-            <>
-              <ManualAttendanceDialog employees={employees ?? []} today={today} />
-              <Button asChild variant="secondary">
-                <a href={`${locale === "en" ? "/en" : ""}/attendance/sheet/pdf?month=${month}`} target="_blank" rel="noopener noreferrer">
-                  <FileText aria-hidden />
-                  {t("sheet.pdf")}
-                </a>
-              </Button>
-            </>
+            <Button asChild variant="secondary">
+              <a href={`${locale === "en" ? "/en" : ""}/attendance/sheet/pdf?month=${month}`} target="_blank" rel="noopener noreferrer">
+                <FileText aria-hidden />
+                {t("sheet.pdf")}
+              </a>
+            </Button>
           )}
           <MonthNav pathname="/attendance/sheet" month={month} latest={today.slice(0, 7)} />
         </div>

@@ -10,7 +10,7 @@ export function LeaveTabs({ role }: { role: Role }) {
     <SectionTabs
       label={t("label")}
       items={[
-        ...(!isLeader ? [{ href: "/leave", label: t("mine") }] : []),
+        ...(role !== "owner" ? [{ href: "/leave", label: t("mine") }] : []),
         ...(role !== "employee" ? [{ href: "/leave/requests", label: t("requests") }] : []),
         ...(isLeader || role === "hr" ? [{ href: "/leave/balances", label: t("balances") }] : []),
       ]}

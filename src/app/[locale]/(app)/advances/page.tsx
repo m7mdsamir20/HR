@@ -11,7 +11,7 @@ import { createClient } from "@/lib/supabase/server";
 export default async function AdvancesPage({ params }: PageProps<"/[locale]">) {
   const locale = (await params).locale as Locale;
   const member = await requireMember(locale);
-  if (member.role === "owner" || member.role === "admin") {
+  if (member.role === "owner") {
     redirect({ href: "/advances/requests", locale });
   }
 

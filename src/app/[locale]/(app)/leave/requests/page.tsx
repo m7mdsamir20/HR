@@ -40,7 +40,7 @@ export default async function LeaveRequestsPage({ params, searchParams }: PagePr
   const isLeader = member.role === "owner" || member.role === "admin";
   const canCreateManual = isLeader || member.role === "hr" || member.role === "manager";
   const manualCandidates = (employees ?? []).filter((e) => {
-    if (e.role === "owner" || e.role === "admin") return false;
+    if (e.role === "owner") return false;
     if (isLeader || member.role === "hr") return true;
     if (member.role === "manager") return e.manager_id === member.employee_id;
     return false;
