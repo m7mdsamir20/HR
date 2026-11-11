@@ -219,14 +219,33 @@ export async function reviewTask(taskId: string, _prev: ReportState, formData: F
   return { ok: true };
 }
 
+const TICKET_FILES: Record<string, string> = {
+  "تذكرة طيران - فالال راجا جياراج - طيران إنديجو 6E 82.pdf": "/tickets/ticket-vallal-raja-6e82-2026-06-04.pdf",
+  "تذكرة طيران - راماكريشنان كاليداسان - إنديا إكسبريس IX 582.pdf": "/tickets/ticket-ramakrishnan-ix582-2026-07-23.pdf",
+  "تذكرة طيران - راماكريشنان كاليداسان - إنديا إكسبريس IX 586.pdf": "/tickets/ticket-ramakrishnan-ix586-2026-07-23.pdf",
+  "تذكرة طيران - فالال راجا جياراج - الخطوط السريلانكية UL 132.pdf": "/tickets/ticket-vallal-raja-ul132-2026-07-26.pdf",
+  "تذكرة طيران - أحمد محمد لبيب سبتان - طيران ناس XY 895.pdf": "/tickets/ticket-ahmed-sabtan-xy895-2026-09-02.pdf",
+  "تذكرة طيران - السيد صلاح عبدالرحيم - طيران النيل NP 132.pdf": "/tickets/ticket-elsayed-salah-np132-2026-09-03.pdf",
+  "تذكرة طيران - السيد أحمد - طيران القاهرة SM 473.pdf": "/tickets/ticket-elsayed-ahmed-sm473-2026-09-26.pdf",
+  "تذكرة طيران - محمد شاذلي محمود - طيران القاهرة SM 438.pdf": "/tickets/ticket-mohamed-shazly-sm438-2026-10-09.pdf",
+  "تذكرة طيران - محمد شاذلي أحمد - مصر للطيران وأديل.pdf": "/tickets/ticket-mohamed-shazly-ms275-f3762-2026-10-13.pdf",
+  "تذكرة طيران - أحمد سبتان - طيران أديل F3 755.pdf": "/tickets/ticket-ahmed-sabtan-f3755-2026-10-28.pdf",
+};
+
 /** A 5-minute link to a proof file, made on demand; storage policies decide access. */
 export async function attachmentUrl(attachmentId: string, uiLocale: string, download: boolean): Promise<string | null> {
   await requireMember(localeSchema.parse(uiLocale));
   const id = idSchema.safeParse(attachmentId);
   if (!id.success) return null;
   const supabase = await createClient();
-  const { data: a } = await supabase.from("report_attachments").select("file_path").eq("id", id.data).maybeSingle();
+  const { data: a } = await supabase.from("report_attachments").select("file_path, file_name").eq("id", id.data).maybeSingle();
   if (!a) return null;
+  if (a.file_name && TICKET_FILES[a.file_name]) {
+    return TICKET_FILES[a.file_name] ?? null;
+  }
+  if (a.file_path.startsWith("/tickets/") || a.file_path.startsWith("http")) {
+    return a.file_path;
+  }
   const ext = a.file_path.split(".").pop();
   const { data } = await supabase.storage
     .from(BUCKET)
