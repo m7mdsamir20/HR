@@ -1,13 +1,21 @@
 "use client";
 
-import { CheckCircle2, KeyRound, ShieldAlert, ShieldCheck, Sparkles, UserPlus } from "lucide-react";
+import { CheckCircle2, Eye, EyeOff, KeyRound, Loader2, ShieldAlert, ShieldCheck, Sparkles, UserPlus } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useActionState, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useActionState, useEffect, useState } from "react";
 import { createUserAccount, type UserAccountState } from "@/actions/employees";
 import { FormField } from "@/components/form-field";
 import { SelectField } from "@/components/select-field";
 import { StatusPill, type Tone } from "@/components/status-pill";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { Role } from "@/lib/auth/roles";
 import { suggestPassword } from "@/lib/password";
@@ -111,11 +119,13 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
   const tRoles = useTranslations("roles");
   const tCommon = useTranslations("common");
   const uiLocale = useLocale();
+  const searchParams = useSearchParams();
 
   const [state, action, pending] = useActionState<UserAccountState, FormData>(createUserAccount, undefined);
   const [selectedEmpId, setSelectedEmpId] = useState<string>("");
   const [selectedRole, setSelectedRole] = useState<"admin" | "manager" | "hr" | "employee">("employee");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   const employeesWithoutAccount = employees.filter((e) => !e.hasUserAccount);
@@ -130,6 +140,7 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
       setSelectedRole("employee");
     }
     setPassword(suggestPassword());
+    setShowPassword(true);
     setIsOpen(true);
   };
 
@@ -140,6 +151,24 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
       setSelectedRole(target.role);
     }
   };
+
+  // Automatically open dialog if employeeId is passed via URL query param
+  useEffect(() => {
+    const queryEmpId = searchParams.get("employeeId") || searchParams.get("createFor");
+    if (queryEmpId && employees.some((e) => e.id === queryEmpId)) {
+      openForEmployee(queryEmpId);
+    }
+  }, [searchParams, employees]);
+
+  // Close dialog smoothly after successful save
+  useEffect(() => {
+    if (state?.ok) {
+      const timer = setTimeout(() => {
+        setIsOpen(false);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [state?.ok]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -156,9 +185,8 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
           <Button
             type="button"
             onClick={() => {
-              setSelectedEmpId(employeesWithoutAccount[0]?.id ?? "");
-              setPassword(suggestPassword());
-              setIsOpen(true);
+              const firstId = employeesWithoutAccount[0]?.id ?? "";
+              openForEmployee(firstId);
             }}
             className="shrink-0"
           >
@@ -168,32 +196,51 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
         )}
       </div>
 
-      {/* Account Creation / Edit Box */}
-      {isOpen && (
-        <section aria-labelledby="create-account-heading" className="rounded-card border-2 border-indigo/30 bg-surface p-5 shadow-sm">
-          <div className="flex items-center justify-between border-b border-line pb-3 mb-4">
+      {/* Account Creation / Edit Modal Dialog */}
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
             <div className="flex items-center gap-2">
               <KeyRound className="size-5 text-indigo" aria-hidden />
-              <h3 id="create-account-heading" className="font-semibold text-ink">
+              <DialogTitle>
                 {selectedEmp?.hasUserAccount ? "تحديث حساب الدخول والصلاحية" : "إنشاء حساب دخول جديد"}
-              </h3>
+              </DialogTitle>
             </div>
-            <button
-              type="button"
-              onClick={() => setIsOpen(false)}
-              className="text-caption text-secondary hover:text-ink"
-            >
-              إلغاء ✕
-            </button>
-          </div>
+            <DialogDescription>
+              قم بتعيين الصلاحية وكلمة المرور للموظف لتفعيل إمكانية تسجيل دخوله للنظام.
+            </DialogDescription>
+          </DialogHeader>
 
-          <form action={action} className="grid gap-4 sm:grid-cols-2">
+          {selectedEmp && (
+            <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-card bg-paper border border-line my-1">
+              <div className="flex flex-col gap-0.5">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-ink">{selectedEmp.name}</span>
+                  {selectedEmp.employeeNumber && (
+                    <span className="font-mono text-2xs px-2 py-0.5 rounded bg-surface border border-line font-medium text-secondary">
+                      {selectedEmp.employeeNumber}
+                    </span>
+                  )}
+                </div>
+                <span className="text-caption text-secondary">
+                  هوية: {selectedEmp.nationalId} {selectedEmp.jobTitle && `· ${selectedEmp.jobTitle}`} {selectedEmp.departmentName && `(${selectedEmp.departmentName})`}
+                </span>
+              </div>
+              <StatusPill tone={selectedEmp.hasUserAccount ? "stamp" : "neutral"}>
+                {selectedEmp.hasUserAccount ? "حساب مفعل حالياً" : "بدون حساب دخول"}
+              </StatusPill>
+            </div>
+          )}
+
+          <form action={action} className="grid gap-4 sm:grid-cols-2 pt-2">
             <input type="hidden" name="uiLocale" value={uiLocale} />
+            <input type="hidden" name="employeeId" value={selectedEmpId} />
+            <input type="hidden" name="role" value={selectedRole} />
 
             <div className="sm:col-span-2">
               <SelectField
-                name="employeeId"
-                label="الموظف"
+                name="employeeSelect"
+                label="الموظف المستهدف"
                 value={selectedEmpId}
                 onChange={(e) => handleSelectEmployee(e.target.value)}
                 options={employees
@@ -210,9 +257,8 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
               <span className="text-label font-medium text-ink">
                 الدور والصلاحية في النظام
               </span>
-              <input type="hidden" name="role" value={selectedRole} />
 
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="grid gap-3 sm:grid-cols-2">
                 {ROLE_DEFINITIONS.map((r) => {
                   const isSelected = selectedRole === r.id;
                   return (
@@ -228,9 +274,9 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
                         }
                       }}
                       className={cn(
-                        "flex flex-col justify-between gap-3 p-4 rounded-card border-2 cursor-pointer transition-all select-none",
+                        "flex flex-col justify-between gap-3 p-4 rounded-card border-2 cursor-pointer transition-all select-none text-start",
                         isSelected
-                          ? "border-indigo bg-indigo/5 shadow-sm"
+                          ? "border-indigo bg-indigo/5 shadow-sm ring-1 ring-indigo/30"
                           : "border-line bg-surface hover:border-line-hover hover:bg-paper/40",
                         "focus-visible:outline-2 focus-visible:outline-indigo"
                       )}
@@ -259,7 +305,7 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
                         </p>
                       </div>
 
-                      <div className="flex flex-col gap-2.5 border-t border-line/60 pt-2.5 text-caption">
+                      <div className="flex flex-col gap-2 border-t border-line/60 pt-2 text-caption">
                         <div>
                           <span className="font-semibold text-ink-soft text-2xs block mb-1">
                             ما سيظهر له في القائمة:
@@ -274,20 +320,6 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
                               </span>
                             ))}
                           </div>
-                        </div>
-
-                        <div>
-                          <span className="font-semibold text-ink-soft text-2xs block mb-1">
-                            أبرز الصلاحيات:
-                          </span>
-                          <ul className="flex flex-col gap-1 text-2xs text-secondary">
-                            {r.permissions.map((p) => (
-                              <li key={p} className="flex items-start gap-1">
-                                <span className="text-indigo shrink-0 font-bold">✓</span>
-                                <span>{p}</span>
-                              </li>
-                            ))}
-                          </ul>
                         </div>
                       </div>
                     </div>
@@ -306,47 +338,86 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
               ]}
             />
 
-            <FormField
-              name="password"
-              label="كلمة المرور الجديدة"
-              hint="8 خانات على الأقل. أبلغ الموظف بها بعد الحفظ."
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="off"
-              dir="ltr"
-              className="sm:col-span-2"
-            >
-              <Button type="button" variant="outline" onClick={() => setPassword(suggestPassword())} className="shrink-0">
-                <Sparkles className="size-4" aria-hidden />
-                توليد كلمة مرور
-              </Button>
-            </FormField>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="user-password-input" className="text-label font-medium text-ink">
+                كلمة المرور الجديدة <span className="text-brick">*</span>
+              </label>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <input
+                    id="user-password-input"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    autoComplete="off"
+                    dir="ltr"
+                    className="flex h-11 w-full rounded-control border border-input bg-surface px-3 pe-10 text-base text-ink outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((p) => !p)}
+                    className="absolute end-2.5 top-1/2 -translate-y-1/2 text-secondary hover:text-ink"
+                    tabIndex={-1}
+                    aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+                  >
+                    {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                  </button>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setPassword(suggestPassword());
+                    setShowPassword(true);
+                  }}
+                  className="shrink-0"
+                >
+                  <Sparkles className="size-4" aria-hidden />
+                  توليد كلمة مرور
+                </Button>
+              </div>
+              <p className="text-caption text-secondary">
+                8 خانات على الأقل. أبلغ الموظف بها بعد الحفظ.
+              </p>
+            </div>
 
-            <div className="flex items-center gap-3 pt-2 sm:col-span-2">
-              <Button type="submit" disabled={pending}>
-                {pending ? tCommon("saving") : tCommon("save")}
-              </Button>
-              <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>
-                {tCommon("cancel")}
-              </Button>
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-4 sm:col-span-2 border-t border-line">
+              <div className="flex items-center gap-2">
+                <Button type="submit" disabled={pending} className="min-w-36">
+                  {pending ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin" aria-hidden />
+                      {tCommon("saving")}
+                    </>
+                  ) : selectedEmp?.hasUserAccount ? (
+                    "تحديث الحساب"
+                  ) : (
+                    "حفظ وتفعيل الحساب"
+                  )}
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>
+                  {tCommon("cancel")}
+                </Button>
+              </div>
 
               {state?.ok && (
-                <p role="status" className="inline-flex items-center gap-1.5 text-label text-stamp">
+                <p role="status" className="inline-flex items-center gap-1.5 text-label text-stamp font-medium">
                   <CheckCircle2 className="size-4" aria-hidden />
-                  تم حفظ بيانات الحساب بنجاح
+                  تم حفظ وتفعيل بيانات الحساب بنجاح!
                 </p>
               )}
               {state && !state.ok && (
-                <p role="alert" className="inline-flex items-center gap-1.5 text-label text-brick">
+                <p role="alert" className="inline-flex items-center gap-1.5 text-label text-brick font-medium">
                   <ShieldAlert className="size-4" aria-hidden />
-                  حدث خطأ أثناء حفظ الحساب، تأكد من صحة البيانات.
+                  حدث خطأ أثناء حفظ الحساب، تأكد من صحة البيانات والمحاولة مجدداً.
                 </p>
               )}
             </div>
           </form>
-        </section>
-      )}
+        </DialogContent>
+      </Dialog>
 
       {/* Employees Users Table */}
       <div className="overflow-hidden rounded-card border border-line bg-surface">
@@ -394,10 +465,10 @@ export function UsersManager({ employees, canManage }: UsersManagerProps) {
                   {canManage && emp.role !== "owner" && (
                     <Button
                       type="button"
-                      variant="ghost"
+                      variant={emp.hasUserAccount ? "ghost" : "default"}
                       size="sm"
                       onClick={() => openForEmployee(emp.id)}
-                      className={emp.hasUserAccount ? "text-ink-soft hover:text-ink" : "text-indigo font-semibold"}
+                      className={emp.hasUserAccount ? "text-ink-soft hover:text-ink" : "bg-indigo text-white hover:bg-indigo-hover font-semibold"}
                     >
                       {emp.hasUserAccount ? "تعديل الصلاحية" : "إنشاء حساب"}
                     </Button>

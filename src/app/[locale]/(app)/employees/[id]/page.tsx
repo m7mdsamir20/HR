@@ -1,4 +1,4 @@
-import { ArrowRight, Pencil, Printer, ShieldAlert } from "lucide-react";
+import { ArrowRight, KeyRound, Pencil, Printer, ShieldAlert } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { z } from "zod";
@@ -17,7 +17,7 @@ import { formatAmount } from "@/lib/money";
 import { createClient } from "@/lib/supabase/server";
 
 const EMPLOYEE_COLUMNS =
-  "id, national_id, id_type, iqama_start, iqama_end, full_name_ar, full_name_en, phone, email, employee_number, job_title, occupation, role, status, department_id, manager_id, nationality, gender, birth_date, marital_status, hire_date, employment_type, contract_type, contract_renewal, contract_start, contract_end, probation_days, termination_type, termination_date, termination_reason, created_at, department:departments(name_ar, name_en), manager:manager_id(full_name_ar, full_name_en)";
+  "id, user_id, national_id, id_type, iqama_start, iqama_end, full_name_ar, full_name_en, phone, email, employee_number, job_title, occupation, role, status, department_id, manager_id, nationality, gender, birth_date, marital_status, hire_date, employment_type, contract_type, contract_renewal, contract_start, contract_end, probation_days, termination_type, termination_date, termination_reason, created_at, department:departments(name_ar, name_en), manager:manager_id(full_name_ar, full_name_en)";
 
 export default async function EmployeeViewPage({ params }: PageProps<"/[locale]/employees/[id]">) {
   const { locale: rawLocale, id: rawId } = await params;
@@ -86,6 +86,15 @@ export default async function EmployeeViewPage({ params }: PageProps<"/[locale]/
 
             {canManage && (
               <>
+                {e.role !== "owner" && (
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={`/settings/users?employeeId=${e.id}`}>
+                      <KeyRound className="size-4" aria-hidden />
+                      {e.user_id ? "تعديل الصلاحية" : "إنشاء حساب دخول"}
+                    </Link>
+                  </Button>
+                )}
+
                 <Button asChild variant="default" size="sm">
                   <Link href={`/employees/${e.id}/edit`}>
                     <Pencil className="size-4" aria-hidden />

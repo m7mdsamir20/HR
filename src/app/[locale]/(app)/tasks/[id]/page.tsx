@@ -42,7 +42,7 @@ export default async function TaskPage({ params }: PageProps<"/[locale]/tasks/[i
   const tPdf = await getTranslations({ locale, namespace: "pdf" });
   const status = task.status as TaskStatus;
   const isAssignee = task.assignee_id === member.employee_id;
-  const isReviewer = !isAssignee && (member.role === "owner" || member.role === "manager");
+  const isReviewer = !isAssignee && (member.role === "owner" || member.role === "admin" || member.role === "manager");
   const canEdit = isReviewer && status !== "approved";
   const overdue = isOverdue(status, task.due_date);
   const latest = reports?.[0];

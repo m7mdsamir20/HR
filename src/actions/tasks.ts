@@ -57,7 +57,7 @@ function readTask(formData: FormData) {
 
 export async function createTask(_prev: TaskFormState, formData: FormData): Promise<TaskFormState> {
   const locale = localeSchema.parse(formData.get("uiLocale"));
-  await requireMember(locale, ["owner", "manager"]);
+  await requireMember(locale, ["owner", "admin", "manager"]);
   const { parsed, values, fields } = readTask(formData);
   if (!parsed.success) return { ok: false, error: "invalid", fields, values };
 
@@ -68,7 +68,7 @@ export async function createTask(_prev: TaskFormState, formData: FormData): Prom
 }
 
 export async function updateTask(taskId: string, _prev: TaskFormState, formData: FormData): Promise<TaskFormState> {
-  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "manager"]);
+  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin", "manager"]);
   const id = idSchema.safeParse(taskId);
   const { parsed, values, fields } = readTask(formData);
   if (!id.success) return { ok: false, error: "notFound", values };
@@ -85,7 +85,7 @@ export type TaskActionState = { ok: true } | { ok: false; error: TaskError } | u
 
 export async function deleteTask(taskId: string, _prev: TaskActionState, formData: FormData): Promise<TaskActionState> {
   const locale = localeSchema.parse(formData.get("uiLocale"));
-  await requireMember(locale, ["owner", "manager"]);
+  await requireMember(locale, ["owner", "admin", "manager"]);
   const id = idSchema.safeParse(taskId);
   if (!id.success) return { ok: false, error: "notFound" };
   const supabase = await createClient();
@@ -196,7 +196,7 @@ export async function submitReport(taskId: string, _prev: ReportState, formData:
 }
 
 export async function reviewTask(taskId: string, _prev: ReportState, formData: FormData): Promise<ReportState> {
-  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "manager"]);
+  await requireMember(localeSchema.parse(formData.get("uiLocale")), ["owner", "admin", "manager"]);
   const id = idSchema.safeParse(taskId);
   if (!id.success) return { ok: false, error: "notFound" };
   const parsed = reviewSchema.safeParse({
