@@ -43,7 +43,7 @@ export default async function TasksPage({ params, searchParams }: PageProps<"/[l
     (() => {
       let query = supabase
         .from("tasks")
-        .select("id, title, status, priority, due_date, due_time, assignee_id")
+        .select("id, title, status, priority, due_date, due_time, assignee_id, created_at")
         .order("due_date", { ascending: true })
         .limit(300);
       if (filter === "open") query = query.neq("status", "approved");
@@ -95,6 +95,7 @@ export default async function TasksPage({ params, searchParams }: PageProps<"/[l
     dueDate: r.due_date,
     dueTime: r.due_time,
     assignee: names.get(r.assignee_id) ?? null,
+    createdAt: r.created_at,
   }));
 
   // Group tasks by their actual due date

@@ -66,7 +66,9 @@ export default async function TaskPage({ params }: PageProps<"/[locale]/tasks/[i
             </a>
           </Button>
         </div>
-        <p className="text-secondary">{t("detail.createdBy", { name: names.get(task.created_by) ?? "—" })}</p>
+        <p className="text-secondary">
+          {t("detail.createdBy", { name: names.get(task.created_by) ?? "—" })} · {t("detail.assignedAt")}: {date(task.created_at.slice(0, 10))}
+        </p>
       </div>
 
       <FactsSection
@@ -75,6 +77,7 @@ export default async function TaskPage({ params }: PageProps<"/[locale]/tasks/[i
           { label: t("detail.assignee"), value: names.get(task.assignee_id) ?? "—" },
           ...(assignee?.national_id ? [{ label: te("columns.nationalId"), value: assignee.national_id }] : []),
           ...(assignee?.job_title ? [{ label: te("columns.jobTitle"), value: assignee.job_title }] : []),
+          { label: t("detail.assignedAt"), value: date(task.created_at.slice(0, 10)) },
           {
             label: t("detail.due"),
             value: (

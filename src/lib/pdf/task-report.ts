@@ -80,11 +80,12 @@ export async function buildTaskReportPdf(locale: Locale, member: Member, taskId:
       { label: t("detail.assignee"), value: txt(names.get(task.assignee_id)) },
       { label: te("columns.nationalId"), value: assignee?.national_id ? ltr(assignee.national_id) : "—" },
       { label: te("columns.jobTitle"), value: txt(assignee?.job_title) },
-      { label: t("form.priority"), value: esc(t(`priority.${task.priority}`)) },
+      { label: t("detail.assignedAt"), value: dt(formatDate(locale, task.created_at.slice(0, 10))) },
       {
         label: t("detail.due"),
         value: `${dt(formatDate(locale, task.due_date))}${task.due_time ? ` · ${esc(t("dueAt", { time: formatTimeString(locale, task.due_time) }))}` : ""}${overdue ? ` ${pill("brick", t("overdue"))}` : ""}`,
       },
+      { label: t("form.priority"), value: esc(t(`priority.${task.priority}`)) },
       { label: t("detail.expectedHours"), value: task.expected_hours ? dt(t("detail.hours", { count: Number(task.expected_hours) })) : "—" },
       { label: t("detail.location"), value: txt(task.location) },
       ...(task.description ? [{ label: t("form.description"), value: txt(task.description), wide: true }] : []),

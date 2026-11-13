@@ -695,6 +695,7 @@
     "columns": {
       "title": "المهمة",
       "assignee": "المكلف",
+      "assignedAt": "تاريخ الإسناد",
       "due": "موعد الإنجاز",
       "priority": "الأولوية",
       "status": "الحالة"
@@ -749,6 +750,7 @@
       "back": "المهام",
       "createdBy": "أنشأها {name}",
       "assignee": "المكلف",
+      "assignedAt": "تاريخ الإسناد",
       "due": "موعد الإنجاز",
       "expectedHours": "الساعات المتوقعة",
       "location": "الموقع",

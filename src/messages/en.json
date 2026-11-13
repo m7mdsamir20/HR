@@ -694,6 +694,7 @@
     "columns": {
       "title": "Task",
       "assignee": "Assignee",
+      "assignedAt": "Assigned",
       "due": "Due",
       "priority": "Priority",
       "status": "Status"
@@ -748,6 +749,7 @@
       "back": "Tasks",
       "createdBy": "Created by {name}",
       "assignee": "Assignee",
+      "assignedAt": "Assigned on",
       "due": "Due",
       "expectedHours": "Expected hours",
       "location": "Location",

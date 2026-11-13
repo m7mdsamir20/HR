@@ -14,6 +14,7 @@ export type TaskRow = {
   dueDate: string;
   dueTime: string | null;
   assignee: string | null;
+  createdAt?: string;
 };
 
 /** A task as a card: the side bar carries the status colour (CLAUDE.md §6 layout). */
@@ -31,9 +32,14 @@ export async function TaskCard({ task, locale, showAssignee }: { task: TaskRow; 
         <span className="font-semibold">{task.title}</span>
         <StatusPill tone={statusTone[task.status]}>{t(`status.${task.status}`)}</StatusPill>
       </span>
-      <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-secondary">
+      <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-secondary text-caption">
+        {task.createdAt && (
+          <span className="tabular-nums">
+            {t("detail.assignedAt")}: {formatDate(locale, task.createdAt.slice(0, 10))}
+          </span>
+        )}
         <span className={cn("tabular-nums", overdue && "font-semibold text-brick")}>
-          {overdue && `${t("overdue")} · `}
+          {t("detail.due")}: {overdue && `${t("overdue")} · `}
           {formatDate(locale, task.dueDate)}
           {task.dueTime && ` · ${t("dueAt", { time: formatTimeString(locale, task.dueTime) })}`}
         </span>
